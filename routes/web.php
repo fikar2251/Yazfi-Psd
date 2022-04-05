@@ -264,7 +264,7 @@ Route::middleware('auth')->group(function () {
             //Route Gaji
             Route::get('/gaji', 'FinanceController@gaji')->name('gaji');
             Route::get('/gaji/json', 'FinanceController@ajax_gaji')->name('ajax.gaji');
-            Route::get('/gaji/update/{id}', 'FinanceController@updateReinburst')->name('gaji.update');
+            Route::get('/gaji/update/{id}', 'FinanceController@updateGaji')->name('gaji.update');
         });
 
         // Route Supervisor

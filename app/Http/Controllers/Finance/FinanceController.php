@@ -635,16 +635,24 @@ class FinanceController extends Controller
                         
                         Penggajian::where('id', $gajian->id)->get();
                 
+                        return '<a href="' . route('finance.gaji.update', $gajian->id) . '"class="btn btn-sm btn-secondary"><i class="fa-solid fa-check"></i></a>';
                         
-                        return '<a href="' . route('hrd.gaji.print', $gajian->id) . '"class="btn btn-sm btn-secondary"><i class="fa-solid fa-print"></i></a>
-                         <a href="' . route('hrd.gaji.show', $gajian->id) . '"class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
-                        <a href="' . route('hrd.gaji.edit', $gajian->id) . '"class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square"></i></a> 
-                        <a href="' . route('hrd.gaji.hapus', $gajian->id) . '"   class="delete-form btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>';
                     })
                     ->addIndexColumn()
                     ->rawColumns(['pegawai','action', 'status'])
                     ->make(true);
             }
+        }
+
+        public function updateGaji($id)
+        {
+           
+            $update = Penggajian::find($id);
+            $update->status_penerimaan = 'paid';
+            $update->save();
+          
+            
+            return redirect()->route('finance.gaji')->with('success', 'Status Penerimaan Complete');
         }
 
 }
