@@ -15,4 +15,9 @@ class Refund extends Model
     {
         return $this->belongsTo(PembatalanUnit::class, 'pembatalan_id');
     }
+
+    public function sumber()
+    {
+        return $this->belongsTo(Chart::class, 'sumber_pembayaran');
+    }
 }

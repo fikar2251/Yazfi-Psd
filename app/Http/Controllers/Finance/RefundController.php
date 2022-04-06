@@ -92,9 +92,29 @@ class RefundController extends Controller
 
     public function listRefund()
     {
-        $refund = Refund::orderBy('no_refund', 'desc')->whereIn('status', ['unpaid', 'reject'])->get();
 
-        return view('finance.refund.daftar', compact('refund'));
+        $refund = Refund::orderBy('no_refund', 'desc')->whereIn('status', ['unpaid', 'reject'])->get();
+        if (!$refund) {
+            foreach ($refund as $key) {
+                $status =  Refund::whereIn('id', $key)->get();
+            }
+        
+            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+            
+                # code...
+            return view('finance.refund.daftar', compact('refund','account','status'));
+        }else {
+
+            foreach ($refund as $key) {
+                $status =  Refund::whereIn('id', $key)->get();
+            }
+
+            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+            
+            return view('finance.refund.daftar', compact('refund','account', 'status'));
+        }
+        
+       
     }
     public function refundJson(Request $request)
     {
@@ -132,14 +152,18 @@ class RefundController extends Controller
     {
         $status = $request->get('status');
         $itemid = $request->get('id');
+        $sumber = $request->get('sumber_pembayaran');
+        $tgl = $request->get('tanggal_pembayaran');
+        // dd($tgl);
         $count_status = count($status);
 
         for ($i = 0; $i < $count_status; $i++) {
             $change = Refund::where('id', $itemid[$i])->first();
-
+            
             $change->update([
                 'status' => $status[$i],
-                'tanggal_pembayaran' => $request->tanggal_pembayaran,
+                'tanggal_pembayaran' => $tgl[$i],
+                'sumber_pembayaran' =>$sumber[$i]
             ]);
             $idbatal = $change->pembatalan_id;
 

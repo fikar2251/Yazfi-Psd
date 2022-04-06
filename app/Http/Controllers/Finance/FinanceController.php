@@ -128,7 +128,28 @@ class FinanceController extends Controller
     public function listPayment()
     {
         $bayar = Pembayaran::whereIn('status_approval', ['pending', 'reject'])->orderBy('id', 'desc')->get();
-        return view('finance.payment.daftar', compact('bayar'));
+       
+
+        if (!($bayar)) {
+            foreach ($bayar as $key) {
+                $status =  Pembayaran::whereIn('id', $key)->get();
+            }
+        
+            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+            
+                # code...
+                return view('finance.payment.daftar', compact('bayar','account','status'));
+        }else {
+            foreach ($bayar as $key) {
+                $status =  Pembayaran::whereIn('id', $key)->whereIn('status_approval', ['pending','reject'])->get();
+            }
+            
+
+            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+           
+
+            return view('finance.payment.daftar', compact('bayar','account', 'status'));
+        }
     }
 
     public function storePayment(Request $request)
