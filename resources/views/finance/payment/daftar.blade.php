@@ -151,7 +151,8 @@
                                                                                 <td>
                                                                                     <select name="tujuan[]" id="tujuan"
                                                                                         class="form-control">
-                                                                                        <option value="0">{{$item->bank_tujuan}}
+                                                                                        <option value="0">
+                                                                                            {{ $item->bank_tujuan }}
                                                                                         </option>
                                                                                         @foreach ($account as $item)
                                                                                             @if ($item->nama_bank != '')
@@ -171,8 +172,17 @@
                                                                                 <td>
                                                                                     <select name="status[]" id="status"
                                                                                         class="form-control rincian">
+                                                                                        <?php
+                                                                                        $bayar = App\Pembayaran::orderBy('no_refund', 'desc')
+                                                                                            ->whereIn('status', ['unpaid', 'reject'])
+                                                                                            ->get();
+                                                                                        foreach ($bayar as $key) {
+                                                                                            $status = App\Pembayaran::whereIn('id', $key)->get();
+                                                                                        }
+                                                                                        ?>
                                                                                         @foreach ($status as $item)
-                                                                                            <option selected value="pending">
+                                                                                            <option selected
+                                                                                                value="pending">
                                                                                                 {{ $item->status_approval }}
                                                                                             </option>
                                                                                         @endforeach

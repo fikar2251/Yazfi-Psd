@@ -39,7 +39,7 @@
                                                 @if ($item->tanggal_pembayaran)
                                                     {{ $item->tanggal_pembayaran }}
                                                 @else
-                                                   
+
                                                 @endif
                                             </td> --}}
                                             <td>
@@ -149,23 +149,21 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    {{-- {{$item->sumber->nama_bank}} --}}
                                                                                     <select class="form-control"
                                                                                         name="sumber_pembayaran[]"
                                                                                         id="sumber">
-                                                                                        <option selected 
+                                                                                        <option selected
                                                                                             value="{{ $item->sumber->id_chart_of_account }}">
                                                                                             {{ $item->sumber->nama_bank }}
                                                                                         </option>
                                                                                         @foreach ($account as $item)
-                                                                                            
                                                                                             @if ($item->nama_bank != '')
                                                                                                 <option
                                                                                                     value="{{ $item->id_chart_of_account }}">
                                                                                                     {{ $item->nama_bank }}
-                                                                                                </option @endif>
-                                                                                                
-                                                                                            @endforeach
+                                                                                                </option>
+                                                                                            @endif
+                                                                                        @endforeach
                                                                                     </select>
                                                                                 </td>
                                                                             </tr>
@@ -196,6 +194,14 @@
                                                                                 <td>
                                                                                     <select name="status[]" id="status"
                                                                                         class="form-control rincian">
+                                                                                        <?php
+                                                                                        $refund = App\Refund::orderBy('no_refund', 'desc')
+                                                                                            ->whereIn('status', ['unpaid', 'reject'])
+                                                                                            ->get();
+                                                                                        foreach ($refund as $key) {
+                                                                                            $status = App\Refund::whereIn('id', $key)->get();
+                                                                                        }
+                                                                                        ?>
                                                                                         @foreach ($status as $item)
                                                                                             <option selected value="unpaid">
                                                                                                 {{ $item->status }}

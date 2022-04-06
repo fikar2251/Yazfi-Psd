@@ -11,7 +11,6 @@ use App\Tagihan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Yajra\DataTables\Facades\DataTables;
 
 class RefundController extends Controller
@@ -44,8 +43,7 @@ class RefundController extends Controller
 
             $idbatal = $singlebatal->no_pembatalan;
             $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
-           
-           
+
             $refund = Refund::where('no_pembatalan', $getno)->first();
             if ($refund) {
                 $idbatal1 = $refund->no_pembatalan;
@@ -94,57 +92,40 @@ class RefundController extends Controller
     {
 
         $refund = Refund::orderBy('no_refund', 'desc')->whereIn('status', ['unpaid', 'reject'])->get();
-        if (!$refund) {
-            foreach ($refund as $key) {
-                $status =  Refund::whereIn('id', $key)->get();
-            }
-        
-            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
-            
-                # code...
-            return view('finance.refund.daftar', compact('refund','account','status'));
-        }else {
 
-            foreach ($refund as $key) {
-                $status =  Refund::whereIn('id', $key)->get();
-            }
+        $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
 
-            $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
-            
-            return view('finance.refund.daftar', compact('refund','account', 'status'));
-        }
-        
-       
+        return view('finance.refund.daftar', compact('refund', 'account'));
+
     }
     public function refundJson(Request $request)
     {
         if (request()->ajax()) {
             if (!empty($request->from_date)) {
                 $refund = Refund::orderBy('no_refund', 'desc')->where('status', 'paid')
-                ->whereBetween('tanggal_pembayaran', array($request->from_date, $request->to_date))
-                ->get(); 
-            }else {
+                    ->whereBetween('tanggal_pembayaran', array($request->from_date, $request->to_date))
+                    ->get();
+            } else {
                 $refund = Refund::orderBy('no_refund', 'desc')->where('status', 'paid')->get();
             }
-        
-        
+
             return DataTables::of($refund)
-                    ->editColumn('refund', function($refund){
-                        if ($refund->status == 'unpaid'){
+                ->editColumn('refund', function ($refund) {
+                    if ($refund->status == 'unpaid') {
                         return '<span class="badge badge-danger">' . $refund->status . '</span>';
-                        }elseif ($refund->status == 'paid'){
-                        return '<span class="badge status-green">' . $refund->status. '</span>';
-                        }
-                    })
-                    ->editColumn('konsumen', function($refund){
-                        return $refund->pembatalan->spr->nama;
-                    })
-                    ->editColumn('sales', function($refund){
-                        return $refund->pembatalan->spr->user->name;
-                    })
-                    ->addIndexColumn()
-                    ->rawColumns(['refund', 'konsumen', 'sales'])
-                    ->make(true);
+                    } elseif ($refund->status == 'paid') {
+                        return '<span class="badge status-green">' . $refund->status . '</span>';
+                    }
+                })
+                ->editColumn('konsumen', function ($refund) {
+                    return $refund->pembatalan->spr->nama;
+                })
+                ->editColumn('sales', function ($refund) {
+                    return $refund->pembatalan->spr->user->name;
+                })
+                ->addIndexColumn()
+                ->rawColumns(['refund', 'konsumen', 'sales'])
+                ->make(true);
         }
     }
 
@@ -159,11 +140,11 @@ class RefundController extends Controller
 
         for ($i = 0; $i < $count_status; $i++) {
             $change = Refund::where('id', $itemid[$i])->first();
-            
+
             $change->update([
                 'status' => $status[$i],
                 'tanggal_pembayaran' => $tgl[$i],
-                'sumber_pembayaran' =>$sumber[$i]
+                'sumber_pembayaran' => $sumber[$i],
             ]);
             $idbatal = $change->pembatalan_id;
 
@@ -175,7 +156,7 @@ class RefundController extends Controller
         if ($change->status == 'paid') {
             # code...
             return redirect('finance/refund/list');
-        }else {
+        } else {
             return redirect()->back();
         }
 
