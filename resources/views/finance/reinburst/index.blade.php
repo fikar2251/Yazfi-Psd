@@ -109,7 +109,12 @@
 <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     $(document).ready(function () {
         $('.input-daterange').datepicker({
@@ -117,6 +122,20 @@
             format: 'yyyy-mm-dd',
             autoclose: true
         });
+
+         // INITIALIZE DATEPICKER PLUGIN
+         $('.datepicker').datepicker({
+            clearBtn: true,
+            format: "dd/mm/yyyy"
+        });
+
+
+        // FOR DEMO PURPOSE
+        $('#reservationDate').on('change', function() {
+            var pickedDate = $('input').val();
+            $('#pickedDate').html(pickedDate);
+        });
+        
         $.noConflict();
         $.ajaxSetup({
             headers: {

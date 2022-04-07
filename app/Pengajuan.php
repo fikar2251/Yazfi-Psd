@@ -43,4 +43,9 @@ class Pengajuan extends Model
     {
         return $this->belongsTo(User::class, 'id_jabatans');
     }
+
+    public function rincianPengajuan()
+    {
+        return $this->hasOne(RincianPengajuan::class, 'nomor_pengajuan');
+    }
 }

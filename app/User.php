@@ -89,4 +89,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(TeamSales::class);
     }
 
+    public function gaji()
+    {
+        return $this->hasMany(Penggajian::class, 'pegawai_id');
+    }
+
 }

@@ -7,6 +7,7 @@ use App\Pembayaran;
 use App\Pengajuan;
 use App\Penggajian;
 use App\Reinburst;
+use App\RincianPengajuan;
 use App\Rumah;
 use App\Spr;
 use App\Tagihan;
@@ -97,7 +98,9 @@ class FinanceController extends Controller
     public function listKomisi(Request $request)
     {
         $komisi = Komisi::orderBy('id', 'desc')->whereIn('status_pembayaran', ['unpaid', 'reject'])->get();
-        return view('finance.komisi.daftar', compact('komisi'));
+        $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+
+        return view('finance.komisi.daftar', compact('komisi', 'account'));
     }
 
     public function storeKomisi(Request $request)
@@ -188,67 +191,78 @@ class FinanceController extends Controller
 
     }
 
-    public function ubahStatus($id)
+    public function ubahStatus(Request $request,$id)
     {
         $bayar = Pembayaran::find($id);
-        $bayar->status_approval = 'paid';
-        $bayar->save();
+        // $bayar->status_approval = 'paid';
+        // $bayar->save();
+        $bayar->update([
+            'status_approval' => $request->status
+        ]);
+        if ($bayar->status_approval == 'paid') {
+            $bayar = Pembayaran::select('nominal', 'rincian_id')->where('id', $id)->first();
+                
+            $where = [
+                            
+                'id_rincian' => $bayar->rincian_id,
+            ];
+                
+            $tagihan = Tagihan::where($where)->first();
+                
+            $rincianid = $bayar->rincian_id;
+            $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
+            $sum = (int) $bayar1;
+                
+            if ($bayar->nominal == $tagihan->jumlah_tagihan) {
+                $tagihan->status_pembayaran = 'paid';
+            } elseif ($bayar->nominal < $tagihan->jumlah_tagihan && $sum < $tagihan->jumlah_tagihan) {
+                $tagihan->status_pembayaran = 'partial';
+            } elseif ($sum == $tagihan->jumlah_tagihan) {
+                $tagihan->status_pembayaran = 'paid';
+            }
+            $tagihan->save();
+                    
+            $spr = $tagihan->id_spr;
+            $spr1 = Spr::where('id_transaksi', $spr)->first();
+            if ($tagihan->tipe == 1) {
+                $spr1->status_booking = 'paid';
+            } elseif ($tagihan->tipe == 2) {
+                $spr1->status_dp = 'paid';
+            }
+            $spr1->save();
+                    
+            $unit = $spr1->id_unit;
+            $rumah = Rumah::where('id_unit_rumah', $unit)->first();
+            $rumah->status_penjualan = 'Sold';
+            $rumah->save();  
 
-        $bayar = Pembayaran::select('nominal', 'rincian_id')
-            ->where('id', $id)->first();
-
-        $where = [
-            // 'nominal' => $bayar->nominal,
-            'id_rincian' => $bayar->rincian_id,
-        ];
-
-        $tagihan = Tagihan::where($where)->first();
-
-        $rincianid = $bayar->rincian_id;
-        $nominal = $bayar->nominal;
-        $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
-        $sum = (int) $bayar1;
-
-        if ($bayar->nominal == $tagihan->jumlah_tagihan) {
-            $tagihan->status_pembayaran = 'paid';
-        } elseif ($bayar->nominal < $tagihan->jumlah_tagihan && $sum < $tagihan->jumlah_tagihan) {
-            $tagihan->status_pembayaran = 'partial';
-        } elseif ($sum == $tagihan->jumlah_tagihan) {
-            $tagihan->status_pembayaran = 'paid';
+            return redirect('/finance/payment');
+        }else {
+            return redirect()->back();
         }
-        $tagihan->save();
-
-        $spr = $tagihan->id_spr;
-        $spr1 = Spr::where('id_transaksi', $spr)->first();
-        if ($tagihan->tipe == 1) {
-            $spr1->status_booking = 'paid';
-        } elseif ($tagihan->tipe == 2) {
-            $spr1->status_dp = 'paid';
-        }
-        $spr1->save();
-
-        $unit = $spr1->id_unit;
-        $rumah = Rumah::where('id_unit_rumah', $unit)->first();
-        $rumah->status_penjualan = 'Sold';
-        $rumah->save();
-
-        return redirect()->back();
     }
 
-    public function updateKomisi($id)
+    public function updateKomisi(Request $request, $id)
     {
-        $tglBayar = Carbon::now()->format('d-m-Y');
+        // $tgl = Carbon::parse($request->tanggal_pembayaran)->format('d/m/Y');
         $komisi = Komisi::find($id);
-        $komisi->status_pembayaran = 'paid';
-        $komisi->tanggal_pembayaran = $tglBayar;
-        $komisi->save();
-
-        return redirect()->back();
+        $komisi->update([
+            'status_pembayaran' => $request->status,
+            'tanggal_pembayaran' => $request->tanggal_pembayaran
+        ]);
+        if ($komisi->status_pembayaran == 'paid') {
+            return redirect('/finance/komisi');
+        }else {
+            return redirect()->back();
+        }
+        // $komisi->status_pembayaran = 'paid';
+        // $komisi->tanggal_pembayaran = $tglBayar;
+        // $komisi->save();       
     }
 
     public function tukarFaktur()
     {
-
+     
         return view('finance.tukar-faktur.index');
     }
 
@@ -256,8 +270,8 @@ class FinanceController extends Controller
     {
         if (request()->ajax()) {
             if (!empty($request->from)) {
-                $tukar = DB::table('tukar_fakturs')
-                    ->whereBetween('tanggal_tukar_faktur', array($request->from, $request->to))
+                $tukar = TukarFaktur::
+                    whereBetween('tanggal_tukar_faktur', array($request->from, $request->to))
                 // ->where('id_user',auth()->user()->id)
                     ->groupBy('tukar_fakturs.no_faktur')
                     ->orderBy('tukar_fakturs.id', 'desc')
@@ -265,9 +279,9 @@ class FinanceController extends Controller
 
             } else {
 
-                $tukar = DB::table('tukar_fakturs')
+                $tukar = TukarFaktur::
                 // ->where('id_user',auth()->user()->id)
-                    ->groupBy('tukar_fakturs.no_faktur')
+                    groupBy('tukar_fakturs.no_faktur')
                     ->orderBy('tukar_fakturs.id', 'desc')
                     ->get();
                 // dd($tukar);
@@ -313,8 +327,118 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($tukars) {
 
                     TukarFaktur::where('id', $tukars->id)->get();
+                    $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
 
-                    return '<a href="' . route('finance.tukar.update', $tukars->id) . '"   class="delete-form btn btn-sm btn-warning"><i class="fa-solid fa-pencil"></i></a>';
+                    // return '<a href="' . route('finance.tukar.update', $tukars->id) . '"   class="delete-form btn btn-sm btn-warning"><i class="fa-solid fa-pencil"></i></a>';
+                    $options = '';
+                    foreach ($account as $key) {
+                        if ($key->nama_bank != '') {
+                            
+                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+                        }
+                    }
+
+                    $stats = '';
+                   
+
+                    $stats .= '<option value="'.$tukars->id.'">'.$tukars->status_pembayaran.'</option>';
+
+                    $currency = '';
+                    $currency = number_format($tukars->nilai_invoice);
+
+                    $tgl = Carbon::parse($tukars->tanggal_tukar_faktur)->format('d/m/Y');
+                    
+                    return ' <form action="' . route('finance.tukar.update', $tukars->id) . '" method="POST">
+                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <!-- Button trigger modal -->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal' . $tukars->id . '">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal' . $tukars->id . '" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                        <div class="modal-dialog " style="max-width: 650px">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="exampleModalLabel">
+                                        ' . $tukars->no_faktur . '</h4>
+                                    <button type="button" class="close"
+                                        data-dismiss="modal" aria-label="Close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered custom-table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 200px">Tanggal Pengajuan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        
+                                                        ' .$tgl.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Total Pembayaran 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                      Rp '. $currency.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Supplier 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        '.$tukars->supplier->nama.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Sumber Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        <select class="form-control"
+                                                            name="sumber_pembayaran" id="sumber">
+                                                        '.$options.'
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                               
+                                                <tr>
+                                                    <td style="width: 200px">Status Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        <select name="status" id="status"
+                                                            class="form-control rincian">
+                                                            
+                                                            '.$stats.'
+                                                            <option value="completed">completed</option>
+                                                            <option value="reject">reject
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" class="btn btn-secondary">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>';
 
                 })
                 ->addIndexColumn()
@@ -330,7 +454,7 @@ class FinanceController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $tukar_fakturs = TukarFaktur::where('id', $id)->get();
 
@@ -342,7 +466,7 @@ class FinanceController extends Controller
 
             // dd($penerimaan);
             DB::table('tukar_fakturs')->whereIn('no_faktur', $penerimaan)->update(array(
-                'status_pembayaran' => 'completed'));
+                'status_pembayaran' => $request->status));
 
             // $tukar->delete();
 
@@ -433,7 +557,98 @@ class FinanceController extends Controller
 
                     Pengajuan::where('id', $data->id)->get();
 
-                    return '<a href="' . route('finance.pengajuan.update', $data->id) . '"   class=" delete-form btn btn-sm btn-warning"><i class="fa fa-check"></i></a>';
+                    // return '<a href="' . route('finance.pengajuan.update', $data->id) . '"   class=" delete-form btn btn-sm btn-warning"><i class="fa fa-check"></i></a>';
+
+                    $stats = '';
+                   
+
+                    $stats .= '<option value="'.$data->id.'">'.$data->status_approval.'</option>'; 
+
+                    $tgl = Carbon::parse($data->tanggal_pengajuan)->format('d/m/Y');
+
+                    $currency = number_format($data->grandtotal);
+
+                    return ' <form action="' . route('finance.pengajuan.update', $data->id) . '" method="POST">
+                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <!-- Button trigger modal -->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal' . $data->id . '">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal' . $data->id . '" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                        <div class="modal-dialog " style="max-width: 650px">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="exampleModalLabel">
+                                        ' . $data->nomor_pengajuan . '</h4>
+                                    <button type="button" class="close"
+                                        data-dismiss="modal" aria-label="Close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered custom-table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 200px">Tanggal Pengajuan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        
+                                                        ' .$tgl.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Total Pengajuan 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                      Rp '. $currency.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Karyawan 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        '.$data->admin->name.'
+                                                    </td>
+                                                </tr>
+                                               
+                                               
+                                                <tr>
+                                                    <td style="width: 200px">Status Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        <select name="status" id="status"
+                                                            class="form-control rincian">
+                                                            
+                                                            '.$stats.'
+                                                            <option value="completed">completed</option>
+                                                            <option value="reject">reject
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" class="btn btn-secondary">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>';
                 })
                 ->addIndexColumn()
                 ->rawColumns(['no_pengajuan', 'status', 'action'])
@@ -441,12 +656,16 @@ class FinanceController extends Controller
         }
     }
 
-    public function updatePengajuan($id)
+    public function updatePengajuan(Request $request, $id)
     {
 
         $update = Pengajuan::find($id);
-        $update->status_approval = 'completed';
-        $update->save();
+        // $update->status_approval = 'completed';
+        // $update->save();
+
+        $update->update([
+            'status_approval' => $request->status,
+        ]);
 
         return redirect()->route('finance.pengajuan')->with('success', 'Status Approval Complete');
     }
@@ -540,8 +759,140 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($reinburst) {
 
                     Reinburst::where('id', $reinburst->id)->get();
-                    $button = '<a href="' . route('finance.reinburst.update', $reinburst->id) . '"  class="custom-badge status-green"><i class="fa-solid fa-check-to-slot"></i></a>';
-                    return $button;
+                    $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+                    $options = '';
+                    foreach ($account as $key) {
+                        if ($key->nama_bank != '') {
+                            
+                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+                        }
+                    }
+                   
+
+                    $stats = '';
+                   
+
+                    $stats .= '<option value="'.$reinburst->id.'">'.$reinburst->status_pembayaran.'</option>'; 
+
+                    $tgl = Carbon::parse($reinburst->tanggal_reinburst)->format('d/m/Y');
+
+                    $currency = number_format($reinburst->total);
+
+                    return ' <form action="' . route('finance.reinburst.update', $reinburst->id) . '" method="POST">
+                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <!-- Button trigger modal -->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal' . $reinburst->id . '">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal' . $reinburst->id . '" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                        <div class="modal-dialog " style="max-width: 650px">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="exampleModalLabel">
+                                        ' . $reinburst->nomor_reinburst . '</h4>
+                                    <button type="button" class="close"
+                                        data-dismiss="modal" aria-label="Close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered custom-table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 200px">Tanggal Pengajuan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        
+                                                        '.$tgl.'
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">No Reinburst 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                      '.$reinburst->nomor_reinburst.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Total Reinburst 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                       Rp '.$currency.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Karyawan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        '.$reinburst->admin->name.'
+                                                    </td>
+                                                </tr>
+                                               
+                                               
+                                                <tr>
+                                                    <td style="width: 200px">Sumber Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                    <select class="form-control"
+                                                    name="sumber_pembayaran" id="sumber">
+                                                            '.$options.'
+                                                     </select>
+                                                    </td>
+                                                </tr>
+                                               
+                                                <tr>
+                                                <td style="width: 200px">Tanggal Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                    
+                                                        
+
+                                                    <input class="form-control" type="date" name="tanggal_pembayaran">
+
+                                                    
+                                                    </td>
+                                                </tr>
+                                                
+
+                                                <tr>
+                                                    <td style="width: 200px">Status
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        <select name="status" id="status"
+                                                            class="form-control rincian">
+                                                            
+                                                            '.$stats.'
+                                                            <option value="completed">completed</option>
+                                                            <option value="reject">reject
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" class="btn btn-secondary">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>';
                 })
                 ->addIndexColumn()
                 ->rawColumns(['no_reinburst', 'pembelian', 'status_hrd', 'status_pembayaran', 'action'])
@@ -550,12 +901,16 @@ class FinanceController extends Controller
 
     }
 
-    public function updateReinburst($id)
+    public function updateReinburst(Request $request, $id)
     {
 
         $update = Reinburst::find($id);
-        $update->status_pembayaran = 'completed';
-        $update->save();
+        // $update->status_pembayaran = 'completed';
+        // $update->save();
+
+        $update->update([
+            'status_pembayaran' => $request->status
+        ]);
 
         return redirect()->route('finance.reinburst')->with('success', 'Status Pembayaran Complete');
     }
@@ -623,7 +978,122 @@ class FinanceController extends Controller
 
                     Penggajian::where('id', $gajian->id)->get();
 
-                    return '<a href="' . route('finance.gaji.update', $gajian->id) . '"class="btn btn-sm btn-secondary"><i class="fa-solid fa-check"></i></a>';
+                    $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+                    $options = '';
+                    foreach ($account as $key) {
+                        if ($key->nama_bank != '') {
+                            
+                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+                        }
+                    }
+                   
+
+                    $stats = '';
+                   
+
+                    $stats .= '<option value="'.$gajian->id.'">'.$gajian->status_penerimaan.'</option>'; 
+
+                    $tgl = Carbon::parse($gajian->tanggal)->format('d/m/Y');
+
+                    $currency = number_format($gajian->gaji_pokok + (($gajian->penerimaan->sum('nominal') - $gajian->gaji_pokok) - $gajian->potongan->sum('nominal')));
+
+                    return ' <form action="' . route('finance.gaji.update', $gajian->id) . '" method="POST">
+                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <!-- Button trigger modal -->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#exampleModal' . $gajian->id . '">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal' . $gajian->id . '" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                        <div class="modal-dialog " style="max-width: 650px">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="exampleModalLabel">
+                                        ' . $gajian->pegawai->name . '</h4>
+                                    <button type="button" class="close"
+                                        data-dismiss="modal" aria-label="Close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered custom-table table-striped">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 200px">Tanggal Pengajuan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        
+                                                        '.$tgl.'
+                                                </tr>
+                                               
+                                                <tr>
+                                                    <td style="width: 200px">Total Pembayaran Gaji 
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                       Rp '.$currency.'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width: 200px">Karyawan
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        '.$gajian->pegawai->name.'
+                                                    </td>
+                                                </tr>
+                                               
+                                               
+                                                <tr>
+                                                    <td style="width: 200px">Sumber Pembayaran
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                    <select class="form-control"
+                                                    name="sumber_pembayaran" id="sumber">
+                                                            '.$options.'
+                                                     </select>
+                                                    </td>
+                                                </tr>
+                                               
+                                                <tr>
+                                               
+                                                
+
+                                                <tr>
+                                                    <td style="width: 200px">Status
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                        <select name="status" id="status"
+                                                            class="form-control rincian">
+                                                            
+                                                            '.$stats.'
+                                                            <option value="paid">paid</option>
+                                                            <option value="reject">reject
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="reset" class="btn btn-secondary">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>';
 
                 })
                 ->addIndexColumn()
@@ -632,12 +1102,15 @@ class FinanceController extends Controller
         }
     }
 
-    public function updateGaji($id)
+    public function updateGaji(Request $request, $id)
     {
 
         $update = Penggajian::find($id);
-        $update->status_penerimaan = 'paid';
-        $update->save();
+        // $update->status_penerimaan = 'paid';
+        // $update->save();
+        $update->update([
+            'status_penerimaan' => $request->status
+        ]);
 
         return redirect()->route('finance.gaji')->with('success', 'Status Penerimaan Complete');
     }

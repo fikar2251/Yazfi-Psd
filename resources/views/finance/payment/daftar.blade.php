@@ -6,64 +6,64 @@
         </div>
     </div>
 
-    <form action="{{ route('finance.store.payment') }}" method="POST">
-        @csrf
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered custom-table table-striped">
-                                <thead>
+    {{-- <form action="{{ route('finance.payment.status', $item->id) }}" method="POST"> --}}
+    @csrf
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered custom-table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; width: 5%">No</th>
+                                    <th style="width: 10%">No Transaksi</th>
+                                    <th style="width: 16%">Tanggal pembayaran</th>
+                                    <th style="width: 15%">Tipe</th>
+                                    <th style="width: 13%">Nominal</th>
+                                    <th style="width: 10%">Status</th>
+                                    <th style="width: 12%">Bank tujuan</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($bayar as $item)
                                     <tr>
-                                        <th style="text-align: center; width: 5%">No</th>
-                                        <th style="width: 10%">No Transaksi</th>
-                                        <th style="width: 16%">Tanggal pembayaran</th>
-                                        <th style="width: 15%">Tipe</th>
-                                        <th style="width: 13%">Nominal</th>
-                                        <th style="width: 10%">Status</th>
-                                        <th style="width: 12%">Bank tujuan</th>
-                                        <th style="width: 10%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($bayar as $item)
-                                        <tr>
-                                            <td style="text-align: center">{{ $loop->iteration }} <input type="hidden"
-                                                    name="id[]" value="{{ $item->id }}"></td>
-                                            <td>{{ $item->no_detail_transaksi }} <input type="hidden" name="no_transaksi"
-                                                    value="{{ $item->no_detail_transaksi }}"></td>
-                                            <td>{{ $item->tanggal_pembayaran }}</td>
-                                            <td>
-                                                {{ $item->rincian->keterangan }}
-                                            </td>
-                                            <td>
-                                                @currency($item->nominal)
-                                            </td>
-                                            <td>
-                                                @if ($item->status_approval == 'pending')
-                                                    <span
-                                                        class="custom-badge status-red">{{ $item->status_approval }}</span>
-                                                @elseif ($item->status_approval == 'paid')
-                                                    <span
-                                                        class="custom-badge status-green">{{ $item->status_approval }}</span>
-                                                @elseif ($item->status_approval == 'reject')
-                                                    <span
-                                                        class="custom-badge status-orange">{{ $item->status_approval }}</span>
-                                                @endif
+                                        <td style="text-align: center">{{ $loop->iteration }} <input type="hidden"
+                                                name="id[]" value="{{ $item->id }}"></td>
+                                        <td>{{ $item->no_detail_transaksi }} <input type="hidden" name="no_transaksi"
+                                                value="{{ $item->no_detail_transaksi }}"></td>
+                                        <td>{{ $item->tanggal_pembayaran }}</td>
+                                        <td>
+                                            {{ $item->rincian->keterangan }}
+                                        </td>
+                                        <td>
+                                            @currency($item->nominal)
+                                        </td>
+                                        <td>
+                                            @if ($item->status_approval == 'pending')
+                                                <span class="custom-badge status-red">{{ $item->status_approval }}</span>
+                                            @elseif ($item->status_approval == 'paid')
+                                                <span
+                                                    class="custom-badge status-green">{{ $item->status_approval }}</span>
+                                            @elseif ($item->status_approval == 'reject')
+                                                <span
+                                                    class="custom-badge status-orange">{{ $item->status_approval }}</span>
+                                            @endif
 
-                                            </td>
-                                            <td style="width: 110px" class="text-center">
-                                                @if ($item->bank_tujuan == 'Bri')
-                                                    BRI
-                                                @elseif ($item->bank_tujuan == 'Bca')
-                                                    BCA
-                                                @else
-                                                    Mandiri
-                                                @endif
-                                            </td>
-                                            <td>
-
+                                        </td>
+                                        <td style="width: 110px" class="text-center">
+                                            @if ($item->bank_tujuan == 'Bri')
+                                                BRI
+                                            @elseif ($item->bank_tujuan == 'Bca')
+                                                BCA
+                                            @else
+                                                Mandiri
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('finance.payment.status', $item->id) }}" method="POST">
+                                                @csrf
                                                 <!-- Button trigger modal -->
                                                 <div class="text-center">
                                                     <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -108,6 +108,7 @@
                                                                                                 class="glyphicon glyphicon-th"></span>
                                                                                         </div>
                                                                                     </div>
+                                                                                    
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -149,7 +150,7 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <select name="tujuan[]" id="tujuan"
+                                                                                    <select name="tujuan" id="tujuan"
                                                                                         class="form-control">
                                                                                         <option value="0">
                                                                                             {{ $item->bank_tujuan }}
@@ -170,17 +171,17 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <select name="status[]" id="status"
+                                                                                    <select name="status" id="status"
                                                                                         class="form-control rincian">
                                                                                         <?php
-                                                                                        $bayar = App\Pembayaran::orderBy('no_refund', 'desc')
-                                                                                            ->whereIn('status', ['unpaid', 'reject'])
+                                                                                        $bayar = App\Pembayaran::orderBy('id', 'desc')
+                                                                                            ->whereIn('status_approval', ['pending', 'reject'])
                                                                                             ->get();
-                                                                                        foreach ($bayar as $key) {
-                                                                                            $status = App\Pembayaran::whereIn('id', $key)->get();
-                                                                                        }
+                                                                                        // foreach ($bayar as $key) {
+                                                                                        //     $status = App\Pembayaran::whereIn('id', $key)->get();
+                                                                                        // }
                                                                                         ?>
-                                                                                        @foreach ($status as $item)
+                                                                                        @foreach ($bayar as $item)
                                                                                             <option selected
                                                                                                 value="pending">
                                                                                                 {{ $item->status_approval }}
@@ -201,29 +202,33 @@
                                                             <div class="modal-footer">
                                                                 <button type="reset"
                                                                     class="btn btn-secondary">Batal</button>
-                                                                <button type="button" class="btn btn-primary"
-                                                                    data-dismiss="modal">Simpan</button>
+                                                                {{-- <a href="{{ route('finance.payment.status', $item->id) }}"
+                                                                    class="btn btn-primary">
+                                                                    Simpan
+                                                                </a> --}}
+                                                                <button type="submit"
+                                                                    class="btn btn-primary">Simpan</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
 
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-                                </tbody>
-                            </table>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="m-t-20 text-center">
-            <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
-                Save</button>
-        </div>
-    </form>
+    </div>
+    <div class="m-t-20 text-center">
+        <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
+            Save</button>
+    </div>
+    {{-- </form> --}}
     <script>
         $(document).ready(function() {
             $("#exampleModal").on("hidden.bs.modal", function(e) {

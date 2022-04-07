@@ -23,7 +23,7 @@ class Penggajian extends Model
     }
     public function pegawai()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'pegawai_id');
     }
     public function jabatan()
     {

@@ -7,66 +7,68 @@
         </div>
     </div>
 
-    <form action="{{ route('finance.store.list.refund') }}" method="POST">
-        @csrf
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered custom-table table-striped">
-                                <thead>
+    {{-- <form action="{{ route('finance.store.list.refund') }}" method="POST"> --}}
+    @csrf
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered custom-table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tanggal Pengajuan</th>
+                                    {{-- <th>Tanggal Pembayaran</th> --}}
+                                    <th>No Refund</th>
+                                    <th>No Pembatalan</th>
+                                    <th>Konsumen</th>
+                                    <th>Sales</th>
+                                    <th>Total refund</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($refund as $item)
                                     <tr>
-                                        <th>No</th>
-                                        <th>Tanggal Pengajuan</th>
-                                        {{-- <th>Tanggal Pembayaran</th> --}}
-                                        <th>No Refund</th>
-                                        <th>No Pembatalan</th>
-                                        <th>Konsumen</th>
-                                        <th>Sales</th>
-                                        <th>Total refund</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($refund as $item)
-                                        <tr>
-                                            <td> {{ $loop->iteration }} <input type="hidden" name="id[]"
-                                                    value="{{ $item->id }}"> </td>
-                                            <td>{{ $item->tanggal_refund }}</td>
-                                            {{-- <td>
+                                        <td> {{ $loop->iteration }} <input type="hidden" name="id[]"
+                                                value="{{ $item->id }}"> </td>
+                                        <td>{{ $item->tanggal_refund }}</td>
+                                        {{-- <td>
                                                 @if ($item->tanggal_pembayaran)
                                                     {{ $item->tanggal_pembayaran }}
                                                 @else
 
                                                 @endif
                                             </td> --}}
-                                            <td>
-                                                {{ $item->no_refund }}
-                                            </td>
-                                            <td>
-                                                {{ $item->no_pembatalan }}
-                                            </td>
-                                            <td>
-                                                {{ $item->pembatalan->spr->nama }}
-                                            </td>
-                                            <td>
-                                                {{ $item->pembatalan->spr->user->name }}
-                                            </td>
-                                            <td>
-                                                {{ $item->total_refund }}
-                                            </td>
-                                            <td>
-                                                @if ($item->status == 'unpaid')
-                                                    <span class="custom-badge status-red">{{ $item->status }}</span>
-                                                @elseif ($item->status == 'paid')
-                                                    <span class="custom-badge status-green">{{ $item->status }}</span>
-                                                @elseif ($item->status == 'reject')
-                                                    <span class="custom-badge status-orange">{{ $item->status }}</span>
-                                                @endif
-                                            </td>
-                                            <td>
+                                        <td>
+                                            {{ $item->no_refund }}
+                                        </td>
+                                        <td>
+                                            {{ $item->no_pembatalan }}
+                                        </td>
+                                        <td>
+                                            {{ $item->pembatalan->spr->nama }}
+                                        </td>
+                                        <td>
+                                            {{ $item->pembatalan->spr->user->name }}
+                                        </td>
+                                        <td>
+                                            {{ $item->total_refund }}
+                                        </td>
+                                        <td>
+                                            @if ($item->status == 'unpaid')
+                                                <span class="custom-badge status-red">{{ $item->status }}</span>
+                                            @elseif ($item->status == 'paid')
+                                                <span class="custom-badge status-green">{{ $item->status }}</span>
+                                            @elseif ($item->status == 'reject')
+                                                <span class="custom-badge status-orange">{{ $item->status }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <form action="{{ route('finance.refund.update', $item->id) }}" method="POST">
+                                                @csrf
                                                 <!-- Button trigger modal -->
                                                 <div class="text-center">
                                                     <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -150,7 +152,7 @@
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
                                                                                     <select class="form-control"
-                                                                                        name="sumber_pembayaran[]"
+                                                                                        name="sumber_pembayaran"
                                                                                         id="sumber">
                                                                                         <option selected
                                                                                             value="{{ $item->sumber->id_chart_of_account }}">
@@ -172,19 +174,20 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <div style="width: 200px"
+                                                                                    {{-- <div style="width: 200px"
                                                                                         class="input-group date"
                                                                                         data-provide="datepicker"
                                                                                         data-date-format="dd/mm/yyyy">
                                                                                         <input type="text"
                                                                                             class="form-control"
-                                                                                            name="tanggal_pembayaran[]"
+                                                                                            name="tanggal_pembayaran"
                                                                                             value="">
                                                                                         <div class="input-group-addon">
                                                                                             <span
                                                                                                 class="glyphicon glyphicon-th"></span>
                                                                                         </div>
-                                                                                    </div>
+                                                                                    </div> --}}
+                                                                                    <input type="date" class="form-control" name="tanggal_pembayaran">
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -192,7 +195,7 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <select name="status[]" id="status"
+                                                                                    <select name="status" id="status"
                                                                                         class="form-control rincian">
                                                                                         <?php
                                                                                         $refund = App\Refund::orderBy('no_refund', 'desc')
@@ -221,28 +224,29 @@
                                                             <div class="modal-footer">
                                                                 <button type="reset"
                                                                     class="btn btn-secondary">Batal</button>
-                                                                <button type="button" class="btn btn-primary"
-                                                                    data-dismiss="modal">Simpan</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary">Simpan</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
 
-                                </tbody>
-                            </table>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="m-t-20 text-center">
-            <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
-                Save</button>
-        </div>
-    </form>
+    </div>
+    <div class="m-t-20 text-center">
+        <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
+            Save</button>
+    </div>
+    {{-- </form> --}}
     <script>
         var date = new Date();
         var year = date.getFullYear();

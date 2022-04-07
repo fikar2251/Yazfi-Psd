@@ -223,7 +223,7 @@ Route::middleware('auth')->group(function () {
 
             // Route Payment
             Route::get('/payment', 'FinanceController@index')->name('payment');
-            Route::get('/payment/updatestatus/{id}', 'FinanceController@ubahStatus')->name('payment.status');
+            Route::post('/payment/updatestatus/{id}', 'FinanceController@ubahStatus')->name('payment.status');
             Route::get('/payment/json', 'FinanceController@paymentJson')->name('payment.json');
 
             // Route Daftar Pembayaran
@@ -234,14 +234,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/refund', 'RefundController@index')->name('refund');
             Route::post('refund/store', 'RefundController@storeRefund')->name('refund.store');
             Route::get('refund/list', 'RefundController@list')->name('refund.list');
-            Route::get('refund/update/{id}', 'RefundController@updateStatus')->name('refund.update');
+            Route::post('refund/update/{id}', 'RefundController@updateStatus')->name('refund.update');
             Route::get('refund/daftar', 'RefundController@listRefund')->name('daftar.refund');
             Route::get('refund/json', 'RefundController@refundJson')->name('json.refund');
             Route::post('refund/daftar/store', 'RefundController@storeListRefund')->name('store.list.refund');
 
             //Route Komisi
             Route::get('/komisi', 'FinanceController@komisiFinance')->name('komisi');
-            Route::get('/komisi/update/{id}', 'FinanceController@updateKomisi')->name('updatekomisi');
+            Route::post('/komisi/update/{id}', 'FinanceController@updateKomisi')->name('updatekomisi');
             Route::get('/komisi/daftar', 'FinanceController@listKomisi')->name('list.komisi');
             Route::get('/komisi/json', 'FinanceController@komisiJson')->name('json.komisi');
             Route::post('/komisi/daftar/store', 'FinanceController@storeKomisi')->name('store.list.komisi');
@@ -249,22 +249,22 @@ Route::middleware('auth')->group(function () {
             //Route Tukar Faktur
             Route::get('/tukar', 'FinanceController@tukarFaktur')->name('tukar');
             Route::get('/tukar/json', 'FinanceController@ajax_faktur')->name('ajax.faktur');
-            Route::get('/tukar/update/{id}', 'FinanceController@destroy')->name('tukar.update');
+            Route::post('/tukar/update/{id}', 'FinanceController@destroy')->name('tukar.update');
             
             //Route Pengajuan
             Route::get('/pengajuan', 'FinanceController@pengajuan')->name('pengajuan');
             Route::get('/pengajuan/json', 'FinanceController@ajax_pengajuan')->name('ajax.pengajuan');
-            Route::get('/pengajuan/update/{id}', 'FinanceController@updatePengajuan')->name('pengajuan.update');
+            Route::post('/pengajuan/update/{id}', 'FinanceController@updatePengajuan')->name('pengajuan.update');
             
             //Route Reinburst
             Route::get('/reinburst', 'FinanceController@reinburst')->name('reinburst');
             Route::get('/reinburst/json', 'FinanceController@ajax_rekap_reinburst')->name('ajax.reinburst');
-            Route::get('/reinburst/update/{id}', 'FinanceController@updateReinburst')->name('reinburst.update');
+            Route::post('/reinburst/update/{id}', 'FinanceController@updateReinburst')->name('reinburst.update');
             
             //Route Gaji
             Route::get('/gaji', 'FinanceController@gaji')->name('gaji');
             Route::get('/gaji/json', 'FinanceController@ajax_gaji')->name('ajax.gaji');
-            Route::get('/gaji/update/{id}', 'FinanceController@updateGaji')->name('gaji.update');
+            Route::post('/gaji/update/{id}', 'FinanceController@updateGaji')->name('gaji.update');
         });
 
         // Route Supervisor

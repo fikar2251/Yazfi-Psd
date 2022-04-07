@@ -9,7 +9,7 @@ class RincianPengajuan extends Model
     protected $guarded = ['id'];
     public function pengajuan()
     {
-        return $this->belongsTo(Pengajuan::class, 'id');
+        return $this->belongsTo(Pengajuan::class, 'nomor_pengajuan');
     }
     public function barang()
     {

@@ -162,19 +162,29 @@ class RefundController extends Controller
 
     }
 
-    public function updateStatus($id)
+    public function updateStatus(Request $request, $id)
     {
         $refund = Refund::find($id);
-        $refund->status = 'paid';
-        $refund->save();
+        // $refund->status = 'paid';
+        // $refund->save();
+        $tgl = Carbon::parse($request->tanggal_pembayaran)->format('d/m/Y');
+        $refund->update([
+            'status' => $request->status,
+            'sumber_pembayaran' => $request->sumber_pembayaran,
+            'tanggal_pembayaran' => $tgl
+        ]);
+        if ($refund->status == 'paid') {
+            
+            $idbatal = $refund->pembatalan_id;
+    
+            $batal = PembatalanUnit::where('id', $idbatal)->first();
+            $batal->refund = 'paid';
+            $batal->save();
 
-        $idbatal = $refund->pembatalan_id;
-
-        $batal = PembatalanUnit::where('id', $idbatal)->first();
-        $batal->refund = 'paid';
-        $batal->save();
-
-        return redirect()->back();
+            return redirect('finance/refund/list');
+        }else {  
+            return redirect()->back();
+        }
     }
 
 }
