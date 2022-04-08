@@ -1,4 +1,5 @@
 @extends('layouts.master', ['title' => 'Daftar Pembayaran'])
+
 @section('content')
     <div class="row">
         <div class="col-sm-4 col-3">
@@ -173,20 +174,14 @@
                                                                                 <td>
                                                                                     <select name="status" id="status"
                                                                                         class="form-control rincian">
-                                                                                        <?php
-                                                                                        $bayar = App\Pembayaran::orderBy('id', 'desc')
-                                                                                            ->whereIn('status_approval', ['pending', 'reject'])
-                                                                                            ->get();
-                                                                                        // foreach ($bayar as $key) {
-                                                                                        //     $status = App\Pembayaran::whereIn('id', $key)->get();
-                                                                                        // }
-                                                                                        ?>
-                                                                                        @foreach ($bayar as $item)
-                                                                                            <option selected
-                                                                                                value="pending">
-                                                                                                {{ $item->status_approval }}
-                                                                                            </option>
-                                                                                        @endforeach
+                                                                                        @php
+                                                                                        foreach ($bayar as $key) {
+                                                                                            
+                                                                                            $status = App\Pembayaran::where('id', $key->id)->first();
+                                                                                        }
+                                                                                        @endphp
+                                                                                        
+                                                                                        <option value="{{$status->id}}">{{$status->status_approval}}</option>
                                                                                         <option value="paid">paid
                                                                                         </option>
                                                                                         <option value="reject">reject
@@ -224,10 +219,10 @@
             </div>
         </div>
     </div>
-    <div class="m-t-20 text-center">
+    {{-- <div class="m-t-20 text-center">
         <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
             Save</button>
-    </div>
+    </div> --}}
     {{-- </form> --}}
     <script>
         $(document).ready(function() {

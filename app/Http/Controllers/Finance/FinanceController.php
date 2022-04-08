@@ -7,7 +7,6 @@ use App\Pembayaran;
 use App\Pengajuan;
 use App\Penggajian;
 use App\Reinburst;
-use App\RincianPengajuan;
 use App\Rumah;
 use App\Spr;
 use App\Tagihan;
@@ -128,10 +127,13 @@ class FinanceController extends Controller
     public function listPayment()
     {
         $bayar = Pembayaran::whereIn('status_approval', ['pending', 'reject'])->orderBy('id', 'desc')->get();
-
+     
+        
+     
         $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
 
         return view('finance.payment.daftar', compact('bayar', 'account'));
+       
 
     }
 
@@ -191,28 +193,28 @@ class FinanceController extends Controller
 
     }
 
-    public function ubahStatus(Request $request,$id)
+    public function ubahStatus(Request $request, $id)
     {
         $bayar = Pembayaran::find($id);
         // $bayar->status_approval = 'paid';
         // $bayar->save();
         $bayar->update([
-            'status_approval' => $request->status
+            'status_approval' => $request->status,
         ]);
         if ($bayar->status_approval == 'paid') {
             $bayar = Pembayaran::select('nominal', 'rincian_id')->where('id', $id)->first();
-                
+
             $where = [
-                            
+
                 'id_rincian' => $bayar->rincian_id,
             ];
-                
+
             $tagihan = Tagihan::where($where)->first();
-                
+
             $rincianid = $bayar->rincian_id;
             $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
             $sum = (int) $bayar1;
-                
+
             if ($bayar->nominal == $tagihan->jumlah_tagihan) {
                 $tagihan->status_pembayaran = 'paid';
             } elseif ($bayar->nominal < $tagihan->jumlah_tagihan && $sum < $tagihan->jumlah_tagihan) {
@@ -221,7 +223,7 @@ class FinanceController extends Controller
                 $tagihan->status_pembayaran = 'paid';
             }
             $tagihan->save();
-                    
+
             $spr = $tagihan->id_spr;
             $spr1 = Spr::where('id_transaksi', $spr)->first();
             if ($tagihan->tipe == 1) {
@@ -230,14 +232,14 @@ class FinanceController extends Controller
                 $spr1->status_dp = 'paid';
             }
             $spr1->save();
-                    
+
             $unit = $spr1->id_unit;
             $rumah = Rumah::where('id_unit_rumah', $unit)->first();
             $rumah->status_penjualan = 'Sold';
-            $rumah->save();  
+            $rumah->save();
 
             return redirect('/finance/payment');
-        }else {
+        } else {
             return redirect()->back();
         }
     }
@@ -248,21 +250,21 @@ class FinanceController extends Controller
         $komisi = Komisi::find($id);
         $komisi->update([
             'status_pembayaran' => $request->status,
-            'tanggal_pembayaran' => $request->tanggal_pembayaran
+            'tanggal_pembayaran' => $request->tanggal_pembayaran,
         ]);
         if ($komisi->status_pembayaran == 'paid') {
             return redirect('/finance/komisi');
-        }else {
+        } else {
             return redirect()->back();
         }
         // $komisi->status_pembayaran = 'paid';
         // $komisi->tanggal_pembayaran = $tglBayar;
-        // $komisi->save();       
+        // $komisi->save();
     }
 
     public function tukarFaktur()
     {
-     
+
         return view('finance.tukar-faktur.index');
     }
 
@@ -280,7 +282,7 @@ class FinanceController extends Controller
             } else {
 
                 $tukar = TukarFaktur::
-                // ->where('id_user',auth()->user()->id)
+                    // ->where('id_user',auth()->user()->id)
                     groupBy('tukar_fakturs.no_faktur')
                     ->orderBy('tukar_fakturs.id', 'desc')
                     ->get();
@@ -333,23 +335,22 @@ class FinanceController extends Controller
                     $options = '';
                     foreach ($account as $key) {
                         if ($key->nama_bank != '') {
-                            
-                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+
+                            $options .= '<option value="' . $key->id_chart_of_account . '">' . $key->nama_bank . '</option>';
                         }
                     }
 
                     $stats = '';
-                   
 
-                    $stats .= '<option value="'.$tukars->id.'">'.$tukars->status_pembayaran.'</option>';
+                    $stats .= '<option value="' . $tukars->id . '">' . $tukars->status_pembayaran . '</option>';
 
                     $currency = '';
                     $currency = number_format($tukars->nilai_invoice);
 
                     $tgl = Carbon::parse($tukars->tanggal_tukar_faktur)->format('d/m/Y');
-                    
+
                     return ' <form action="' . route('finance.tukar.update', $tukars->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -379,24 +380,24 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        
-                                                        ' .$tgl.'
+
+                                                        ' . $tgl . '
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">Total Pembayaran 
+                                                    <td style="width: 200px">Total Pembayaran
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                      Rp '. $currency.'
+                                                      Rp ' . $currency . '
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">Supplier 
+                                                    <td style="width: 200px">Supplier
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        '.$tukars->supplier->nama.'
+                                                        ' . $tukars->supplier->nama . '
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -406,11 +407,11 @@ class FinanceController extends Controller
                                                     <td>
                                                         <select class="form-control"
                                                             name="sumber_pembayaran" id="sumber">
-                                                        '.$options.'
+                                                        ' . $options . '
                                                         </select>
                                                     </td>
                                                 </tr>
-                                               
+
                                                 <tr>
                                                     <td style="width: 200px">Status Pembayaran
                                                     </td>
@@ -418,8 +419,8 @@ class FinanceController extends Controller
                                                     <td>
                                                         <select name="status" id="status"
                                                             class="form-control rincian">
-                                                            
-                                                            '.$stats.'
+
+                                                            ' . $stats . '
                                                             <option value="completed">completed</option>
                                                             <option value="reject">reject
                                                             </option>
@@ -456,19 +457,20 @@ class FinanceController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        $tukar_fakturs = TukarFaktur::where('id', $id)->first();
+        $tukar_fakturs->update([
+            'status_pembayaran' =>$request->status
+        ]);
+        
         $tukar_fakturs = TukarFaktur::where('id', $id)->get();
 
         foreach ($tukar_fakturs as $tukar) {
 
             $penerimaan = TukarFaktur::whereIn('no_faktur', $tukar)->select('no_po_vendor', 'no_faktur')->get();
-            // dd($penerimaan);
-            // $nofaktur = $tukar->no_faktur;
-
-            // dd($penerimaan);
-            DB::table('tukar_fakturs')->whereIn('no_faktur', $penerimaan)->update(array(
+            
+           
+            $tukar = DB::table('tukar_fakturs')->whereIn('no_faktur', $penerimaan)->update(array(
                 'status_pembayaran' => $request->status));
-
-            // $tukar->delete();
 
         }
         // dd($purchases);
@@ -560,16 +562,15 @@ class FinanceController extends Controller
                     // return '<a href="' . route('finance.pengajuan.update', $data->id) . '"   class=" delete-form btn btn-sm btn-warning"><i class="fa fa-check"></i></a>';
 
                     $stats = '';
-                   
 
-                    $stats .= '<option value="'.$data->id.'">'.$data->status_approval.'</option>'; 
+                    $stats .= '<option value="' . $data->id . '">' . $data->status_approval . '</option>';
 
                     $tgl = Carbon::parse($data->tanggal_pengajuan)->format('d/m/Y');
 
                     $currency = number_format($data->grandtotal);
 
                     return ' <form action="' . route('finance.pengajuan.update', $data->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -599,28 +600,28 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        
-                                                        ' .$tgl.'
+
+                                                        ' . $tgl . '
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">Total Pengajuan 
+                                                    <td style="width: 200px">Total Pengajuan
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                      Rp '. $currency.'
+                                                      Rp ' . $currency . '
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">Karyawan 
+                                                    <td style="width: 200px">Karyawan
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        '.$data->admin->name.'
+                                                        ' . $data->admin->name . '
                                                     </td>
                                                 </tr>
-                                               
-                                               
+
+
                                                 <tr>
                                                     <td style="width: 200px">Status Pembayaran
                                                     </td>
@@ -628,8 +629,8 @@ class FinanceController extends Controller
                                                     <td>
                                                         <select name="status" id="status"
                                                             class="form-control rincian">
-                                                            
-                                                            '.$stats.'
+
+                                                            ' . $stats . '
                                                             <option value="completed">completed</option>
                                                             <option value="reject">reject
                                                             </option>
@@ -763,23 +764,21 @@ class FinanceController extends Controller
                     $options = '';
                     foreach ($account as $key) {
                         if ($key->nama_bank != '') {
-                            
-                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+
+                            $options .= '<option value="' . $key->id_chart_of_account . '">' . $key->nama_bank . '</option>';
                         }
                     }
-                   
 
                     $stats = '';
-                   
 
-                    $stats .= '<option value="'.$reinburst->id.'">'.$reinburst->status_pembayaran.'</option>'; 
+                    $stats .= '<option value="' . $reinburst->id . '">' . $reinburst->status_pembayaran . '</option>';
 
                     $tgl = Carbon::parse($reinburst->tanggal_reinburst)->format('d/m/Y');
 
                     $currency = number_format($reinburst->total);
 
                     return ' <form action="' . route('finance.reinburst.update', $reinburst->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -809,23 +808,23 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        
-                                                        '.$tgl.'
+
+                                                        ' . $tgl . '
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">No Reinburst 
+                                                    <td style="width: 200px">No Reinburst
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                      '.$reinburst->nomor_reinburst.'
+                                                      ' . $reinburst->nomor_reinburst . '
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 200px">Total Reinburst 
+                                                    <td style="width: 200px">Total Reinburst
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                       Rp '.$currency.'
+                                                       Rp ' . $currency . '
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -833,11 +832,11 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        '.$reinburst->admin->name.'
+                                                        ' . $reinburst->admin->name . '
                                                     </td>
                                                 </tr>
-                                               
-                                               
+
+
                                                 <tr>
                                                     <td style="width: 200px">Sumber Pembayaran
                                                     </td>
@@ -845,25 +844,25 @@ class FinanceController extends Controller
                                                     <td>
                                                     <select class="form-control"
                                                     name="sumber_pembayaran" id="sumber">
-                                                            '.$options.'
+                                                            ' . $options . '
                                                      </select>
                                                     </td>
                                                 </tr>
-                                               
+
                                                 <tr>
                                                 <td style="width: 200px">Tanggal Pembayaran
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                    
-                                                        
+
+
 
                                                     <input class="form-control" type="date" name="tanggal_pembayaran">
 
-                                                    
+
                                                     </td>
                                                 </tr>
-                                                
+
 
                                                 <tr>
                                                     <td style="width: 200px">Status
@@ -872,8 +871,8 @@ class FinanceController extends Controller
                                                     <td>
                                                         <select name="status" id="status"
                                                             class="form-control rincian">
-                                                            
-                                                            '.$stats.'
+
+                                                            ' . $stats . '
                                                             <option value="completed">completed</option>
                                                             <option value="reject">reject
                                                             </option>
@@ -909,7 +908,7 @@ class FinanceController extends Controller
         // $update->save();
 
         $update->update([
-            'status_pembayaran' => $request->status
+            'status_pembayaran' => $request->status,
         ]);
 
         return redirect()->route('finance.reinburst')->with('success', 'Status Pembayaran Complete');
@@ -982,23 +981,21 @@ class FinanceController extends Controller
                     $options = '';
                     foreach ($account as $key) {
                         if ($key->nama_bank != '') {
-                            
-                            $options .= '<option value="'.$key->id_chart_of_account.'">'.$key->nama_bank.'</option>';
+
+                            $options .= '<option value="' . $key->id_chart_of_account . '">' . $key->nama_bank . '</option>';
                         }
                     }
-                   
 
                     $stats = '';
-                   
 
-                    $stats .= '<option value="'.$gajian->id.'">'.$gajian->status_penerimaan.'</option>'; 
+                    $stats .= '<option value="' . $gajian->id . '">' . $gajian->status_penerimaan . '</option>';
 
                     $tgl = Carbon::parse($gajian->tanggal)->format('d/m/Y');
 
                     $currency = number_format($gajian->gaji_pokok + (($gajian->penerimaan->sum('nominal') - $gajian->gaji_pokok) - $gajian->potongan->sum('nominal')));
 
                     return ' <form action="' . route('finance.gaji.update', $gajian->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" '.csrf_token().' ">
+                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -1028,16 +1025,24 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        
-                                                        '.$tgl.'
+
+                                                        ' . $tgl . '
                                                 </tr>
-                                               
                                                 <tr>
-                                                    <td style="width: 200px">Total Pembayaran Gaji 
+                                                    <td style="width: 200px">No Slip
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                       Rp '.$currency.'
+
+                                                        ' . $gajian->slip_gaji . '
+                                                </tr>
+
+                                                <tr>
+                                                    <td style="width: 200px">Total Pembayaran Gaji
+                                                    </td>
+                                                    <td style="width: 20px">:</td>
+                                                    <td>
+                                                       Rp ' . $currency . '
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -1045,11 +1050,11 @@ class FinanceController extends Controller
                                                     </td>
                                                     <td style="width: 20px">:</td>
                                                     <td>
-                                                        '.$gajian->pegawai->name.'
+                                                        ' . $gajian->pegawai->name . '
                                                     </td>
                                                 </tr>
-                                               
-                                               
+
+
                                                 <tr>
                                                     <td style="width: 200px">Sumber Pembayaran
                                                     </td>
@@ -1057,14 +1062,14 @@ class FinanceController extends Controller
                                                     <td>
                                                     <select class="form-control"
                                                     name="sumber_pembayaran" id="sumber">
-                                                            '.$options.'
+                                                            ' . $options . '
                                                      </select>
                                                     </td>
                                                 </tr>
-                                               
+
                                                 <tr>
-                                               
-                                                
+
+
 
                                                 <tr>
                                                     <td style="width: 200px">Status
@@ -1073,8 +1078,8 @@ class FinanceController extends Controller
                                                     <td>
                                                         <select name="status" id="status"
                                                             class="form-control rincian">
-                                                            
-                                                            '.$stats.'
+
+                                                            ' . $stats . '
                                                             <option value="paid">paid</option>
                                                             <option value="reject">reject
                                                             </option>
@@ -1109,7 +1114,7 @@ class FinanceController extends Controller
         // $update->status_penerimaan = 'paid';
         // $update->save();
         $update->update([
-            'status_penerimaan' => $request->status
+            'status_penerimaan' => $request->status,
         ]);
 
         return redirect()->route('finance.gaji')->with('success', 'Status Penerimaan Complete');

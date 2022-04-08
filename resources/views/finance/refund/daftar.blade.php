@@ -197,19 +197,14 @@
                                                                                 <td>
                                                                                     <select name="status" id="status"
                                                                                         class="form-control rincian">
-                                                                                        <?php
-                                                                                        $refund = App\Refund::orderBy('no_refund', 'desc')
-                                                                                            ->whereIn('status', ['unpaid', 'reject'])
-                                                                                            ->get();
+                                                                                        @php
                                                                                         foreach ($refund as $key) {
-                                                                                            $status = App\Refund::whereIn('id', $key)->get();
+                                                                                            
+                                                                                            $status = App\Refund::where('id', $key->id)->first();
                                                                                         }
-                                                                                        ?>
-                                                                                        @foreach ($status as $item)
-                                                                                            <option selected value="unpaid">
-                                                                                                {{ $item->status }}
-                                                                                            </option>
-                                                                                        @endforeach
+                                                                                        @endphp
+                                                                                        
+                                                                                        <option value="{{$status->id}}">{{$status->status}}</option>
                                                                                         <option value="paid">paid</option>
                                                                                         <option value="reject">reject
                                                                                         </option>
@@ -242,10 +237,10 @@
             </div>
         </div>
     </div>
-    <div class="m-t-20 text-center">
+    {{-- <div class="m-t-20 text-center">
         <button type="submit" name="submit" class="btn btn-primary submit-btn"><i class="fa fa-save"></i>
             Save</button>
-    </div>
+    </div> --}}
     {{-- </form> --}}
     <script>
         var date = new Date();
