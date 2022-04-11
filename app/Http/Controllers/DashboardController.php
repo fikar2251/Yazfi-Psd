@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Barang;
-use Illuminate\Support\Facades\DB;
 use App\Booking;
-use App\Customer;
 use App\Holidays;
 use App\Komisi;
 use App\Pembayaran;
@@ -14,15 +12,15 @@ use App\Penggajian;
 use App\Purchase;
 use App\Refund;
 use App\Reinburst;
-use App\Tindakan;
 use App\Spr;
 use App\TeamSales;
 use App\TukarFaktur;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -58,8 +56,8 @@ class DashboardController extends Controller
             $now = Carbon::now()->format('Y-m-d');
             $customer = Spr::count();
             // $reinburst_pending = Reinburst::where('id_user', auth()->user()->id)->where('status_pembayaran','pending')->get()->count();
-             $reinburst_pending = Reinburst::where('id_user', auth()->user()->id)->get()->count();
-            $warehouse =  Barang::count();
+            $reinburst_pending = Reinburst::where('id_user', auth()->user()->id)->get()->count();
+            $warehouse = Barang::count();
 
             return view('dashboard.index', [
                 'customer' => $customer,
@@ -68,54 +66,58 @@ class DashboardController extends Controller
             ]);
         }
         if (auth()->user()->hasRole('finance')) {
-          
+
             $bayar = Pembayaran::where('status_approval', ['pending', 'reject'])->get()->count();
             $refund = Refund::orderBy('no_refund', 'desc')->where('status', ['unpaid', 'reject'])->get()->count();
-            $komisi = Komisi::orderBy('id', 'desc')->where('status_pembayaran', ['unpaid','reject'])->get()->count();
-            $tukar = DB::table('tukar_fakturs')
-            // ->where('id_user',auth()->user()->id)
-            ->groupBy('tukar_fakturs.no_faktur')
-            ->orderBy('tukar_fakturs.id','desc')
-            ->get()->count();
-             $pengajuans = Pengajuan::orderBy('id','desc')
-            ->groupBy('nomor_pengajuan')
-            ->get()->count();
+            $komisi = Komisi::orderBy('id', 'desc')->where('status_pembayaran', ['unpaid', 'reject'])->get()->count();
+            $tukar = DB::table('tukar_fakturs')->
+                whereIn('status_pembayaran', ['pending', 'reject'])
+                ->groupBy('tukar_fakturs.no_faktur')
+                ->orderBy('tukar_fakturs.id', 'desc')
+                ->get()->count();
+            $pengajuans = Pengajuan::orderBy('id', 'desc')
+                ->whereIn('status_approval', ['pending', 'reject'])
+                ->groupBy('nomor_pengajuan')
+                ->get()->count();
             $reinbursts = DB::table('reinbursts')
-            ->leftJoin('rincian_reinbursts','reinbursts.nomor_reinburst','=','rincian_reinbursts.nomor_reinburst')
-            ->select('reinbursts.id_user','reinbursts.id','reinbursts.tanggal_reinburst','reinbursts.nomor_reinburst','reinbursts.status_hrd','rincian_reinbursts.nomor_reinburst','rincian_reinbursts.total','reinbursts.status_pembayaran','reinbursts.id')
-            ->orderBy('reinbursts.id','desc')
-            ->groupBy('reinbursts.nomor_reinburst')
-            ->where('reinbursts.status_hrd','completed')
+                ->leftJoin('rincian_reinbursts', 'reinbursts.nomor_reinburst', '=', 'rincian_reinbursts.nomor_reinburst')
+                ->select('reinbursts.id_user', 'reinbursts.id', 'reinbursts.tanggal_reinburst', 'reinbursts.nomor_reinburst', 'reinbursts.status_hrd', 'rincian_reinbursts.nomor_reinburst', 'rincian_reinbursts.total', 'reinbursts.status_pembayaran', 'reinbursts.id')
+                ->orderBy('reinbursts.id', 'desc')
+                ->groupBy('reinbursts.nomor_reinburst')
+                ->where('reinbursts.status_hrd', 'completed')
+                ->whereIn('status_pembayaran', ['pending', 'reject'])
+                ->get()->count();
+            $penggajians = Penggajian::orderBy('id', 'desc')
+            ->whereIn('status_penerimaan', ['pending', 'reject'])
             ->get()->count();
-            $penggajians= Penggajian::orderBy('id','desc')->get()->count();
-            
-            return view('dashboard.index', compact('bayar', 'refund', 'komisi', 'tukar', 'pengajuans','reinbursts','penggajians'));
+
+            return view('dashboard.index', compact('bayar', 'refund', 'komisi', 'tukar', 'pengajuans', 'reinbursts', 'penggajians'));
         }
 
         if (auth()->user()->hasRole('purchasing')) {
 
             $now = Carbon::now()->format('Y-m-d');
             $tukar_faktur_count = TukarFaktur::where('id_user', auth()->user()->id)->get()->count();
-            $reinburst_pending = Reinburst::where('id_user', auth()->user()->id)->whereDate('tanggal_reinburst', $now)->where('status_pembayaran','=','pending')->get()->count();
-            $received_pending = Purchase::where('status_barang','=','pending')->get()->count();
+            $reinburst_pending = Reinburst::where('id_user', auth()->user()->id)->whereDate('tanggal_reinburst', $now)->where('status_pembayaran', '=', 'pending')->get()->count();
+            $received_pending = Purchase::where('status_barang', '=', 'pending')->get()->count();
             return view('dashboard.index', [
                 'received_pending' => $received_pending,
                 'tukar_faktur_count' => $tukar_faktur_count,
                 'reinburst_pending' => $reinburst_pending,
-                
+
             ]);
         }
         if (auth()->user()->hasRole('logistik')) {
 
             $now = Carbon::now()->format('Y-m-d');
-            $barang = DB::table('in_outs')->where('user_id',auth()->user()->id)->count();
-            $pengajuan_pending = Pengajuan::where('id_user', auth()->user()->id)->where('status_approval','=','pending')->get()->count();
-            $received_pending = Purchase::where('status_barang','=','pending')->where('user_id',auth()->user()->id)->get()->count();
+            $barang = DB::table('in_outs')->where('user_id', auth()->user()->id)->count();
+            $pengajuan_pending = Pengajuan::where('id_user', auth()->user()->id)->where('status_approval', '=', 'pending')->get()->count();
+            $received_pending = Purchase::where('status_barang', '=', 'pending')->where('user_id', auth()->user()->id)->get()->count();
             return view('dashboard.index', [
                 'received_pending' => $received_pending,
                 'barang' => $barang,
                 'pengajuan_pending' => $pengajuan_pending,
-                
+
             ]);
         }
 
@@ -157,16 +159,15 @@ class DashboardController extends Controller
                 return $data->where('name', 'hrd');
             })->where('is_active', 1)->get()->count();
 
-            $pengajuan_dana = Pengajuan::where('status_approval', '==', 'pending')->where('id_user',auth()->user()->id)->get()->count();
-            $reinburst = Reinburst::where('id_user',auth()->user()->id)->get()->count();
+            $pengajuan_dana = Pengajuan::where('status_approval', '==', 'pending')->where('id_user', auth()->user()->id)->get()->count();
+            $reinburst = Reinburst::where('id_user', auth()->user()->id)->get()->count();
             $reinburs_acc = Reinburst::where('status_hrd', 'completed')->get()->count();
 
-           
             return view('dashboard.index', [
                 'hrd' => $hrd,
                 'pengajuan_dana' => $pengajuan_dana,
                 'reinburst' => $reinburst,
-                'reinburs_acc' => $reinburs_acc
+                'reinburs_acc' => $reinburs_acc,
             ]);
         }
 
@@ -190,7 +191,7 @@ class DashboardController extends Controller
         $attr = request()->validate([
             'name' => 'required',
             'email' => 'required',
-            'address' => 'required'
+            'address' => 'required',
         ]);
 
         $user = User::find(auth()->user()->id);
@@ -198,7 +199,7 @@ class DashboardController extends Controller
         if (request('password') == null) {
             $attr['password'] = $user->password;
         } else {
-            $attr['password'] =  Hash::make(request('password'));
+            $attr['password'] = Hash::make(request('password'));
         }
 
         $image = request()->file('image');

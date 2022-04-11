@@ -127,13 +127,10 @@ class FinanceController extends Controller
     public function listPayment()
     {
         $bayar = Pembayaran::whereIn('status_approval', ['pending', 'reject'])->orderBy('id', 'desc')->get();
-     
-        
-     
+
         $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
 
         return view('finance.payment.daftar', compact('bayar', 'account'));
-       
 
     }
 
@@ -282,7 +279,7 @@ class FinanceController extends Controller
             } else {
 
                 $tukar = TukarFaktur::
-                    // ->where('id_user',auth()->user()->id)
+                    whereIn('status_pembayaran', ['pending', 'reject'])->
                     groupBy('tukar_fakturs.no_faktur')
                     ->orderBy('tukar_fakturs.id', 'desc')
                     ->get();
@@ -459,16 +456,15 @@ class FinanceController extends Controller
     {
         $tukar_fakturs = TukarFaktur::where('id', $id)->first();
         $tukar_fakturs->update([
-            'status_pembayaran' =>$request->status
+            'status_pembayaran' => $request->status,
         ]);
-        
+
         $tukar_fakturs = TukarFaktur::where('id', $id)->get();
 
         foreach ($tukar_fakturs as $tukar) {
 
             $penerimaan = TukarFaktur::whereIn('no_faktur', $tukar)->select('no_po_vendor', 'no_faktur')->get();
-            
-           
+
             $tukar = DB::table('tukar_fakturs')->whereIn('no_faktur', $penerimaan)->update(array(
                 'status_pembayaran' => $request->status));
 
@@ -488,6 +484,7 @@ class FinanceController extends Controller
 
         } else {
             $pengajuans = Pengajuan::orderBy('id', 'desc')
+                ->whereIn('status_approval', ['pending', 'reject'])
                 ->groupBy('nomor_pengajuan')
                 ->get();
         }
@@ -507,6 +504,7 @@ class FinanceController extends Controller
                     ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
                     ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
                         'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
+                    ->whereIn('status_approval', ['pending', 'reject'])
                     ->whereBetween('pengajuans.tanggal_pengajuan', array($request->from_date, $request->to_date))
                     ->groupBy('pengajuans.nomor_pengajuan')
                     ->orderBy('pengajuans.id', 'desc')
@@ -519,6 +517,7 @@ class FinanceController extends Controller
                     ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
                     ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
                         'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
+                    ->whereIn('status_approval', ['pending', 'reject'])
                     ->orderBy('pengajuans.id', 'desc')
                     ->get();
                 // dd($pengajuans);
@@ -681,6 +680,7 @@ class FinanceController extends Controller
             $coba = DB::table('rincian_reinbursts')->leftjoin('reinbursts', 'rincian_reinbursts.nomor_reinburst', '=', 'reinbursts.nomor_reinburst')
                 ->select('reinbursts.id_user', 'reinbursts.id', 'reinbursts.tanggal_reinburst', 'reinbursts.nomor_reinburst', 'reinbursts.status_hrd', 'rincian_reinbursts.nomor_reinburst', 'rincian_reinbursts.total', 'reinbursts.status_pembayaran', 'reinbursts.id')
                 ->whereBetween('rincian_reinbursts.created_at', [$from, $to])->where('reinbursts.status_hrd', 'completed')
+                ->whereIn('status_pembayaran', ['pending', 'reject'])
                 ->groupBy('reinbursts.nomor_reinburst')->sum('rincian_reinbursts.total');
             // dd($coba);
         } else {
@@ -690,6 +690,7 @@ class FinanceController extends Controller
                 ->orderBy('reinbursts.id', 'desc')
                 ->groupBy('reinbursts.nomor_reinburst')
                 ->where('reinbursts.status_hrd', 'completed')
+                ->whereIn('status_pembayaran', ['pending', 'reject'])
                 ->get();
 
         }
@@ -708,6 +709,7 @@ class FinanceController extends Controller
                     ->whereBetween('reinbursts.tanggal_reinburst', array($request->from_date, $request->to_date))
                     ->groupBy('reinbursts.nomor_reinburst')
                     ->orderBy('reinbursts.id', 'desc')->where('reinbursts.status_hrd', 'completed')
+                    ->whereIn('status_pembayaran', ['pending', 'reject'])
                     ->get();
                 // dd($reinbursts);
             } else {
@@ -717,6 +719,7 @@ class FinanceController extends Controller
                         'rincian_reinbursts.total', 'reinbursts.id')
                     ->groupBy('reinbursts.nomor_reinburst')
                     ->orderBy('reinbursts.id', 'desc')->where('reinbursts.status_hrd', 'completed')
+                    ->whereIn('status_pembayaran', ['pending', 'reject'])
                     ->get();
 
             }
@@ -916,7 +919,9 @@ class FinanceController extends Controller
 
     public function gaji()
     {
-        $penggajians = Penggajian::orderBy('id', 'desc')->get();
+        $penggajians = Penggajian::orderBy('id', 'desc')
+            ->whereIn('status_penerimaan', ['pending', 'reject'])
+            ->get();
 
         return view('finance.gaji.index', compact('penggajians'));
     }
@@ -925,10 +930,14 @@ class FinanceController extends Controller
     {
         if (request()->ajax()) {
             if (!empty($request->from_date)) {
-                $gaji = Penggajian::whereBetween('tanggal', array($request->from_date, $request->to_date))->orderBy('id', 'desc')->get();
+                $gaji = Penggajian::whereBetween('tanggal', array($request->from_date, $request->to_date))->orderBy('id', 'desc')
+                    ->whereIn('status_penerimaan', ['pending', 'reject'])
+                    ->get();
 
             } else {
-                $gaji = Penggajian::orderBy('id', 'desc')->get();
+                $gaji = Penggajian::orderBy('id', 'desc')
+                    ->whereIn('status_penerimaan', ['pending', 'reject'])
+                    ->get();
             }
             return datatables()
                 ->of($gaji)

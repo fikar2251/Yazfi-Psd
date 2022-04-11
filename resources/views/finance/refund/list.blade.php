@@ -25,10 +25,12 @@
                 </div>
             </div>
         </div>
-       <div class="col-sm-6 col-md-3">
+        <div class="col-sm-6 col-md-3">
             <div style="margin-top:8px;">
-            <button type="button" name="filter" id="filter" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button type="button" name="refresh" id="refresh" class="btn btn-danger"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button type="button" name="filter" id="filter" class="btn btn-primary"><i
+                        class="fa-solid fa-magnifying-glass"></i></button>
+                <button type="button" name="refresh" id="refresh" class="btn btn-danger"><i
+                        class="fa-solid fa-arrows-rotate"></i></button>
             </div>
         </div>
     </div>
@@ -41,6 +43,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>id</th>
                                     <th>Tanggal Pengajuan</th>
                                     <th>Tanggal Pembayaran</th>
                                     <th>No Refund</th>
@@ -153,19 +156,29 @@
                 .clone(true)
                 .addClass('filters')
                 .appendTo('#refund thead');
-                load_data();
+            load_data();
 
-        function load_data(from_date = '', to_date = '') {
-            var table = $('#refund').DataTable({
-                processing: true,
-                serverSide: true,
-                orderCellsTop: true,
-                fixedHeader: true,
-                dom: 'Bfrtip',
-                // buttons: [
-                //     'copy', 'csv', 'excel', 'pdf', 'print'
-                // ],
-                buttons: [{
+            function load_data(from_date = '', to_date = '') {
+                var table = $('#refund').DataTable({
+                    columnDefs: [{
+                        "targets": [1],
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [8], 
+                        "className": "dt-body-right",
+                    },
+                ],
+                    processing: true,
+                    serverSide: true,
+                    orderCellsTop: true,
+                    fixedHeader: true,
+                    dom: 'Bfrtip',
+                    // buttons: [
+                    //     'copy', 'csv', 'excel', 'pdf', 'print'
+                    // ],
+                    buttons: [{
                             extend: 'copy',
                             className: 'btn-default',
                             exportOptions: {
@@ -175,7 +188,7 @@
                         {
                             extend: 'excel',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar',
+                            title: 'List Refund',
                             messageTop: 'Tanggal  {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -185,7 +198,7 @@
                         {
                             extend: 'pdf',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar ',
+                            title: 'List Refund ',
                             messageTop: 'Tanggal {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -195,7 +208,7 @@
                         {
                             extend: 'print',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar ',
+                            title: 'List Refund ',
                             messageTop: 'Tanggal {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -203,61 +216,62 @@
                             }
                         },
                     ],
-                initComplete: function() {
-                    var api = this.api();
+                    initComplete: function() {
+                        var api = this.api();
 
-                    // For each column
-                    api
-                        .columns()
-                        .eq(0)
-                        .each(function(colIdx) {
-                            // Set the header cell to contain the input element
-                            var cell = $('.filters th').eq(
-                                $(api.column(colIdx).header()).index()
-                            );
-                            var title = $(cell).text();
-                            $(cell).html('<input class="form-control" type="text" placeholder="' +
-                                title + '" style="width: 100%"/>');
+                        // For each column
+                        api
+                            .columns()
+                            .eq(0)
+                            .each(function(colIdx) {
+                                // Set the header cell to contain the input element
+                                var cell = $('.filters th').eq(
+                                    $(api.column(colIdx).header()).index()
+                                );
+                                var title = $(cell).text();
+                                $(cell).html(
+                                    '<input class="form-control" type="text" placeholder="' +
+                                    title + '" style="width: 100%"/>');
 
-                            // On every keypress in this input
-                            $(
-                                    'input',
-                                    $('.filters th').eq($(api.column(colIdx).header()).index())
-                                )
-                                .off('keyup change')
-                                .on('keyup change', function(e) {
-                                    e.stopPropagation();
+                                // On every keypress in this input
+                                $(
+                                        'input',
+                                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                                    )
+                                    .off('keyup change')
+                                    .on('keyup change', function(e) {
+                                        e.stopPropagation();
 
-                                    // Get the search value
-                                    $(this).attr('title', $(this).val());
-                                    var regexr =
-                                        '({search})'; //$(this).parents('th').find('select').val();
+                                        // Get the search value
+                                        $(this).attr('title', $(this).val());
+                                        var regexr =
+                                            '({search})'; //$(this).parents('th').find('select').val();
 
-                                    var cursorPosition = this.selectionStart;
-                                    // Search the column for that value
-                                    api
-                                        .column(colIdx)
-                                        .search(
-                                            this.value != '' ?
-                                            regexr.replace('{search}', '(((' + this.value +
-                                                ')))') :
-                                            '',
-                                            this.value != '',
-                                            this.value == ''
-                                        )
-                                        .draw();
+                                        var cursorPosition = this.selectionStart;
+                                        // Search the column for that value
+                                        api
+                                            .column(colIdx)
+                                            .search(
+                                                this.value != '' ?
+                                                regexr.replace('{search}', '(((' + this.value +
+                                                    ')))') :
+                                                '',
+                                                this.value != '',
+                                                this.value == ''
+                                            )
+                                            .draw();
 
-                                    $(this)
-                                        .focus()[0]
-                                        .setSelectionRange(cursorPosition, cursorPosition);
-                                });
-                        });
-                },
-                order: [
-                    [0, 'asc']
-                ],
-                // ajax: "/finance/refund/json",
-                ajax: {
+                                        $(this)
+                                            .focus()[0]
+                                            .setSelectionRange(cursorPosition, cursorPosition);
+                                    });
+                            });
+                    },
+                    order: [
+                        [1, 'desc']
+                    ],
+                    // ajax: "/finance/refund/json",
+                    ajax: {
                         url: '/finance/refund/json',
                         get: 'get',
                         data: {
@@ -266,50 +280,54 @@
                         }
 
                     },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                    },
-                    {
-                        data: 'tanggal_refund',
-                        name: 'tanggal_refund',
-                    },
-                    {
-                        data: 'tanggal_pembayaran',
-                        name: 'tanggal_pembayaran',
-                    },
-                    {
-                        data: 'no_refund',
-                        name: 'no_refund',
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                        },
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'tanggal_refund',
+                            name: 'tanggal_refund',
+                        },
+                        {
+                            data: 'tanggal_pembayaran',
+                            name: 'tanggal_pembayaran',
+                        },
+                        {
+                            data: 'no_refund',
+                            name: 'no_refund',
 
-                    },
-                    {
-                        data: 'no_pembatalan',
-                        name: 'no_pembatalan',
+                        },
+                        {
+                            data: 'no_pembatalan',
+                            name: 'no_pembatalan',
 
 
-                    },
+                        },
 
-                    {
-                        data: 'konsumen',
-                        name: 'konsumen',
-                    },
-                    {
-                        data: 'sales',
-                        name: 'sales',
-                    },
-                    {
-                        data: 'total_refund',
-                        name: 'total_refund',
-                    },
-                    {
-                        data: 'refund',
-                        name: 'refund',
-                    },
-                ]
-            });
-        }
-        $('#filter').click(function() {
+                        {
+                            data: 'konsumen',
+                            name: 'konsumen',
+                        },
+                        {
+                            data: 'sales',
+                            name: 'sales',
+                        },
+                        {
+                            data: 'total_refund',
+                            name: 'total_refund',
+                        },
+                        {
+                            data: 'status',
+                            name: 'status',
+                        },
+                    ]
+                });
+            }
+            $('#filter').click(function() {
                 var from_date = $('#from_date').val();
                 var to_date = $('#to_date').val();
                 if (from_date != '' && to_date != '') {

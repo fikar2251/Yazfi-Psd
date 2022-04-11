@@ -26,8 +26,10 @@
         </div>
         <div class="col-sm-6 col-md-3">
             <div style="margin-top:8px;">
-            <button type="button" name="filter" id="filter" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button type="button" name="refresh" id="refresh" class="btn btn-danger"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button type="button" name="filter" id="filter" class="btn btn-primary"><i
+                        class="fa-solid fa-magnifying-glass"></i></button>
+                <button type="button" name="refresh" id="refresh" class="btn btn-danger"><i
+                        class="fa-solid fa-arrows-rotate"></i></button>
             </div>
         </div>
     </div>
@@ -40,10 +42,11 @@
                         <table class="table table-bordered custom-table table-striped" id="payment" style="width: 100%">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th style="width: 15%">No Transaksi</th>
                                     <th style="width: 15%">Tanggal pembayaran</th>
                                     <th>Tipe</th>
-                                    <th>Nominal</th>
+                                    <th style="text-align: left">Nominal</th>
                                     <th>Status</th>
                                     <th>Bank tujuan</th>
                                 </tr>
@@ -161,6 +164,10 @@
 
             function load_data(from_date = '', to_date = '') {
                 var table = $('#payment').DataTable({
+                    columnDefs: [{
+                        "targets": 4, 
+                        "className": "dt-body-right",
+                    }],
                     processing: true,
                     serverSide: true,
                     orderCellsTop: true,
@@ -261,6 +268,7 @@
                     order: [
                         [0, 'desc']
                     ],
+
                     // ajax: "/finance/payment/json",
 
                     ajax: {
@@ -274,6 +282,11 @@
                     },
 
                     columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+
+                        },
+                        {
                             data: 'no_detail_transaksi',
                             name: 'no_detail_transaksi',
                         },

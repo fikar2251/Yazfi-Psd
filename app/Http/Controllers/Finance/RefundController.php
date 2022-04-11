@@ -110,7 +110,7 @@ class RefundController extends Controller
             }
 
             return DataTables::of($refund)
-                ->editColumn('refund', function ($refund) {
+                ->editColumn('status', function ($refund) {
                     if ($refund->status == 'unpaid') {
                         return '<span class="badge badge-danger">' . $refund->status . '</span>';
                     } elseif ($refund->status == 'paid') {
@@ -124,7 +124,7 @@ class RefundController extends Controller
                     return $refund->pembatalan->spr->user->name;
                 })
                 ->addIndexColumn()
-                ->rawColumns(['refund', 'konsumen', 'sales'])
+                ->rawColumns(['status', 'konsumen', 'sales'])
                 ->make(true);
         }
     }

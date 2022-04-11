@@ -39,6 +39,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Id</th>
                                     <th>No Komisi</th>
                                     <th>Tanggal Pengajuan</th>
                                     <th>No SPR</th>
@@ -148,6 +149,28 @@
 
             function load_data(from_date = '', to_date = '') {
              var table = $('#komisi').DataTable({
+                columnDefs: [{
+                        "targets": [1],
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        
+                        "targets": [5], 
+                        "className": "dt-body-right",
+                    },
+                    {
+                        
+                        "targets": [6], 
+                        "className": "dt-body-right",
+                    },
+                    {
+                        
+                        "targets": [7], 
+                        "className": "dt-body-right",
+                    },
+                    
+                    ],
                     processing: true,
                     serverSide: true,
                     orderCellsTop: true,
@@ -166,7 +189,7 @@
                         {
                             extend: 'excel',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar',
+                            title: 'Daftar Komisi',
                             messageTop: 'Tanggal  {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -176,7 +199,7 @@
                         {
                             extend: 'pdf',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar ',
+                            title: 'Daftar Komisi ',
                             messageTop: 'Tanggal {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -186,7 +209,7 @@
                         {
                             extend: 'print',
                             className: 'btn-default',
-                            title: 'Konfirmasi Bayar ',
+                            title: 'Daftar Komisi ',
                             messageTop: 'Tanggal {{ request('from') }} - {{ request('to') }}',
                             footer: true,
                             exportOptions: {
@@ -261,6 +284,11 @@
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
+
+                        },
+                        {
+                            data: 'id',
+                            name: 'id',
 
                         },
                         {
