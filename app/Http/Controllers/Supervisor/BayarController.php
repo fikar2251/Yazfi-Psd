@@ -174,17 +174,20 @@ use Yajra\DataTables\DataTables;
         {
             $no = request()->get('no_transaksi');
 
-            $where = [
-                'id_rincian' => $request->rincian_id,
-            ];
+            // $where = array($request->rincian_id);
+            $where = array($request->rincian_id);
+            
+            $sum = implode(",",$where);
+            return $sum;
+            
 
             $data = DB::table('rincian_tagihan_spr')
                 ->select('rincian_tagihan_spr.id_rincian', 'rincian_tagihan_spr.jumlah_tagihan')
                 ->groupBy('rincian_tagihan_spr.jumlah_tagihan', 'rincian_tagihan_spr.id_rincian')
-                ->where($where)->get();
+                ->whereIn('id_rincian', [$sum])->get();
 
             $data1 = Pembayaran::where('rincian_id', $where)->first();
-
+            
             if ($data1) {
                 # code...
                 $nominal = $data1->nominal;

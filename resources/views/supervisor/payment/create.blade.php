@@ -102,22 +102,22 @@
                                             <td style="width: 200px">Pembayaran</td>
                                             <td style="width: 20px">:</td>
                                             <td>
-                                                <select name="rincian_id" id="rincian_id" class="form-control rincian"
-                                                    style="width: 200px">
-                                                    <option selected value="">-- Pembayaran --</option>
+                                                <select name="rincian_id[]" id="rincian-id" class="form-control rincian "
+                                                    style="width: 200px" multiple="multiple">
+                                                    {{-- <option  value="">-- Pembayaran --</option> --}}
                                                     @foreach ($tagihan as $item)
                                                         {{-- <option value="{{ $item->id_rincian }}"> --}}
                                                         @if ($item->tipe == 1 && $item->status_pembayaran == 'unpaid')
                                                             <option value="{{ $item->id_rincian }}">Booking fee</option>
                                                         @elseif ($item->tipe == 1 && $item->status_pembayaran == 'paid')
-                                                            <option hidden value="{{ $item->id_rincian }}">Booking fee
+                                                            <option disabled value="{{ $item->id_rincian }}">Booking fee
                                                             </option>
                                                         @elseif ($item->tipe == 2 && $item->status_pembayaran == 'unpaid')
                                                             <option value="{{ $item->id_rincian }}">Downpayment</option>
                                                         @elseif ($item->tipe == 2 && $item->status_pembayaran == 'partial')
                                                             <option value="{{ $item->id_rincian }}">Downpayment</option>
                                                         @elseif ($item->tipe == 2 && $item->status_pembayaran == 'paid')
-                                                            <option hidden value="{{ $item->id_rincian }}">Downpayment
+                                                            <option disabled value="{{ $item->id_rincian }}">Downpayment
                                                             </option>
                                                         @elseif ($item->tipe == 3 && $item->status_pembayaran == 'unpaid')
                                                             <option value="{{ $item->id_rincian }}">
@@ -139,7 +139,7 @@
                                             <td style="width: 200px">Bank tujuan</td>
                                             <td style="width: 20px">:</td>
                                             <td>
-                                                <select name="bank_tujuan" id="bank_tujuan" class="form-control rincian"
+                                                <select name="bank_tujuan" id="bank_tujuan" class="form-control"
                                                     style="width: 200px">
                                                     <option selected value="">-- Bank tujuan --</option>
                                                     <option value="Bri">BRI</option>
@@ -292,16 +292,72 @@
         @endif
     @else
     @endif
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.rincian').change(function() {
-                var rincian_id = $(this).val();
-                var nominal = $(this).val();
+
+@stop
+@section('footer')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js" integrity="sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.js" integrity="sha512-e6Nk3mhokFywlEPtnkGmop6rHh6maUqL0T65yOkbSsJ3/y9yiwb+LzFoSTJM/a4j/gKwh/y/pHiSLxE82ARhJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css" integrity="sha512-Lif7u83tKvHWTPxL0amT2QbJoyvma0s9ubOlHpcodxRxpZo4iIGFw/lDWbPwSjNlnas2PsTrVTTcOoaVfb4kwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.min.css" integrity="sha512-jpey1PaBfFBeEAsKxmkM1Yh7fkH09t/XDVjAgYGrq1s2L9qPD/kKdXC/2I6t2Va8xdd9SanwPYHIAnyBRdPmig==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script>
+    $(document).ready(function() {
+        // $('#rincian_id').multiselect({
+        //     nonSelectedText: '--Pembayaran--',
+        //     onChange: function (option,selected) {
+        //         var rincian = this.$select.val();
+        //         var nominal = this.$select.val();
+        //         var div = $(this).parent();
+        //         var op = " ";
+        //         var token = $("input[name='_token']").val();
+        //         if (rincian.length > 0) {
+        //             $.ajax({
+        //                 url:  `/supervisor/nominal`,
+        //                 method: "get",
+        //                 data: {
+        //                     'rincian': rincian,
+        //                     'nominal' : nominal,
+                            
+        //                 },
+        //                 success: function(data) {
+        //             // if (data) {
+        //             console.log(data);
+
+        //             for (var i = 0; i < data.length; i++) {
+        //                 if (data[i].jumlah_tagihan) {
+        //                     var nominal = data[i].jumlah_tagihan;
+        //                     var numb = nominal;
+        //                     var format = numb.toString().split('').reverse().join('');
+        //                     var convert = format.match(/\d{1,3}/g);
+        //                     var rupiah = convert.join('.').split('').reverse()
+        //                         .join('')
+        //                 } else {
+
+        //                     var nominal = data;
+
+
+        //                 }
+        //                 document.getElementById('nominal').value = nominal;
+        //                 document.getElementById('nominals').value = nominal;
+        //                 console.log(rupiah);
+        //             };
+
+        //         },
+        //         error: function() {
+
+        //         },
+        //             })
+        //         }
+        //     }
+        // });
+        $('#rincian-id').multiselect({
+            nonSelectedText: '--Pembayaran--',
+            onChange: function() { 
+                var rincian_id = this.$select.val();
+                var nominal = this.$select.val();
                 var div = $(this).parent();
                 var op = " ";
-
+    
                 console.log(rincian_id);
                 $.ajax({
                     url: `/supervisor/nominal`,
@@ -310,11 +366,11 @@
                         'rincian_id': rincian_id,
                         'nominal': nominal,
                     },
-
+    
                     success: function(data) {
                         // if (data) {
                         console.log(data);
-
+    
                         for (var i = 0; i < data.length; i++) {
                             if (data[i].jumlah_tagihan) {
                                 var nominal = data[i].jumlah_tagihan;
@@ -324,59 +380,113 @@
                                 var rupiah = convert.join('.').split('').reverse()
                                     .join('')
                             } else {
-
+    
                                 var nominal = data;
-
-
+    
+    
                             }
                             document.getElementById('nominal').value = nominal;
                             document.getElementById('nominals').value = nominal;
                             console.log(rupiah);
                         };
-
+    
                     },
                     error: function() {
-
+    
                     },
-
-
-
+    
+    
+    
                 })
-            })
-
-
+            }
         })
 
-        $('#nominal').on('keyup', function() {
-            var input = $(this).val();
-            var int = input.replace(/[^\w\s]/gi, '')
-            document.getElementById('nominals').value = int;
-        });
+        // $('.rincian').change(function() {
+        //     var rincian_id = $(this).val();
+        //     var nominal = $(this).val();
+        //     var div = $(this).parent();
+        //     var op = " ";
 
-        var rupiah = document.getElementById('nominal');
-        rupiah.addEventListener('keyup', function(e) {
-            // tambahkan 'Rp.' pada saat form di ketik
-            // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
-            rupiah.value = formatRupiah(this.value);
-        });
+        //     console.log(rincian_id);
+        //     $.ajax({
+        //         url: `/supervisor/nominal`,
+        //         method: "get",
+        //         data: {
+        //             'rincian_id': rincian_id,
+        //             'nominal': nominal,
+        //         },
 
-        /* Fungsi formatRupiah */
-        function formatRupiah(angka, prefix) {
-            var number_string = angka.replace(/[^,\d]/g, '').toString(),
-                split = number_string.split(','),
-                sisa = split[0].length % 3,
-                rupiah = split[0].substr(0, sisa),
-                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        //         success: function(data) {
+        //             // if (data) {
+        //             console.log(data);
 
-            // tambahkan titik jika yang di input sudah menjadi angka ribuan
-            if (ribuan) {
-                separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
+        //             for (var i = 0; i < data.length; i++) {
+        //                 if (data[i].jumlah_tagihan) {
+        //                     var nominal = data[i].jumlah_tagihan;
+        //                     var numb = nominal;
+        //                     var format = numb.toString().split('').reverse().join('');
+        //                     var convert = format.match(/\d{1,3}/g);
+        //                     var rupiah = convert.join('.').split('').reverse()
+        //                         .join('')
+        //                 } else {
 
-            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+        //                     var nominal = data;
+
+
+        //                 }
+        //                 document.getElementById('nominal').value = nominal;
+        //                 document.getElementById('nominals').value = nominal;
+        //                 console.log(rupiah);
+        //             };
+
+        //         },
+        //         error: function() {
+
+        //         },
+
+
+
+        //     })
+        // })
+
+        
+    })
+
+    $('#nominal').on('keyup', function() {
+        var input = $(this).val();
+        var int = input.replace(/[^\w\s]/gi, '')
+        document.getElementById('nominals').value = int;
+    });
+
+    var rupiah = document.getElementById('nominal');
+    rupiah.addEventListener('keyup', function(e) {
+        // tambahkan 'Rp.' pada saat form di ketik
+        // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+        rupiah.value = formatRupiah(this.value);
+    });
+
+    /* Fungsi formatRupiah */
+    function formatRupiah(angka, prefix) {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        // tambahkan titik jika yang di input sudah menjadi angka ribuan
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
         }
-    </script>
 
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+    }
+</script>
+{{-- <script type="text/javascript">
+    $(document).ready(function() {
+        $('#rincian_id').multiselect();
+    });
+</script> --}}
 @stop
+
