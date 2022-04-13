@@ -15,4 +15,9 @@ class Pembayaran extends Model
     {
         return $this->belongsTo(Tagihan::class, 'rincian_id');
     }
+
+    public function bayartagihan()
+    {
+        return $this->hasOne(BayarTagihan::class, 'pembayaran_id');
+    }
 }

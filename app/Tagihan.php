@@ -20,4 +20,9 @@ class Tagihan extends Model
     {
         return $this->hasMany(Pembayaran::class, 'rincian_id');
     }
+
+    public function bayartagihan()
+    {
+        return $this->hasOne(BayarTagihan::class, 'rincian_id');
+    }
 }

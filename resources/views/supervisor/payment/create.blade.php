@@ -127,7 +127,7 @@
                                                             <option value="{{ $item->id_rincian }}">
                                                                 {{ $item->keterangan }}</option>
                                                         @elseif ($item->tipe == 3 && $item->status_pembayaran == 'paid')
-                                                            <option hidden value="{{ $item->id_rincian }}">
+                                                            <option disabled value="{{ $item->id_rincian }}">
                                                                 {{ $item->keterangan }}
                                                             </option>
                                                         @endif
@@ -245,7 +245,9 @@
                                                 <td style="width: 100px">{{ $item->tanggal_konfirmasi }}</td>
                                                 <td style="width: 100px">{{ $item->tanggal_pembayaran }}</td>
                                                 <td>
-                                                    {{ $item->rincian->keterangan }}
+                                                    @foreach ($ket as $kt)
+                                                        {{ $kt->rincian->keterangan }}
+                                                    @endforeach
                                                 </td>
                                                 <td>
                                                     @currency($item->nominal)
@@ -268,7 +270,7 @@
                                                             class="custom-badge status-green">{{ $item->status_approval }}</span>
                                                     @elseif ($item->status_approval == 'reject')
                                                         <span
-                                                        class="custom-badge status-orange">{{ $item->status_approval }}</span>
+                                                            class="custom-badge status-orange">{{ $item->status_approval }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -295,198 +297,208 @@
 
 @stop
 @section('footer')
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js" integrity="sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.js" integrity="sha512-e6Nk3mhokFywlEPtnkGmop6rHh6maUqL0T65yOkbSsJ3/y9yiwb+LzFoSTJM/a4j/gKwh/y/pHiSLxE82ARhJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css" integrity="sha512-Lif7u83tKvHWTPxL0amT2QbJoyvma0s9ubOlHpcodxRxpZo4iIGFw/lDWbPwSjNlnas2PsTrVTTcOoaVfb4kwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.min.css" integrity="sha512-jpey1PaBfFBeEAsKxmkM1Yh7fkH09t/XDVjAgYGrq1s2L9qPD/kKdXC/2I6t2Va8xdd9SanwPYHIAnyBRdPmig==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<script>
-    $(document).ready(function() {
-        // $('#rincian_id').multiselect({
-        //     nonSelectedText: '--Pembayaran--',
-        //     onChange: function (option,selected) {
-        //         var rincian = this.$select.val();
-        //         var nominal = this.$select.val();
-        //         var div = $(this).parent();
-        //         var op = " ";
-        //         var token = $("input[name='_token']").val();
-        //         if (rincian.length > 0) {
-        //             $.ajax({
-        //                 url:  `/supervisor/nominal`,
-        //                 method: "get",
-        //                 data: {
-        //                     'rincian': rincian,
-        //                     'nominal' : nominal,
-                            
-        //                 },
-        //                 success: function(data) {
-        //             // if (data) {
-        //             console.log(data);
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"
+        integrity="sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.js"
+        integrity="sha512-e6Nk3mhokFywlEPtnkGmop6rHh6maUqL0T65yOkbSsJ3/y9yiwb+LzFoSTJM/a4j/gKwh/y/pHiSLxE82ARhJA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css"
+        integrity="sha512-Lif7u83tKvHWTPxL0amT2QbJoyvma0s9ubOlHpcodxRxpZo4iIGFw/lDWbPwSjNlnas2PsTrVTTcOoaVfb4kwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.min.css"
+        integrity="sha512-jpey1PaBfFBeEAsKxmkM1Yh7fkH09t/XDVjAgYGrq1s2L9qPD/kKdXC/2I6t2Va8xdd9SanwPYHIAnyBRdPmig=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+        $(document).ready(function() {
+            // $('#rincian_id').multiselect({
+            //     nonSelectedText: '--Pembayaran--',
+            //     onChange: function (option,selected) {
+            //         var rincian = this.$select.val();
+            //         var nominal = this.$select.val();
+            //         var div = $(this).parent();
+            //         var op = " ";
+            //         var token = $("input[name='_token']").val();
+            //         if (rincian.length > 0) {
+            //             $.ajax({
+            //                 url:  `/supervisor/nominal`,
+            //                 method: "get",
+            //                 data: {
+            //                     'rincian': rincian,
+            //                     'nominal' : nominal,
 
-        //             for (var i = 0; i < data.length; i++) {
-        //                 if (data[i].jumlah_tagihan) {
-        //                     var nominal = data[i].jumlah_tagihan;
-        //                     var numb = nominal;
-        //                     var format = numb.toString().split('').reverse().join('');
-        //                     var convert = format.match(/\d{1,3}/g);
-        //                     var rupiah = convert.join('.').split('').reverse()
-        //                         .join('')
-        //                 } else {
+            //                 },
+            //                 success: function(data) {
+            //             // if (data) {
+            //             console.log(data);
 
-        //                     var nominal = data;
+            //             for (var i = 0; i < data.length; i++) {
+            //                 if (data[i].jumlah_tagihan) {
+            //                     var nominal = data[i].jumlah_tagihan;
+            //                     var numb = nominal;
+            //                     var format = numb.toString().split('').reverse().join('');
+            //                     var convert = format.match(/\d{1,3}/g);
+            //                     var rupiah = convert.join('.').split('').reverse()
+            //                         .join('')
+            //                 } else {
+
+            //                     var nominal = data;
 
 
-        //                 }
-        //                 document.getElementById('nominal').value = nominal;
-        //                 document.getElementById('nominals').value = nominal;
-        //                 console.log(rupiah);
-        //             };
+            //                 }
+            //                 document.getElementById('nominal').value = nominal;
+            //                 document.getElementById('nominals').value = nominal;
+            //                 console.log(rupiah);
+            //             };
 
-        //         },
-        //         error: function() {
+            //         },
+            //         error: function() {
 
-        //         },
-        //             })
-        //         }
-        //     }
-        // });
-        $('#rincian-id').multiselect({
-            nonSelectedText: '--Pembayaran--',
-            onChange: function() { 
-                var rincian_id = this.$select.val();
-                var nominal = this.$select.val();
-                var div = $(this).parent();
-                var op = " ";
-    
-                console.log(rincian_id);
-                $.ajax({
-                    url: `/supervisor/nominal`,
-                    method: "get",
-                    data: {
-                        'rincian_id': rincian_id,
-                        'nominal': nominal,
-                    },
-    
-                    success: function(data) {
-                        // if (data) {
-                        console.log(data);
-    
-                        for (var i = 0; i < data.length; i++) {
-                            if (data[i].jumlah_tagihan) {
-                                var nominal = data[i].jumlah_tagihan;
-                                var numb = nominal;
-                                var format = numb.toString().split('').reverse().join('');
-                                var convert = format.match(/\d{1,3}/g);
-                                var rupiah = convert.join('.').split('').reverse()
-                                    .join('')
-                            } else {
-    
-                                var nominal = data;
-    
-    
-                            }
-                            document.getElementById('nominal').value = nominal;
-                            document.getElementById('nominals').value = nominal;
-                            console.log(rupiah);
-                        };
-    
-                    },
-                    error: function() {
-    
-                    },
-    
-    
-    
-                })
-            }
+            //         },
+            //             })
+            //         }
+            //     }
+            // });
+            $('#rincian-id').multiselect({
+                nonSelectedText: '--Pembayaran--',
+                onChange: function() {
+                    var rincian_id = this.$select.val();
+                    var nominal = this.$select.val();
+                    var div = $(this).parent();
+                    var op = " ";
+
+                    console.log(rincian_id);
+                    $.ajax({
+                        url: `/supervisor/nominal`,
+                        method: "get",
+                        data: {
+                            'rincian_id': rincian_id,
+                            'nominal': nominal,
+                        },
+
+                        success: function(data) {
+                            // if (data) {
+                            console.log(data);
+
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].jumlah_tagihan) {
+                                    var nominal = data[i].jumlah_tagihan;
+                                    var numb = nominal;
+                                    var format = numb.toString().split('').reverse().join(
+                                        '');
+                                    var convert = format.match(/\d{1,3}/g);
+                                    var rupiah = convert.join('.').split('').reverse()
+                                        .join('')
+                                } else {
+
+                                    var nominal = data;
+
+
+                                }
+                                document.getElementById('nominal').value = nominal;
+                                document.getElementById('nominals').value = nominal;
+                                console.log(rupiah);
+                            };
+
+                        },
+                        error: function() {
+
+                        },
+
+
+
+                    })
+                }
+            })
+
+            // $('.rincian').change(function() {
+            //     var rincian_id = $(this).val();
+            //     var nominal = $(this).val();
+            //     var div = $(this).parent();
+            //     var op = " ";
+
+            //     console.log(rincian_id);
+            //     $.ajax({
+            //         url: `/supervisor/nominal`,
+            //         method: "get",
+            //         data: {
+            //             'rincian_id': rincian_id,
+            //             'nominal': nominal,
+            //         },
+
+            //         success: function(data) {
+            //             // if (data) {
+            //             console.log(data);
+
+            //             for (var i = 0; i < data.length; i++) {
+            //                 if (data[i].jumlah_tagihan) {
+            //                     var nominal = data[i].jumlah_tagihan;
+            //                     var numb = nominal;
+            //                     var format = numb.toString().split('').reverse().join('');
+            //                     var convert = format.match(/\d{1,3}/g);
+            //                     var rupiah = convert.join('.').split('').reverse()
+            //                         .join('')
+            //                 } else {
+
+            //                     var nominal = data;
+
+
+            //                 }
+            //                 document.getElementById('nominal').value = nominal;
+            //                 document.getElementById('nominals').value = nominal;
+            //                 console.log(rupiah);
+            //             };
+
+            //         },
+            //         error: function() {
+
+            //         },
+
+
+
+            //     })
+            // })
+
+
         })
 
-        // $('.rincian').change(function() {
-        //     var rincian_id = $(this).val();
-        //     var nominal = $(this).val();
-        //     var div = $(this).parent();
-        //     var op = " ";
+        $('#nominal').on('keyup', function() {
+            var input = $(this).val();
+            var int = input.replace(/[^\w\s]/gi, '')
+            document.getElementById('nominals').value = int;
+        });
 
-        //     console.log(rincian_id);
-        //     $.ajax({
-        //         url: `/supervisor/nominal`,
-        //         method: "get",
-        //         data: {
-        //             'rincian_id': rincian_id,
-        //             'nominal': nominal,
-        //         },
+        var rupiah = document.getElementById('nominal');
+        rupiah.addEventListener('keyup', function(e) {
+            // tambahkan 'Rp.' pada saat form di ketik
+            // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+            rupiah.value = formatRupiah(this.value);
+        });
 
-        //         success: function(data) {
-        //             // if (data) {
-        //             console.log(data);
+        /* Fungsi formatRupiah */
+        function formatRupiah(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-        //             for (var i = 0; i < data.length; i++) {
-        //                 if (data[i].jumlah_tagihan) {
-        //                     var nominal = data[i].jumlah_tagihan;
-        //                     var numb = nominal;
-        //                     var format = numb.toString().split('').reverse().join('');
-        //                     var convert = format.match(/\d{1,3}/g);
-        //                     var rupiah = convert.join('.').split('').reverse()
-        //                         .join('')
-        //                 } else {
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
 
-        //                     var nominal = data;
-
-
-        //                 }
-        //                 document.getElementById('nominal').value = nominal;
-        //                 document.getElementById('nominals').value = nominal;
-        //                 console.log(rupiah);
-        //             };
-
-        //         },
-        //         error: function() {
-
-        //         },
-
-
-
-        //     })
-        // })
-
-        
-    })
-
-    $('#nominal').on('keyup', function() {
-        var input = $(this).val();
-        var int = input.replace(/[^\w\s]/gi, '')
-        document.getElementById('nominals').value = int;
-    });
-
-    var rupiah = document.getElementById('nominal');
-    rupiah.addEventListener('keyup', function(e) {
-        // tambahkan 'Rp.' pada saat form di ketik
-        // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
-        rupiah.value = formatRupiah(this.value);
-    });
-
-    /* Fungsi formatRupiah */
-    function formatRupiah(angka, prefix) {
-        var number_string = angka.replace(/[^,\d]/g, '').toString(),
-            split = number_string.split(','),
-            sisa = split[0].length % 3,
-            rupiah = split[0].substr(0, sisa),
-            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-        // tambahkan titik jika yang di input sudah menjadi angka ribuan
-        if (ribuan) {
-            separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
+            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
         }
-
-        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
-    }
-</script>
-{{-- <script type="text/javascript">
+    </script>
+    {{-- <script type="text/javascript">
     $(document).ready(function() {
         $('#rincian_id').multiselect();
     });
 </script> --}}
 @stop
-
