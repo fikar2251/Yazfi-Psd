@@ -15,11 +15,11 @@
                         <td style="width: 20px">:</td>
                         <td> {{ $spr->no_transaksi }} </td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <td style="width: 100px">Tanggal</td>
                         <td style="width: 20px">:</td>
                         <td> {{ $spr->tanggal_transaksi }} </td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
             </table>
         </div>
@@ -134,7 +134,7 @@
                                     <td style="width: 200px">Penambahan Luas Tanah</td>
                                     <td style="width: 20px">:</td>
                                     <td>
-                                        @if ($spr->unit->nstd = '-')
+                                        @if ($spr->unit->nstd == '-')
                                             -
                                         @else
                                             {{ $spr->unit->nstd }} M<sup>2</sup>

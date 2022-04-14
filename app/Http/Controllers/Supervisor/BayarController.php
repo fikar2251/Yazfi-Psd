@@ -38,19 +38,14 @@ class BayarController extends Controller
         $getSpr = Spr::where('no_transaksi', $no)->get();
         $tagihan = Tagihan::where('no_transaksi', $no)->get();
         $bayar = Pembayaran::where('no_detail_transaksi', $no)->get();
-
-        foreach ($bayar as $key) {
-            $ket = Bayartagihan::whereIn('pembayaran_id', $key)->get();
-           
-        }
-        // foreach ($ket as $ky) {
-        //     echo $ky->rincian->keterangan;
-        // }
-       
-        // dd($ket);
-
-        return view('supervisor.payment.create', compact('spr', 'getSpr', 'tagihan', 'bayar', 'id', 'ket'));
-
+        
+        $total = Pembayaran::where('no_detail_transaksi', $no)
+                ->where('status_approval', 'paid')->sum('nominal');
+        
+        $totaltg = Tagihan::where('no_transaksi', $no)->sum('jumlah_tagihan');
+        $sisa = $totaltg - $total;
+        
+        return view('supervisor.payment.create', compact('spr', 'getSpr', 'tagihan', 'bayar', 'id','total', 'sisa'));
     }
 
     public function sales()

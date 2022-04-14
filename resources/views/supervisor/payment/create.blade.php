@@ -147,6 +147,20 @@
                                                     <option value="Mandiri">Mandiri</option>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td style="width: 200px">Total pembayaran</td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+                                                @currency($total)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 200px">Sisa pembayaran</td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+                                                @currency($sisa)
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -245,9 +259,10 @@
                                                 <td style="width: 100px">{{ $item->tanggal_konfirmasi }}</td>
                                                 <td style="width: 100px">{{ $item->tanggal_pembayaran }}</td>
                                                 <td>
-                                                    @foreach ($ket as $kt)
-                                                        {{ $kt->rincian->keterangan }}
+                                                    @foreach ($item->bayartagihan as $by)
+                                                        {{$by->rincian->keterangan}} <br>
                                                     @endforeach
+                                                   {{-- {{$item->rincian->keterangan}} --}}
                                                 </td>
                                                 <td>
                                                     @currency($item->nominal)

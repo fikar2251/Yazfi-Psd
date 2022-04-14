@@ -36,7 +36,9 @@
                                                 value="{{ $item->no_detail_transaksi }}"></td>
                                         <td>{{ $item->tanggal_pembayaran }}</td>
                                         <td>
-                                            {{ $item->rincian->keterangan }}
+                                            @foreach ($item->bayartagihan as $by)
+                                                {{ $by->rincian->keterangan }} <br>
+                                            @endforeach
                                         </td>
                                         <td>
                                             @currency($item->nominal)
@@ -81,7 +83,10 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h4 class="modal-title" id="exampleModalLabel">
-                                                                    {{ $item->rincian->keterangan }}</h4>
+                                                                    @foreach ($item->bayartagihan as $by)
+                                                                        {{ $by->rincian->keterangan }} <br>
+                                                                    @endforeach
+                                                                </h4>
                                                                 <button type="button" class="close"
                                                                     data-dismiss="modal" aria-label="Close">&times;</button>
                                                             </div>
@@ -96,20 +101,8 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <div style="width: 200px"
-                                                                                        class="input-group date"
-                                                                                        data-provide="datepicker"
-                                                                                        data-date-format="dd/mm/yyyy">
-                                                                                        <input type="text"
-                                                                                            class="form-control"
-                                                                                            name="tanggal_pembayaran"
-                                                                                            value="{{ $item->tanggal_pembayaran }}">
-                                                                                        <div class="input-group-addon">
-                                                                                            <span
-                                                                                                class="glyphicon glyphicon-th"></span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    
+                                                                                    {{ $item->tanggal_pembayaran }}
+
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -175,13 +168,15 @@
                                                                                     <select name="status" id="status"
                                                                                         class="form-control rincian">
                                                                                         @php
-                                                                                        foreach ($bayar as $key) {
-                                                                                            
-                                                                                            $status = App\Pembayaran::where('id', $key->id)->first();
-                                                                                        }
+                                                                                            foreach ($bayar as $key) {
+                                                                                                $status = App\Pembayaran::where('id', $key->id)->first();
+                                                                                            }
                                                                                         @endphp
-                                                                                        
-                                                                                        <option value="{{$status->id}}">{{$status->status_approval}}</option>
+
+                                                                                        <option
+                                                                                            value="{{ $status->id }}">
+                                                                                            {{ $status->status_approval }}
+                                                                                        </option>
                                                                                         <option value="paid">paid
                                                                                         </option>
                                                                                         <option value="reject">reject

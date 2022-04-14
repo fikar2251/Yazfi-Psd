@@ -35,8 +35,9 @@
                         <label for=" tanggal" class="col-sm-1">Tanggal <span>:</span></label>
                         <div class="col-sm-2">
                             <input style="text-decoration: none; border-style: none; background-color: #FAFAFA" type="text"
-                                name="tanggal_transaksi" id="tanggal_transaksi"
+                                name="tanggal" id="tanggal_transaksi"
                                 value="{{ Carbon\Carbon::now()->format('d-m-Y') }}" >
+                                <input type="hidden" name="tanggal_transaksi" value="{{ Carbon\Carbon::now()->format('Y-m-d')}}">
                         </div>
                     </div>
                 </div>
