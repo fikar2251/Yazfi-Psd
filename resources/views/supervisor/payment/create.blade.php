@@ -13,6 +13,13 @@
                             value="{{ Carbon\Carbon::now()->format('d-m-Y') }}">
                     </div>
                 </div>
+                <div class="form-group row d-flex justify-content-center">
+                    <label for=" tanggal" class="col-sm-1">Sales <span>:</span></label>
+                    <div class="col-sm-2">
+                        <input style="text-decoration: none; border-style: none; background-color: #FAFAFA" type="text"
+                            name="nama_sales" id="nama_sales" value="{{ $nama->user->name }}">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -20,19 +27,21 @@
     <form action="" method="GET">
         <div class="form-group row d-flex justify-content-center mt-2">
             <label for="name" class="col-sm-2">Masukkan nomor SPR :</label>
-            <div class="col-sm-2">
-                <select name="no_transaksi" id="spr" class="form-control">
+            <div class="col-sm-3">
+                <select name="no_transaksi" id="spr" class="form-control select2" style="width: 200%">
                     @if (!request()->get('no_transaksi'))
                         <option selected value=""></option>
                     @endif
                     @foreach ($spr as $item)
                         @if (request()->get('no_transaksi') == $item->no_transaksi)
-                            <option value="{{ $item->no_transaksi }}" selected>{{ $item->no_transaksi }}</option>
+                            <option value="{{ $item->no_transaksi }}" selected>{{ $item->no_transaksi }} / {{$item->nama}}</option>
                         @else
-                            <option value="{{ $item->no_transaksi }}">{{ $item->no_transaksi }}</option>
+                            <option value="{{ $item->no_transaksi }}">{{ $item->no_transaksi }} / {{$item->nama}}</option>
                         @endif
                     @endforeach
                 </select>
+
+                {{-- <input type="text" name="no_transaksi" id="transaksi" class="typeahead form-control"> --}}
             </div>
             <div class="col-sm-2">
                 <button type="submit" name="submit" class="btn btn-primary">Cari</button>
@@ -260,9 +269,9 @@
                                                 <td style="width: 100px">{{ $item->tanggal_pembayaran }}</td>
                                                 <td>
                                                     @foreach ($item->bayartagihan as $by)
-                                                        {{$by->rincian->keterangan}} <br>
+                                                        {{ $by->rincian->keterangan }} <br>
                                                     @endforeach
-                                                   {{-- {{$item->rincian->keterangan}} --}}
+                                                    {{-- {{$item->rincian->keterangan}} --}}
                                                 </td>
                                                 <td>
                                                     @currency($item->nominal)
@@ -313,6 +322,11 @@
 @stop
 @section('footer')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    {{-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script> --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"
         integrity="sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -327,6 +341,28 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.min.css"
         integrity="sha512-jpey1PaBfFBeEAsKxmkM1Yh7fkH09t/XDVjAgYGrq1s2L9qPD/kKdXC/2I6t2Va8xdd9SanwPYHIAnyBRdPmig=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+        $('.select2').select2();
+    </script>
+    <script>
+        $(function() {
+            $('.selectpicker').selectpicker();
+        });
+    </script>
+
+    <script type="text/javascript">
+        var path = "{{ route('supervisor.autocomplete') }}";
+        $('input.typeahead').typeahead({
+            source: function(query, process) {
+                return $.get(path, {
+                    query: query
+                }, function(data) {
+                    return process(data);
+                });
+            }
+        });
+    </script>
+
     <script>
         $(document).ready(function() {
             // $('#rincian_id').multiselect({

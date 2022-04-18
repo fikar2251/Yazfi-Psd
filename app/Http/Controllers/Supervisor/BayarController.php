@@ -34,8 +34,9 @@ class BayarController extends Controller
     public function show($id)
     {
         $no = request()->get('no_transaksi');
-        $spr = Spr::select('no_transaksi')->where('id_sales', $id)->get();
+        $spr = Spr::select('no_transaksi', 'nama')->where('id_sales', $id)->get();
         $getSpr = Spr::where('no_transaksi', $no)->get();
+        $nama = Spr::where('id_sales', $id)->first();
         $tagihan = Tagihan::where('no_transaksi', $no)->get();
         $bayar = Pembayaran::where('no_detail_transaksi', $no)->get();
         
@@ -45,7 +46,7 @@ class BayarController extends Controller
         $totaltg = Tagihan::where('no_transaksi', $no)->sum('jumlah_tagihan');
         $sisa = $totaltg - $total;
         
-        return view('supervisor.payment.create', compact('spr', 'getSpr', 'tagihan', 'bayar', 'id','total', 'sisa'));
+        return view('supervisor.payment.create', compact('spr', 'getSpr', 'tagihan', 'bayar', 'id','total', 'sisa', 'nama'));
     }
 
     public function sales()
@@ -117,6 +118,7 @@ class BayarController extends Controller
         $getSpr = Spr::where('no_transaksi', $no)->get();
         $tagihan = Tagihan::where('no_transaksi', $no)->get();
         $bayar = Pembayaran::where('no_detail_transaksi', $no)->get();
+        $nama = Spr::where('id_sales', $id)->first();
 
         // $alasan = Alasan::all();
         if ($no) {
@@ -127,18 +129,21 @@ class BayarController extends Controller
             }
             $idtf = $no->id_transaksi;
             $batal = PembatalanUnit::where('spr_id', $idtf)->first();
+          
             if ($batal) {
                 # code...
                 $idbatal = $batal->spr->no_transaksi;
-                return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'idbatal'));
+                
+                return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'idbatal', 'nama'));
             } else {
+               
                 $idbatal = '';
-                return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'idbatal'));
+                return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'idbatal', 'nama'));
             }
 
         } else {
             # code...
-            return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'id'));
+            return view('supervisor.cancel.cancel', compact('getSpr', 'spr', 'id', 'nama'));
         }
 
     }
@@ -261,5 +266,16 @@ class BayarController extends Controller
         // dd($tagihan);
         // }
         return redirect()->back();
+    }
+
+    public function autoComplete(Request $request)
+    {
+       
+
+        $data = Spr::select("no_transaksi as name")->where("no_transaksi","LIKE","%{$request->input('query')}%")
+        
+        ->get();
+
+        return response()->json($data);
     }
 }
