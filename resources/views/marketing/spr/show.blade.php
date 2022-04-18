@@ -134,12 +134,15 @@
                                     <td style="width: 200px">Penambahan Luas Tanah</td>
                                     <td style="width: 20px">:</td>
                                     <td>
-                                        @if ($spr->unit->nstd == '-')
-                                            -
-                                        @else
-                                            {{ $spr->unit->nstd }} M<sup>2</sup>
-                                        @endif
-
+                                        @php
+                                            $string = preg_replace("/[^0-9]/","",$spr->unit->nstd);
+                                           if ($spr->unit->nstd == $string) {
+                                                echo $spr->unit->nstd . ' M<sup>2</sup>';
+                                           }elseif ($spr->unit->nstd != $string ) {
+                                               echo "-";
+                                           }
+                                        @endphp
+                                    </td>
                                     <td style="width: 200px">Total</td>
                                     <td style="width: 20px">:</td>
                                     <td>

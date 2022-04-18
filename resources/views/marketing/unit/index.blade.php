@@ -46,13 +46,27 @@
                                         </td>
                                         <td>
 
-                                            {{ $item->lb }}
+                                            {{ $item->lb }} M<sup>2</sup>
                                         </td>
-                                        <td>{{ $item->lt }}</td>
-                                        <td>{{ $item->nstd }}</td>
+                                        <td>{{ $item->lt }} M<sup>2</sup></td>
+                                        <td>
+                                        {{-- @if ($item->nstd == '-')
+                                            -
+                                        @else
+                                            {{ $item->nstd }} M<sup>2</sup>
+                                        @endif --}}
+                                        @php
+                                            $string = preg_replace("/[^0-9]/","",$item->nstd);
+                                           if ($item->nstd == $string) {
+                                                echo $item->nstd . ' M<sup>2</sup>';
+                                           }elseif ($item->nstd != $string ) {
+                                               echo "-";
+                                           }
+                                        @endphp
+                                        </td>
                                         <td>
 
-                                            {{ $item->total }}
+                                            {{ $item->total }} M<sup>2</sup>
                                         </td>
                                         <td>
 
