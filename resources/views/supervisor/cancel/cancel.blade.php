@@ -38,7 +38,7 @@
                     <label for=" tanggal" class="col-sm-1">Sales <span>:</span></label>
                     <div class="col-sm-2">
                         <input style="text-decoration: none; border-style: none; background-color: #FAFAFA" type="text"
-                            name="nama_sales" id="nama_sales" value="{{ $nama->user->name }}">
+                            name="nama_sales" id="nama_sales" value="{{ $nama->name }}">
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
     <form action="" method="GET">
         <div class="form-group row d-flex justify-content-center mt-2">
             <label for="name" class="col-sm-2">Masukkan nomor SPR :</label>
-            <div class="col-sm-3">
+            <div class="col-sm-3"> 
                 <select name="no_transaksi" id="spr" class="form-control select2">
                     @if (!request()->get('no_transaksi'))
                         <option selected value=""></option>
@@ -121,14 +121,14 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="width: 200px">LT</td>
+                                                <td style="width: 200px">Total Luas Tanah</td>
                                                 <td style="width: 20px">:</td>
                                                 <td>
-                                                    {{ $item->unit->lt }} M<sup>2</sup>
+                                                    {{ $item->unit->total }} M<sup>2</sup>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="width: 200px">LB</td>
+                                                <td style="width: 200px">Luas Bangunan</td>
                                                 <td style="width: 20px">:</td>
                                                 <td>
                                                     {{ $item->unit->lb }} M<sup>2</sup>

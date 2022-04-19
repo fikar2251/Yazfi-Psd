@@ -232,8 +232,8 @@ class FinanceController extends Controller
                 $rumah->save();
             }
             $rincianid = $bayar->rincian_id;
-                $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
-                $sum = (int) $bayar1;
+            $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
+            $sum = (int) $bayar1;
             $jumlah = $tagihans->sum('jumlah_tagihan');
             if ($bayar->nominal == $jumlah) {
                 $tagihans = Tagihan::whereIn('id_rincian', $array)->update(array(
@@ -243,7 +243,7 @@ class FinanceController extends Controller
                 $tagihans = Tagihan::whereIn('id_rincian', $array)->update(array(
                     'status_pembayaran' => 'partial',
                 ));
-            }elseif ($sum == $jumlah) {
+            } elseif ($sum == $jumlah) {
                 $tagihans = Tagihan::whereIn('id_rincian', $array)->update(array(
                     'status_pembayaran' => 'paid',
                 ));
@@ -1179,6 +1179,39 @@ class FinanceController extends Controller
         ]);
 
         return redirect()->route('finance.gaji')->with('success', 'Status Penerimaan Complete');
+    }
+
+    public function chart()
+    {   
+        $cat = DB::table('cat_chart_of_account')->get();
+        return view('finance.accounting.chart_of_account.index', compact('cat'));
+    }
+
+    public function ajax_chart()
+    {
+        $chart = DB::table('new_chart_of_account')
+            ->leftJoin('cat_chart_of_account', 'cat_chart_of_account.id_cat', '=', 'new_chart_of_account.cat_id')
+            ->get();
+
+        return DataTables::of($chart)
+            ->editColumn('type', function ($chart) {
+                return $chart->nama_cat;
+            })
+            ->editColumn('action', function ($chart) {
+                return '<a href="#" class="btn btn-warning">
+              <i class="fa-solid fa-pen-to-square"></i>
+          </a>';
+            })
+
+            ->addIndexColumn()
+            ->rawColumns(['type', 'action'])
+            ->make(true);
+
+    }
+
+    public function createChart()
+    {
+        return view('finance.accounting.chart_of_account.create');
     }
 
 }

@@ -17,7 +17,7 @@
                     <label for=" tanggal" class="col-sm-1">Sales <span>:</span></label>
                     <div class="col-sm-2">
                         <input style="text-decoration: none; border-style: none; background-color: #FAFAFA" type="text"
-                            name="nama_sales" id="nama_sales" value="{{ $nama->user->name }}">
+                            name="nama_sales" id="nama_sales" value="{{ $nama->name }}">
                     </div>
                 </div>
             </div>

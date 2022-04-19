@@ -265,6 +265,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/gaji', 'FinanceController@gaji')->name('gaji');
             Route::get('/gaji/json', 'FinanceController@ajax_gaji')->name('ajax.gaji');
             Route::post('/gaji/update/{id}', 'FinanceController@updateGaji')->name('gaji.update');
+
+            //Route Accounting
+            Route::get('/chart', 'FinanceController@chart')->name('chart');
+            Route::get('/chart/json', 'FinanceController@ajax_chart')->name('ajax.chart');
+            Route::get('/chart/create', 'FinanceController@createChart')->name('chart.create');
         });
 
         // Route Supervisor

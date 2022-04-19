@@ -36,7 +36,7 @@ class BayarController extends Controller
         $no = request()->get('no_transaksi');
         $spr = Spr::select('no_transaksi', 'nama')->where('id_sales', $id)->get();
         $getSpr = Spr::where('no_transaksi', $no)->get();
-        $nama = Spr::where('id_sales', $id)->first();
+        $nama = User::where('id', $id)->first();
         $tagihan = Tagihan::where('no_transaksi', $no)->get();
         $bayar = Pembayaran::where('no_detail_transaksi', $no)->get();
         
@@ -118,7 +118,7 @@ class BayarController extends Controller
         $getSpr = Spr::where('no_transaksi', $no)->get();
         $tagihan = Tagihan::where('no_transaksi', $no)->get();
         $bayar = Pembayaran::where('no_detail_transaksi', $no)->get();
-        $nama = Spr::where('id_sales', $id)->first();
+        $nama = User::where('id', $id)->first();
 
         // $alasan = Alasan::all();
         if ($no) {

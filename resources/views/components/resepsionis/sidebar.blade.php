@@ -9,7 +9,7 @@
         <a href="{{ route('finance.payment') }}"><i class="fa-solid fa-money-bill-wave"></i> <span>Payment</span></a>
     </li>
 
-      <li class="submenu">
+    <li class="submenu">
         <a href="#"><i class="fa fa-money" aria-hidden="true"></i> <span>Refund</span><span
                 class="menu-arrow"></span></a>
         <ul style="display: none;">
@@ -22,8 +22,21 @@
         </ul>
     </li>
     
-
     <li class="{{ request()->is('finance/komisi') ? 'active' : '' }}">
         <a href="{{ route('finance.komisi') }}"><i class="fa fa-files-o"></i> <span>Komisi</span></a>
     </li>
+
+    <li class="submenu">
+        <a href="#"><i class="fa-solid fa-book"></i><span>Accounting</span><span
+                class="menu-arrow"></span></a>
+        <ul style="display: none;">
+            <li class="{{ request()->is('finance/chart') ? 'active' : '' }}">
+                <a href="{{ route('finance.chart') }}"><span>Chart of account</span></a>
+            </li>
+            <li class="{{ request()->is('finance/refund/list') ? 'active' : '' }}">
+                <a href="{{ route('finance.refund.list') }}"><span>List Refund</span></a>
+            </li>
+        </ul>
+    </li>
+
 </ul>
