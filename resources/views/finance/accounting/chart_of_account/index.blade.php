@@ -1,5 +1,12 @@
 @extends('layouts.master', ['title' => 'Chart of account'])
+@section('auto')
+    <style>
+        table.dataTable td {
+            font-size: 13px;
+        }
 
+    </style>
+@endsection
 @section('content')
     <div class="row">
         <div class="col-sm-4 col-3">
@@ -15,11 +22,13 @@
             </button>
         </div>
     </div>
-
+    <x-alert></x-alert>
+    <br />
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow">
                 <div class="card-body">
+                   
                     <div class="table-responsive">
                         <table class="table table-bordered custom-table table-striped" id="chart" style="width: 100%">
                             <thead>
@@ -29,7 +38,7 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>Balance</th>
-                                    <th>Action</th>
+                                    <th style="width: 20px">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,13 +60,13 @@
                         Add Chart of account</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
                 </div>
-                <form action="#" method="POST">
+                <form action="{{ route('finance.store.chart') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Account type</label>
                             <div class="col-md-9">
-                                <select class="form-control" name="cat_chart" id="cat-chart">
+                                <select class="form-control type" name="cat_id" id="cat_id">
                                     <option>--Select Type--</option>
                                     @foreach ($cat as $item)
                                         <option value="{{ $item->id_cat }}">{{ $item->nama_cat }}</option>
@@ -68,40 +77,40 @@
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Account No</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" name="kode">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Name</label>
                             <div class="col-md-9">
-                                <input type="email" class="form-control">
+                                <input type="text" class="form-control" name="deskripsi">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Sub Account</label>
+                            <label class="col-md-3 col-form-label ">Sub Account</label>
                             <div class="col-md-9">
-                               <select name="sub_account" id="sub-account" class="form-control">
-                                   <option>--Select sub account--</option>
-                               </select>
+                                <select name="child_numb" id="child-numb" class="form-control root">
+                                    <option selected value="0">--Select sub account--</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Opening Balance</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" name="balance">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">tanggal</label>
+                            <label class="col-md-3 col-form-label">Tanggal</label>
                             <div class="col-md-9">
-                                <input type="date" class="form-control">
+                                <input type="date" class="form-control" name="tanggal">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Notes</label>
                             <div class="col-md-9">
-                                <textarea name="notes" id="notes" rows="5" cols="53">
-
+                                <textarea name="notes" id="notes" rows="5" cols="53" >
+                                    
                                 </textarea>
                             </div>
                         </div>
@@ -115,8 +124,8 @@
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div> 
+        </div>  
     </div>
 
 @stop
@@ -153,9 +162,23 @@
                 orderCellsTop: true,
                 fixedHeader: true,
                 dom: 'Bfrtip',
-                // buttons: [
-                //     'copy', 'csv', 'excel', 'pdf', 'print'
-                // ],
+                columnDefs: [{
+                        targets: 5,
+                        className: 'dt-body-center'
+                    },
+                    {
+                        targets: 0,
+                        className: 'dt-body-center'
+                    },
+                    {
+                        targets: 1,
+                        width: '15%'
+                    },
+                    {
+                        targets: 4,
+                        width: '20%'
+                    }
+                ],
                 buttons: [{
                         extend: 'copy',
                         className: 'btn-default',
@@ -245,9 +268,9 @@
                                 });
                         });
                 },
-                order: [
-                    [0, 'desc']
-                ],
+                // order: [
+                //     [0, 'desc']
+                // ],
 
                 ajax: "/finance/chart/json",
 
@@ -281,7 +304,7 @@
                     {
                         data: 'balance',
                         name: 'balance',
-
+                        render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
                     },
                     {
                         data: 'action',
@@ -290,5 +313,43 @@
                 ]
             });
         });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.type').change(function() {
+                var cat_id = $(this).val();
+                var child_numb = $(this).val();
+                var div = $(this).parent();
+                var op = " ";
+
+                console.log(cat_id);
+                $.ajax({
+                    url: `/finance/account`,
+                    method: "get",
+                    data: {
+                        'cat_id': cat_id,
+                        'child_numb': child_numb,
+                    },
+
+                    success: function(data) {
+                        // if (data) {
+                        console.log(data);
+                        op += '<option value="0">--Select Sub account--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            op += '<option value=" ' + data[i].id + ' ">' + data[i].deskripsi +
+                                '</option>'
+                        };
+                        $('.root').html(op);
+                    },
+                    error: function() {
+
+                    },
+
+
+
+                })
+            })
+        })
     </script>
 @endsection

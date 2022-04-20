@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\BayarTagihan;
+use App\ChartOfAccount;
 use App\Http\Controllers\Controller;
 use App\Komisi;
 use App\Pembayaran;
@@ -1184,27 +1185,33 @@ class FinanceController extends Controller
     public function chart()
     {   
         $cat = DB::table('cat_chart_of_account')->get();
+        $parent = ChartOfAccount::with('children')->get();
+        
         return view('finance.accounting.chart_of_account.index', compact('cat'));
     }
 
     public function ajax_chart()
     {
-        $chart = DB::table('new_chart_of_account')
-            ->leftJoin('cat_chart_of_account', 'cat_chart_of_account.id_cat', '=', 'new_chart_of_account.cat_id')
-            ->get();
+        // $chart = DB::table('new_chart_of_account')
+        //     ->leftJoin('cat_chart_of_account', 'cat_chart_of_account.id_cat', '=', 'new_chart_of_account.cat_id')
+        //     ->get();
 
-        return DataTables::of($chart)
-            ->editColumn('type', function ($chart) {
-                return $chart->nama_cat;
+        $parent = ChartOfAccount::with('children')->get();
+
+        return DataTables::of($parent)
+            ->editColumn('type', function ($parent) {
+                return $parent->category->nama_cat;
             })
-            ->editColumn('action', function ($chart) {
+            
+            ->editColumn('action', function ($parent) {
                 return '<a href="#" class="btn btn-warning">
               <i class="fa-solid fa-pen-to-square"></i>
           </a>';
             })
+          
 
             ->addIndexColumn()
-            ->rawColumns(['type', 'action'])
+            ->rawColumns(['type', 'action', 'deskripsi'])
             ->make(true);
 
     }
@@ -1212,6 +1219,31 @@ class FinanceController extends Controller
     public function createChart()
     {
         return view('finance.accounting.chart_of_account.create');
+    }
+
+    public function account(Request $request)
+    {
+      
+        $data = DB::table('new_chart_of_account')
+            ->where('cat_id', $request->cat_id)
+            ->get();
+
+        return $data;
+    }
+
+    public function storeChart(Request $request)
+    {
+        DB::table('new_chart_of_account')->insert([
+            'kode' => $request->kode,
+            'deskripsi' => $request->deskripsi,
+            'balance' => $request->balance,
+            'cat_id' => $request->cat_id,
+            'tanggal' => $request->tanggal,
+            'notes' => !empty($request->notes) ? $request->notes : '',
+            'child_numb' => $request->child_numb
+        ]);
+
+        return redirect()->back()->with('success', 'Chart of account berhasil ditambahkan');
     }
 
 }

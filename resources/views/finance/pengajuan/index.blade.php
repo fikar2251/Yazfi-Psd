@@ -5,12 +5,12 @@
     <div class="col-md-4">
         <h1 class="page-title">Pengajuan Dana</h1>
     </div>
-    @can('pengajuan-create')
+    {{-- @can('pengajuan-create')
     <div class="col-sm-8 text-right m-b-20">
         <a href="{{ route('hrd.pengajuan.create') }}" class="btn btn btn-primary btn-rounded float-right"><i
                 class="fa fa-plus"></i> Add Pengajuan</a>
     </div>
-    @endcan
+    @endcan --}}
 </div>
 <x-alert></x-alert>
 <br />
