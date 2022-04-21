@@ -28,7 +28,7 @@
         <div class="col-lg-12">
             <div class="card shadow">
                 <div class="card-body">
-                   
+
                     <div class="table-responsive">
                         <table class="table table-bordered custom-table table-striped" id="chart" style="width: 100%">
                             <thead>
@@ -42,7 +42,49 @@
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @php
+                                    $i = 0;
+                                @endphp
+                                @foreach ($parent as $item)
+                              
+                                    <tr>
+                                        <td> {{ ++$i }} </td>
+                                        <td>
+                                            {{ $item->kode }}
+                                        </td>
+                                        <td style="font-weight: 500">
+                                           {{ $item->deskripsi }} 
+                                           
+                                        </td>
+                                        <td style="font-weight: 500"> {{ $item->category->nama_cat }} </td>
+                                        <td> @currency($item->balance) </td>
+                                        <td>
+                                            <a href="#" class="btn btn-warning">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @foreach ($item->children as $child)
+                                   <tr>
+                                    <td> {{++$i}} </td>
+                                    <td>
+                                        {{ $child->kode }}
+                                    </td>
+                                    <td>
+                                      &nbsp; &nbsp; &nbsp; {{ $child->deskripsi }}
+                                       
+                                    </td>
+                                    <td> {{ $child->category->nama_cat }} </td>
+                                    <td> @currency($child->balance) </td>
+                                    <td>
+                                        <a href="#" class="btn btn-warning">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                    </td>
+                                    
+                                   </tr>
+                                   @endforeach
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -109,8 +151,8 @@
                         <div class="form-group row">
                             <label class="col-md-3 col-form-label">Notes</label>
                             <div class="col-md-9">
-                                <textarea name="notes" id="notes" rows="5" cols="53" >
-                                    
+                                <textarea name="notes" id="notes" rows="5" cols="53">
+
                                 </textarea>
                             </div>
                         </div>
@@ -124,8 +166,8 @@
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
                 </form>
-            </div> 
-        </div>  
+            </div>
+        </div>
     </div>
 
 @stop
@@ -158,7 +200,7 @@
 
             $('#chart').DataTable({
                 processing: true,
-                serverSide: true,
+                // serverSide: true,
                 orderCellsTop: true,
                 fixedHeader: true,
                 dom: 'Bfrtip',
@@ -272,7 +314,7 @@
                 //     [0, 'desc']
                 // ],
 
-                ajax: "/finance/chart/json",
+                // ajax: "/finance/chart/json",
 
                 // ajax: {
                 //     url: '/finance/payment/json',
@@ -284,39 +326,39 @@
 
                 // },
 
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
+                // columns: [{
+                //         data: 'DT_RowIndex',
+                //         name: 'DT_RowIndex',
 
-                    },
-                    {
-                        data: 'kode',
-                        name: 'kode',
-                    },
-                    {
-                        data: 'deskripsi',
-                        name: 'deskripsi',
-                    },
-                    {
-                        data: 'type',
-                        name: 'type',
-                    },
-                    {
-                        data: 'balance',
-                        name: 'balance',
-                        render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                    },
-                ]
+                //     },
+                //     {
+                //         data: 'kode',
+                //         name: 'kode',
+                //     },
+                //     {
+                //         data: 'deskripsi',
+                //         name: 'deskripsi',
+                //     },
+                //     {
+                //         data: 'type',
+                //         name: 'type',
+                //     },
+                //     {
+                //         data: 'balance',
+                //         name: 'balance',
+                //         render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                //     },
+                //     {
+                //         data: 'action',
+                //         name: 'action',
+                //     },
+                // ]
             });
         });
     </script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.type').change(function() {
                 var cat_id = $(this).val();
                 var child_numb = $(this).val();

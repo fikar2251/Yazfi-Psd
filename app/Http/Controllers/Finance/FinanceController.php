@@ -1185,9 +1185,9 @@ class FinanceController extends Controller
     public function chart()
     {   
         $cat = DB::table('cat_chart_of_account')->get();
-        $parent = ChartOfAccount::with('children')->get();
+        $parent = ChartOfAccount::with('children')->root()->get();
         
-        return view('finance.accounting.chart_of_account.index', compact('cat'));
+        return view('finance.accounting.chart_of_account.index', compact('cat', 'parent'));
     }
 
     public function ajax_chart()
@@ -1201,6 +1201,13 @@ class FinanceController extends Controller
         return DataTables::of($parent)
             ->editColumn('type', function ($parent) {
                 return $parent->category->nama_cat;
+            })
+            ->editColumn('deskripsi', function ($parent) {
+                $desc = '';
+                foreach ($parent->children as $key) {
+                    $desc .= '<br>'.$key->deskripsi.'';
+                }
+                return [$desc, $parent->deskripsi];
             })
             
             ->editColumn('action', function ($parent) {

@@ -87,7 +87,9 @@ class SprController extends Controller
         $data = DB::table('unit_rumah')
             ->select('unit_rumah.type', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.status_penjualan')
             ->groupBy('unit_rumah.blok')
-            ->where($blok)->get();
+            ->where($blok)->orWhere([
+                'status_penjualan' => ' '
+            ])->get();
 
         return $data;
     }
@@ -102,7 +104,9 @@ class SprController extends Controller
         $data = DB::table('unit_rumah')
             ->select('unit_rumah.id_unit_rumah', 'unit_rumah.type', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.status_penjualan')
             ->groupBy('unit_rumah.no')
-            ->where($no)->get();
+            ->where($no)->orWhere([
+                'status_penjualan' => ' '
+            ])->get();
 
         return $data;
     }
@@ -328,6 +332,7 @@ class SprController extends Controller
         $skema = Skema::all();
 
         $blok = DB::table('unit_rumah')
+            ->where('project_id', $id)
             ->groupBy('type')
             ->get();
             

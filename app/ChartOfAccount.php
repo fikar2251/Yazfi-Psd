@@ -18,6 +18,11 @@ class ChartOfAccount extends Model
         return $this->hasMany(self::class, 'child_numb');
     }
 
+    public function scopeRoot($query)
+    {
+        $query->whereNull('child_numb');
+    }
+
     public function category()
     {
         return $this->belongsTo(CatChartOfAccount::class, 'cat_id');
