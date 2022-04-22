@@ -7,7 +7,6 @@ use App\City;
 use App\District;
 use App\Http\Controllers\Controller;
 use App\Marketing;
-use App\Project;
 use App\Provinces;
 use App\Skema;
 use App\Spr;
@@ -18,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View as FacadesView;
 use Illuminate\View\View;
-Use PDF;
 use Yajra\DataTables\Facades\DataTables;
 
 class SprController extends Controller
@@ -40,57 +38,54 @@ class SprController extends Controller
     }
 
     public function mrkJson()
-    {   
+    {
         $idsales = auth()->user()->id;
         $spr = Spr::where('id_sales', $idsales)->orderBy('id_transaksi', 'desc')->get();
-        
+
         return DataTables::of($spr)
-                ->editColumn('no_transaksi', function($spr){
-                   return '<a href="'.route('marketing.spr.detail', $spr->id_transaksi) .'">' . $spr->no_transaksi .
-                   '</a>';
-                })
-                ->editColumn('status_booking', function($spr){
-                    if ($spr->status_booking == 'unpaid'){
-                    return '<span class="badge badge-danger">'. $spr->status_booking . '</span>';
-                    }elseif ($spr->status_booking == 'paid'){
-                    return '<span class="badge status-green">'. $spr->status_booking . '</span>';
-                    }
-                })
-                ->editColumn('status_dp', function($spr){
-                    if ($spr->status_dp == 'unpaid'){
+            ->editColumn('no_transaksi', function ($spr) {
+                return '<a href="' . route('marketing.spr.detail', $spr->id_transaksi) . '">' . $spr->no_transaksi .
+                    '</a>';
+            })
+            ->editColumn('status_booking', function ($spr) {
+                if ($spr->status_booking == 'unpaid') {
+                    return '<span class="badge badge-danger">' . $spr->status_booking . '</span>';
+                } elseif ($spr->status_booking == 'paid') {
+                    return '<span class="badge status-green">' . $spr->status_booking . '</span>';
+                }
+            })
+            ->editColumn('status_dp', function ($spr) {
+                if ($spr->status_dp == 'unpaid') {
                     return '<span class="badge badge-danger">' . $spr->status_dp . '</span>';
-                    }elseif ($spr->status_dp == 'paid'){
-                    return '<span class="badge status-green">' . $spr->status_dp. '</span>';
-                    }
-                })
-                ->editColumn('type', function($spr){
-                    return $spr->unit->type;
-                })
-                ->editColumn('total', function($spr){
-                    return $spr->unit->total . '/' . $spr->unit->lb;
-                })
-                ->editColumn('skema', function($spr){
-                    return $spr->skema_pembayaran->nama_skema;
-                })
-                ->addIndexColumn()
-                ->rawColumns(['no_transaksi', 'status_booking', 'status_dp'])
-                ->make(true);
+                } elseif ($spr->status_dp == 'paid') {
+                    return '<span class="badge status-green">' . $spr->status_dp . '</span>';
+                }
+            })
+            ->editColumn('type', function ($spr) {
+                return $spr->unit->type;
+            })
+            ->editColumn('total', function ($spr) {
+                return $spr->unit->total . '/' . $spr->unit->lb;
+            })
+            ->editColumn('skema', function ($spr) {
+                return $spr->skema_pembayaran->nama_skema;
+            })
+            ->addIndexColumn()
+            ->rawColumns(['no_transaksi', 'status_booking', 'status_dp'])
+            ->make(true);
     }
 
     public function blok(Request $request)
     {
         $blok = [
             'type' => $request->type,
-            'status_penjualan' => 'Available',
+            // 'status_penjualan' => 'Available',
         ];
 
         $data = DB::table('unit_rumah')
             ->select('unit_rumah.type', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.status_penjualan')
             ->groupBy('unit_rumah.blok')
-            ->where($blok)->orWhere([
-                'status_penjualan' => ' '
-            ])->get();
-
+            ->where($blok)->whereIn('status_penjualan', ['Available', ''])->get();
         return $data;
     }
 
@@ -98,15 +93,13 @@ class SprController extends Controller
     {
         $no = [
             'blok' => $request->blok,
-            'status_penjualan' => 'Available',
+            'type' => $request->type,
+            // 'status_penjualan' => 'Available',
         ];
 
         $data = DB::table('unit_rumah')
             ->select('unit_rumah.id_unit_rumah', 'unit_rumah.type', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.status_penjualan')
-            ->groupBy('unit_rumah.no')
-            ->where($no)->orWhere([
-                'status_penjualan' => ' '
-            ])->get();
+            ->where($no)->whereIn('status_penjualan', ['Available', ''])->get();
 
         return $data;
     }
@@ -115,11 +108,12 @@ class SprController extends Controller
     {
         $lutan = [
             'blok' => $request->blok,
+            'type' => $request->type,
             'no' => $request->no,
         ];
 
         $data = DB::table('unit_rumah')
-            ->select('unit_rumah.type', 'unit_rumah.id_unit_rumah', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.harga_jual', 'unit_rumah.lb', 'unit_rumah.nstd', 'unit_rumah.total')
+            ->select('unit_rumah.type', 'unit_rumah.id_unit_rumah', 'unit_rumah.blok', 'unit_rumah.no', 'unit_rumah.lt', 'unit_rumah.harga_jual', 'unit_rumah.lb', 'unit_rumah.nstd', 'unit_rumah.total', 'unit_rumah.total_harga', 'unit_rumah.harga_tanah_lebih')
             ->groupBy('unit_rumah.lt', 'unit_rumah.no')
             ->where($lutan)->get();
 
@@ -152,8 +146,8 @@ class SprController extends Controller
         $spr = Spr::find($id);
         $alamatid = $spr->alamat_id;
         $add = Alamat::where('id', $alamatid)->first();
-        
-        return view('marketing.spr.show', compact('spr','add'));
+
+        return view('marketing.spr.show', compact('spr', 'add'));
     }
 
     public function cetakSPR($id)
@@ -162,17 +156,17 @@ class SprController extends Controller
         $idspr = $spr->no_transaksi;
         $alamatid = $spr->alamat_id;
         $add = Alamat::where('id', $alamatid)->first();
-      
+
         $bf = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 1])->first();
         $dp = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 2])->first();
 
         // $pdf = PDF::loadview('marketing.spr.cetakspr',['spr'=>$spr, 'add'=>$add]);
         // return $pdf->stream();
         // $pdf = PDF::loadView('marketing.spr.cetakspr', $spr);
-		// return $pdf->stream('document.pdf');
-        $filename = $idspr.'.pdf';
+        // return $pdf->stream('document.pdf');
+        $filename = $idspr . '.pdf';
         $mpdf = new \Mpdf\Mpdf();
-        $html = FacadesView::make('marketing.spr.cetakspr')->with(['spr'=>$spr, 'add'=>$add, 'bf'=>$bf, 'dp'=>$dp]);
+        $html = FacadesView::make('marketing.spr.cetakspr')->with(['spr' => $spr, 'add' => $add, 'bf' => $bf, 'dp' => $dp]);
         $html->render();
         // $stylesheet = file_get_contents(url('/css/style.css'));
         // $mpdf->WriteHTML($stylesheet, 1);
@@ -186,11 +180,11 @@ class SprController extends Controller
         $spr = Spr::find($id);
         $add = Alamat::find($id);
         $idspr = $spr->no_transaksi;
-      
+
         $bf = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 1])->first();
         $dp = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 2])->first();
 
-        return view('marketing.spr.cetakspr', compact('spr', 'add', 'bf','dp'));
+        return view('marketing.spr.cetakspr', compact('spr', 'add', 'bf', 'dp'));
     }
 
     /**
@@ -206,7 +200,7 @@ class SprController extends Controller
 
     public function storeSpr(Request $request, $id)
     {
-       
+
         $alamat = Alamat::create([
             'alamat' => $request->alamat,
             'provinsi_id' => $request->provinsi,
@@ -249,12 +243,10 @@ class SprController extends Controller
             'status_dp' => 'unpaid',
             'harga_jual' => $request->harga_jual,
             'diskon' => $request->potongan,
-            'harga_net' => $request->harga_net,
+            'harga_net' => $request->harga_nett,
             'total_luas_tanah' => $request->tlt,
-            'sumber_informasi' =>$request->sumber_informasi
+            'sumber_informasi' => $request->sumber_informasi,
         ]);
-
-       
 
         $skema = Skema::select('jumlah_skema')
             ->where('id_skema', $request->skema)
@@ -284,7 +276,7 @@ class SprController extends Controller
                 'no_transaksi' => $request->no_transaksi,
                 'id_spr' => $spr->id_transaksi,
                 'jatuh_tempo' => $tempo,
-                'keterangan' => 'Booking Fee'
+                'keterangan' => 'Booking Fee',
             ],
             ['tipe' => 2,
                 'jumlah_tagihan' => $request->downpayment,
@@ -292,7 +284,7 @@ class SprController extends Controller
                 'no_transaksi' => $request->no_transaksi,
                 'id_spr' => $spr->id_transaksi,
                 'jatuh_tempo' => $tempo,
-                'keterangan' => 'Downpayment'
+                'keterangan' => 'Downpayment',
             ],
         ];
 
@@ -310,7 +302,7 @@ class SprController extends Controller
                     'no_transaksi' => $request->no_transaksi,
                     'id_spr' => $spr->id_transaksi,
                     'jatuh_tempo' => $tempo,
-                    'keterangan' => 'Cicilan Tahap '. $a
+                    'keterangan' => 'Cicilan Tahap ' . $a,
                 ],
             ];
             Tagihan::insert($tipe3);
@@ -335,9 +327,8 @@ class SprController extends Controller
             ->where('project_id', $id)
             ->groupBy('type')
             ->get();
-            
+
         $provinces = Provinces::all();
-    
 
         return view('marketing.spr.create', compact('blok', 'id', 'skema', 'provinces'));
     }
@@ -346,21 +337,21 @@ class SprController extends Controller
     {
         $city = City::where('id_prov', $request->provinsi)->get();
 
-        return $city;    
+        return $city;
     }
 
     public function kecamatan(Request $request)
     {
         $district = District::where('id_kab', $request->kota)->get();
 
-        return $district;    
+        return $district;
     }
 
     public function desa(Request $request)
     {
         $subdistrict = Subdistrict::where('id_kec', $request->kecamatan)->get();
 
-        return $subdistrict;    
+        return $subdistrict;
     }
 
     /**

@@ -35,9 +35,9 @@
                         <label for=" tanggal" class="col-sm-1">Tanggal <span>:</span></label>
                         <div class="col-sm-2">
                             <input style="text-decoration: none; border-style: none; background-color: #FAFAFA" type="text"
-                                name="tanggal" id="tanggal_transaksi"
-                                value="{{ Carbon\Carbon::now()->format('d-m-Y') }}" >
-                                <input type="hidden" name="tanggal_transaksi" value="{{ Carbon\Carbon::now()->format('Y-m-d')}}">
+                                name="tanggal" id="tanggal_transaksi" value="{{ Carbon\Carbon::now()->format('d-m-Y') }}">
+                            <input type="hidden" name="tanggal_transaksi"
+                                value="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,8 @@
 
                 <div class="form-group">
                     <label for="phone_number">Kecamatan</label>
-                    <select name="kecamatan" id="kecamatan" class="form-control kecamatan kecamatan1" required data-dependent="lt">
+                    <select name="kecamatan" id="kecamatan" class="form-control kecamatan kecamatan1" required
+                        data-dependent="lt">
                         <option value="">-- Select Kecamatan --</option>
                     </select>
 
@@ -216,7 +217,9 @@
                     <select name="blok" id="blok" class="form-control dinamis root2" data-dependent="no" required>
                         <option value=""></option>
                     </select>
+                    <select hidden name="blok1" id="blok1" class="root6">
 
+                    </select>
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -285,18 +288,17 @@
                         @enderror
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
                 <div class="form-group">
-                    <label for="phone_number">Harga Jual</label>
-                    <input type="number" name="harga_jual" id="harga_jual" class="form-control" readonly>
+                    <label for="phone_number">Nilai Penambahan Luas tanah</label>
+                    <input type="text" name="nilai_tambah" id="nilai_tambah" class="form-control" readonly>
+                    <input type="hidden" name="nilai_tambahs" id="nilai_tambahs" class="form-control" readonly>
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="phone_number">Potongan</label>
-                    <input type="number" name="potongan" id="potongan" class="form-control" maxlength="9"
+                    <label for="phone_number">Potongan Penambahan Luas tanah</label>
+                    <input type="number" name="potongans" id="potongans" class="form-control" maxlength="9"
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
 
                     @error('phone_number')
@@ -304,8 +306,42 @@
                     @enderror
                 </div>
                 <div class="form-group">
+                    <label for="phone_number">Harga Net Penambahan Luas tanah</label>
+                    <input type="text" name="tambah_net" id="tambah_net" class="form-control" maxlength="9"
+                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" readonly>
+
+                    @error('phone_number')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="phone_number">Harga Jual</label>
+                    <input type="text" name="harga_jual" id="harga_jual" class="form-control" readonly>
+                    <input type="hidden" name="harga_juals" id="harga_juals" class="form-control" readonly>
+                    <input type="hidden" name="harga_nets" id="harga_nets" class="form-control" readonly>
+                    @error('phone_number')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="phone_number">Potongan Harga Jual</label>
+                    <input type="number" name="potongan" id="potongan" class="form-control" maxlength="9"
+                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+
+                    @error('phone_number')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
                     <label for="phone_number">Harga Net</label>
-                    <input type="number" name="harga_net" id="harga_net" class="form-control">
+                    <input type="text" name="harga_net" id="harga_net" class="form-control" readonly>
+                    <input type="hidden" name="harga_nett" id="harga_nett" class="form-control">
+                    <input type="hidden" name="harga_nettt" id="harga_nettt" class="form-control">
 
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
@@ -366,6 +402,7 @@
                 var lt = $(this).val();
                 var div = $(this).parent();
                 var op = " ";
+                var tp = " ";
                 $.ajax({
                     url: `/marketing/blok`,
                     method: "get",
@@ -381,8 +418,12 @@
                         for (var i = 0; i < data.length; i++) {
                             op += '<option value="' + data[i].blok + '">' + data[i].blok +
                                 '</option>'
+
+                            tp += ' <option hidden selected value="' + data[i].type + '">' +
+                                data[i].type + '</option>'
                         };
                         $('.root2').html(op);
+                        $('.root6').html(tp);
                     },
                     error: function() {
 
@@ -392,13 +433,14 @@
         })
         $(document).ready(function() {
             $('.dinamis').change(function() {
-
-                var type = $(this).val();
+                var type = $('.root6').html(tp).val();
                 var blok = $(this).val();
                 var no = $(this).val();
                 var lt = $(this).val();
                 var div = $(this).parent();
+                var tp = " ";
                 var op = " ";
+                console.log(type);
                 $.ajax({
                     url: `/marketing/no`,
                     method: "get",
@@ -414,6 +456,7 @@
                         for (var i = 0; i < data.length; i++) {
                             op += '<option value=" ' + data[i].no + ' ">' + data[i].no +
                                 '</option>'
+
                         };
                         $('.root1').html(op);
                     },
@@ -425,19 +468,20 @@
         })
         $(document).ready(function() {
             $('.lt').change(function() {
-
+                var type = $('.root6').html(tp).val();
                 var blok = $('.root2').html(op).val();
                 var no = $(this).val();
                 var lt = $(this).val();
                 var div = $(this).parent();
                 var op = " ";
+                var tp = " ";
 
                 console.log(blok)
                 $.ajax({
                     url: `/marketing/lt`,
                     method: "get",
                     data: {
-
+                        'type': type,
                         'blok': blok,
                         'no': no,
                         'lt': lt,
@@ -454,19 +498,41 @@
                             var luas_tanah = data[i].lt;
                             document.getElementById('lt').value = luas_tanah;
 
+                            // var l = document.getElementById('no');
                             var harga_jual = data[i].harga_jual;
+                            var harganets = data[i].harga_tanah_lebih;
+                            var harga_nets = harganets.replace(/[^\w\s]/gi, '');
                             var harga = harga_jual.replace(/[^\w\s]/gi, '');
                             if (isNaN(harga_jual)) {
-                                document.getElementById('harga_jual').value = harga;
+                                var numRp = new Intl.NumberFormat("id-ID", {
+                                    style: "currency",
+                                    currency: "IDR"
+                                })
+                                document.getElementById('harga_jual').value =
+                                    numRp.format(harga);
+                                document.getElementById('harga_juals').value = harga;
+                                document.getElementById('harga_nets').value = harga_nets;
+                                document.getElementById('nilai_tambahs').value = harga_nets;
+                                document.getElementById('nilai_tambah').value = numRp.format(
+                                    harga_nets);
+                                document.getElementById('tambah_net').value = numRp.format(
+                                    harga_nets);
                             } else {
                                 document.getElementById('harga_jual').value = harga_jual;
 
                             };
 
-                            var harga_net = data[i].harga_jual;
+                            var harga_net = data[i].total_harga;
                             var harganet = harga_net.replace(/[^\w\s]/gi, '');
                             if (isNaN(harga_net)) {
-                                document.getElementById('harga_net').value = harganet;
+                                var numRp = new Intl.NumberFormat("id-ID", {
+                                    style: "currency",
+                                    currency: "IDR"
+                                })
+                                document.getElementById('harga_net').value = numRp.format(
+                                    harganet);
+                                document.getElementById('harga_nett').value = harganet;
+                                document.getElementById('harga_nettt').value = harganet;
                             } else {
                                 document.getElementById('harga_net').value = harga_net;
 
@@ -536,7 +602,8 @@
                         console.log(district);
                         op += '<option value="0">--Select Kecamatan--</option>';
                         for (var i = 0; i < district.length; i++) {
-                            op += '<option value="' + district[i].id_kec + '">' + district[i].name +
+                            op += '<option value="' + district[i].id_kec + '">' + district[i]
+                                .name +
                                 '</option>'
                         };
                         $('.kecamatan1').html(op);
@@ -565,7 +632,8 @@
                         console.log(subdistrict);
                         op += '<option value="0">--Select Desa--</option>';
                         for (var i = 0; i < subdistrict.length; i++) {
-                            op += '<option value="' + subdistrict[i].id_kel + '">' + subdistrict[i].name +
+                            op += '<option value="' + subdistrict[i].id_kel + '">' +
+                                subdistrict[i].name +
                                 '</option>'
                         };
                         $('.desa1').html(op);
@@ -581,17 +649,91 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $("#potongan").keyup(function() {
-                var harga_jual = parseInt($("#harga_jual").val());
+                var harga_jual = parseInt($("#harga_juals").val());
+                var total_harga = parseInt($("#harga_nettt").val());
                 var potongan = parseInt($("#potongan").val());
-                var total = harga_jual - potongan;
-                $("#harga_net").val(total);
+                var tanah_lebih = parseInt($("#harga_nets").val());
+                if (potongan == 0 || isNaN(potongan)) {
+                    var totals = harga_jual + tanah_lebih;
+                    var numRp = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR"
+                    })
+                    document.getElementById('harga_net').value =
+                        numRp.format(totals);
+                    document.getElementById('harga_nett').value =
+                        totals;
+                } else {
+
+                    var total = total_harga - potongan;
+                    var numRp = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR"
+                    })
+                    document.getElementById('harga_net').value =
+                        numRp.format(total);
+                    document.getElementById('harga_nett').value =
+                        total;
+                }
             });
         });
+
+        $(document).ready(function() {
+            $("#potongans").keyup(function() {
+                var harga_jual = parseInt($("#harga_juals").val());
+                var total_harga = parseInt($("#harga_nett").val());
+                var potongan = parseInt($("#potongans").val());
+                var tanah_lebih = parseInt($("#harga_nets").val());
+                var tanah_lebihs = parseInt($("#nilai_tambahs").val());
+                if (potongan == 0 || isNaN(potongan)) {
+                    var total = tanah_lebihs + 0;
+                    var harganet = harga_jual + total;
+                    var numRp = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR"
+                    })
+                    document.getElementById('tambah_net').value =
+                        numRp.format(tanah_lebihs);
+                    document.getElementById('harga_nets').value =
+                        tanah_lebihs;
+                    document.getElementById('harga_net').value =
+                        numRp.format(harganet);
+                   
+                    document.getElementById('harga_nettt').value =
+                        harganet;
+                } else {
+                    var total = tanah_lebihs - potongan;
+                    var harganet = harga_jual + total;
+                    var numRp = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR"
+                    })
+                    document.getElementById('tambah_net').value =
+                        numRp.format(total);
+                    document.getElementById('harga_nets').value =
+                        total;
+                    document.getElementById('harga_net').value =
+                        numRp.format(harganet);
+                  
+                    document.getElementById('harga_nettt').value =
+                        harganet;
+                }
+
+            });
+        });
+
         $(document).ready(function() {
             $("#plt").keyup(function() {
                 var lt = parseInt($("#lt").val());
                 var plt = parseInt($("#plt").val());
                 var total = lt + plt;
+                var nilai = plt * 2750000;
+                var numRp = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR"
+                    })
+                document.getElementById('nilai_tambah').value = numRp.format(nilai);
+                document.getElementById('tambah_net').value = numRp.format(nilai);
                 $("#tlt").val(total);
             });
         });
