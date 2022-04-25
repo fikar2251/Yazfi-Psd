@@ -153,20 +153,23 @@ class SprController extends Controller
     public function cetakSPR($id)
     {
         $spr = Spr::find($id);
+        $angs = Tagihan::where('no_transaksi', $spr->no_transaksi)->where('tipe', 3)->count();
+        // dd($angs);
         $idspr = $spr->no_transaksi;
         $alamatid = $spr->alamat_id;
         $add = Alamat::where('id', $alamatid)->first();
 
         $bf = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 1])->first();
         $dp = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 2])->first();
+        $tg = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 3])->first();
 
         // $pdf = PDF::loadview('marketing.spr.cetakspr',['spr'=>$spr, 'add'=>$add]);
         // return $pdf->stream();
         // $pdf = PDF::loadView('marketing.spr.cetakspr', $spr);
         // return $pdf->stream('document.pdf');
         $filename = $idspr . '.pdf';
-        $mpdf = new \Mpdf\Mpdf();
-        $html = FacadesView::make('marketing.spr.cetakspr')->with(['spr' => $spr, 'add' => $add, 'bf' => $bf, 'dp' => $dp]);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'A4-P']);
+        $html = FacadesView::make('marketing.spr.cetakspr')->with(['spr' => $spr, 'add' => $add, 'bf' => $bf, 'dp' => $dp, 'angs' => $angs, 'tg' => $tg]);
         $html->render();
         // $stylesheet = file_get_contents(url('/css/style.css'));
         // $mpdf->WriteHTML($stylesheet, 1);
@@ -178,13 +181,15 @@ class SprController extends Controller
     public function showSPR($id)
     {
         $spr = Spr::find($id);
+        $angs = Tagihan::where('no_transaksi', $spr->no_transaksi)->where('tipe', 3)->count();
         $add = Alamat::find($id);
         $idspr = $spr->no_transaksi;
 
         $bf = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 1])->first();
         $dp = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 2])->first();
+        $tg = Tagihan::where(['no_transaksi' => $idspr, 'tipe' => 3])->first();
 
-        return view('marketing.spr.cetakspr', compact('spr', 'add', 'bf', 'dp'));
+        return view('marketing.spr.cetakspr', compact('spr', 'add', 'bf', 'dp', 'angs', 'tg'));
     }
 
     /**
@@ -241,11 +246,13 @@ class SprController extends Controller
             'status_booking' => 'unpaid',
             'status_approval' => 'pending',
             'status_dp' => 'unpaid',
-            'harga_jual' => $request->harga_jual,
+            'harga_jual' => $request->harga_juals,
             'diskon' => $request->potongan,
             'harga_net' => $request->harga_nett,
             'total_luas_tanah' => $request->tlt,
             'sumber_informasi' => $request->sumber_informasi,
+            'harga_tanah_lebih' => $request->nilai_tambahs,
+            'harga_net_tanah' => $request->harga_nets,
         ]);
 
         $skema = Skema::select('jumlah_skema')
@@ -263,7 +270,7 @@ class SprController extends Controller
 
         // $tempo3 = date('d-m-Y', strtotime('+30 days', strtotime($tempo)));
 
-        $harga_jual = $request->harga_jual;
+        $harga_jual = $request->harga_nett;
 
         $jumlah = $harga_jual / $int;
         $tagihan = round($jumlah);

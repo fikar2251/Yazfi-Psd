@@ -21,7 +21,7 @@
     body {
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
-        font-size: 14;
+        font-size: 13;
     }
 
     .row {
@@ -126,29 +126,53 @@
     }
 
     #customers {
-        font-family: Arial, Helvetica, sans-serif;
+        /* font-family: Arial, Helvetica, sans-serif; */
         border-collapse: collapse;
         width: 100%;
     }
 
     #customers td,
     #customers th #customers table {
+        border: 1px solid black;
+        padding: 5px;
+    }
+
+    #kop {
+        /* font-family: Arial, Helvetica, sans-serif; */
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #kop td,
+    #kop th #kop table {
+        border: none;
+        padding: 5px;
+    }
+
+    #customerss {
+        /* font-family: Arial, Helvetica, sans-serif; */
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #customerss td,
+    #customerss th #customerss table {
         border: none;
         padding: 5px;
     }
 
 
-    #customers th {
+    /* #customers th {
         padding-top: 12px;
         padding-bottom: 12px;
         text-align: left;
         background-color: #04AA6D;
         color: white;
-    }
+    } */
 
 
     #customer {
-        font-family: Arial, Helvetica, sans-serif;
+        /* font-family: Arial, Helvetica, sans-serif; */
         border-collapse: collapse;
         width: 100%;
     }
@@ -220,236 +244,326 @@
 </style>
 
 <body>
-    <div class="main-wrapper">
-        <div class="page-wrapper">
-            <div class="content">
-                <img src="{{ public_path('/img/logo/yazfi.png') }}" alt="" width="120" height="100">
-                <div class="text-center">
-                    <h4 style="font-size: 30px; font-weight: 500; text-decoration: underline" class="page-title mb-3">
-                        SURAT
-                        PEMESANAN
-                        RUMAH</h4>
-                </div>
-                <div class=" row d-flex justify-content-center" style="margin-left: 220px">
-                    <div class="col-sm-5">
-                        <table class="table table-borderless" style="border: none">
-                            <tbody>
-                                <tr>
-                                    <td style="width: 100px; border: none; font-weight: bold">Nomor</td>
-                                    <td style="width: 20px; border: none; font-weight: bold">:</td>
-                                    <td style="width: 100px; border: none; font-weight: bold">
-                                        {{ $spr->no_transaksi }}
-                                        <hr>
-                                    </td>
-                                </tr>
-                                {{-- <tr>
-                                    <td style="width: 100px">Tanggal</td>
-                                    <td style="width: 20px">:</td>
-                                    <td> {{ $spr->tanggal_transaksi }} </td>
-                                </tr> --}}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-10">
-                        <div class="card shadow">
-                            <div class="card-body">
-                                <h4 class="card-title">I. Data Pembeli</h4>
-                                <div class="table-responsive container">
-                                    <table id="customers" class="table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 200px">Konsumen</td>
-                                                <td style="width: 20px">:</td>
-                                                <td>{{ $spr->nama }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>No KTP</td>
-                                                <td>:</td>
-                                                <td> {{ $spr->no_ktp }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>No NPWP</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $spr->npwp }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>No Tlp</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $spr->no_tlp }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>No HP</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $spr->no_hp }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Email</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $spr->email }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Alamat</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $add->alamat }},
-                                                    {{ $add->desa->name }},
-                                                    {{ $add->kecamatan->name }},
-                                                    {{ $add->kota->name }}, {{ $add->provinsi->name }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Pekerjaan</td>
-                                                <td>:</td>
-                                                <td>
-                                                    {{ $spr->pekerjaan }}
-                                                    <hr>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <h4 class="card-title mt-5">II. Data Unit Rumah</h4>
-                                <div class="table-responsive container">
-                                    <table class="table table-borderless" id="customers">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 200px">Type</td>
-                                                <td style="width: 20px">:</td>
-                                                <td colspan="4"> {{ $spr->unit->type }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Blok</td>
-                                                <td>:</td>
-                                                <td> {{ $spr->unit->blok }}
+    <table id="kop">
+        
+        <tr>
+            <td style="width: 15%">
+                <img src="{{ public_path('/img/logo/yazfi.png') }}" alt="" width="90" height="80">
+            </td>
+            <td style="width: 300px; line-height: 15px">
+                <p>
+                    <b>PT. YAZFI SETIA PERSADA</b> <br>
+                    Komplek Bishub Blok RA Nomor 3, <br>
+                    Kelurahan Pabuaran, Kecamatan Gunung Sindur <br>
+                    Kabupaten Bogor - Jawa Barat <br>
+                    021-75678196
+                </p>
+            </td>
+            <td style="line-height: 15px">
+                <p>
+                    <b>ASHOKA PARK</b> <br>
+                    Jl Jampang <br>
+                    Gunung Sindur - Bogor <br>
+                    Jawa Barat <br>
+                    &nbsp;
+                </p>
+            </td>
+            <td>
+                <img src="{{ public_path('/img/ashokapark.jpg') }}" alt="" width="90" height="80">
+            </td>
+        </tr>
+    </table>
+    <hr>
+    
+        <h4 style="font-size: 20px; font-weight: bold; text-decoration: underline; text-align: center">
+            SURAT
+            PEMESANAN
+            RUMAH</h4>
+
+    <table style="border: none; margin-left: 220px; padding-bottom: 0%">
+        <tr>
+            <td style="width: 100px; border: none;">Nomor</td>
+            <td style="width: 20px; border: none;">:</td>
+            <td style="width: 100px; border: none;">
+                {{ $spr->no_transaksi }}
+                <hr>
+            </td>
+        </tr>
+    </table>
 
 
-                                                <td style="width: 50px">No</td>
-                                                <td style="width: 20px">:</td>
-                                                <td>
-                                                    {{ $spr->unit->no }}
+    <div class="row mt-3">
+        <div class="col-md-10">
 
-                                                </td>
 
-                                            </tr>
-                                            <tr>
-                                                <td>Luas tanah</td>
-                                                <td>:</td>
-                                                <td colspan="4">
-                                                    {{ $spr->unit->lt }} M<sup>2</sup>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Luas Bangunan</td>
-                                                <td>:</td>
-                                                <td colspan="4">
-                                                    {{ $spr->unit->lb }} M<sup>2</sup>
-
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Penambahan Luas Tanah</td>
-                                                <td>:</td>
-                                                <td>
-                                                    @if ($spr->unit->nstd = '-')
-                                                        -
-                                                    @else
-                                                        {{ $spr->unit->nstd }} M<sup>2</sup>
-                                                    @endif
-
-                                                <td style="width: 50px">Total</td>
-                                                <td style="width: 20px">:</td>
-                                                <td>
-                                                    {{ $spr->unit->total }} M<sup>2</sup>
-                                                </td>
-
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Harga Jual</td>
-                                                <td>:</td>
-                                                <td>
-                                                    @currency($spr->harga_jual)
-
-                                                <td style="width: 100px">Harga Net</td>
-                                                <td style="width: 20px">:</td>
-                                                <td>
-                                                    @currency($spr->harga_net)
-                                                </td>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <h4 class="card-title mt-5">III. Data Pembayaran</h4>
-                                <div class="table-responsive container">
-                                    <table class="table table-borderless" id="customer" style="border: 1px solid black">
-                                        <tbody>
-                                            <tr style="background-color:darkblue; ">
-                                                <td style="color: white">No</td>
-                                                <td style="color: white">Termin Pembayaran</td>
-                                                <td style="color: white">Jumlah</td>
-                                                <td style="color: white">Jadwal</td>
-                                                <td style="color: white">Keterangan</td>
-                                            </tr>
-                                            <tr>
-                                                <td>1</td>
-                                                <td>Booking Fee</td>
-                                                <td>@currency($bf->jumlah_tagihan)</td>
-                                                <td>{{ $bf->jatuh_tempo }}</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Downpayment</td>
-                                                <td>@currency($dp->jumlah_tagihan)</td>
-                                                <td>{{ $dp->jatuh_tempo }}</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3</td>
-                                                <td>Plafond Kredit</td>
-                                                <td>@currency($spr->harga_net - $dp->jumlah_tagihan)</td>
-                                                <td>{{ $dp->jatuh_tempo }}</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2">Total Pembayaran</td>
-                                                <td>@currency($dp->jumlah_tagihan + ($spr->harga_net -
-                                                    $dp->jumlah_tagihan) + $bf->jumlah_tagihan)</td>
-                                                <td></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h4 class="card-title">I. Data Pembeli</h4>
+            <div class="table-responsive container">
+                <table id="customerss" class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td style="width: 200px">Konsumen</td>
+                            <td style="width: 20px">:</td>
+                            <td>{{ $spr->nama }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No KTP</td>
+                            <td>:</td>
+                            <td> {{ $spr->no_ktp }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No NPWP</td>
+                            <td>:</td>
+                            <td>
+                                {{ $spr->npwp }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No Tlp</td>
+                            <td>:</td>
+                            <td>
+                                {{ $spr->no_tlp }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>No HP</td>
+                            <td>:</td>
+                            <td>
+                                {{ $spr->no_hp }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>:</td>
+                            <td>
+                                {{ $spr->email }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Alamat</td>
+                            <td>:</td>
+                            <td>
+                                {{ $add->alamat }},
+                                {{ $add->desa->name }},
+                                {{ $add->kecamatan->name }},
+                                {{ $add->kota->name }}, {{ $add->provinsi->name }}
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pekerjaan</td>
+                            <td>:</td>
+                            <td>
+                                {{ $spr->pekerjaan }}
+                                <hr>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <h4 class="card-title mt-5">II. Data Unit Rumah</h4>
+            <div class="table-responsive container">
+                <table class="table table-borderless" id="customers">
+                    <tbody>
+                        <tr>
+                            <td style="width: 200px">Type</td>
+                            <td style="width: 20px">:</td>
+                            <td colspan="4"> {{ $spr->unit->type }}
+
+                            <td style="width: 50px">Informasi</td>
+                            <td style="width: 20px">:</td>
+                            <td>
+                                {{ $spr->sumber_informasi }}
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>Blok</td>
+                            <td>:</td>
+                            <td> {{ $spr->unit->blok }}
+
+                            <td style="width: 50px">No</td>
+                            <td style="width: 20px">:</td>
+                            <td colspan="4">
+                                {{ $spr->unit->no }}
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td>Luas tanah</td>
+                            <td>:</td>
+                            <td colspan="7">
+                                {{ $spr->unit->lt }} M<sup>2</sup>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Luas Bangunan</td>
+                            <td>:</td>
+                            <td colspan="7">
+                                {{ $spr->unit->lb }} M<sup>2</sup>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Penambahan Luas Tanah</td>
+                            <td>:</td>
+                            <td>
+                                @php
+                                    $string = preg_replace('/[^0-9]/', '', $spr->unit->nstd);
+                                    if ($spr->unit->nstd == $string) {
+                                        echo $spr->unit->nstd . ' M<sup>2</sup>';
+                                    } elseif ($spr->unit->nstd != $string) {
+                                        echo '-';
+                                    }
+                                @endphp
+                            <td style="width: 50px">Total</td>
+                            <td style="width: 20px">:</td>
+                            <td colspan="4">
+                                {{ $spr->unit->total }} M<sup>2</sup>
+                            </td>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Nilai penambahan luas</td>
+                            <td>:</td>
+                            <td style="text-align: right">
+                                @rp($spr->harga_tanah_lebih)
+
+                            <td>Diskon</td>
+                            <td>:</td>
+                            <td style="text-align: right">
+                                {{-- @if ($spr->diskon != null)
+                                                    @currency($spr->diskon)
+                                                     @else
+                                                     -   
+                                                    @endif --}}
+                                @rp($spr->harga_tanah_lebih - $spr->harga_net_tanah)
+                            </td>
+                            <td style="width: 100px">Harga Net</td>
+                            <td style="width: 20px">:</td>
+                            <td style="text-align: right">
+                                @rp($spr->harga_net_tanah)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Harga Jual</td>
+                            <td>:</td>
+                            <td style="text-align: right">
+                                @rp($spr->harga_jual)
+
+
+                            <td>Diskon</td>
+                            <td>:</td>
+                            <td style="text-align: right">
+                                @rp($spr->diskon)
+                            </td>
+
+                            <td style="width: 100px">Harga Net</td>
+                            <td style="width: 20px">:</td>
+                            <td style="text-align: right">
+                                @rp($spr->harga_net)
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="card-title mt-5">III. Data Pembayaran</h4>
+            <div class="table-responsive container">
+                <table class="table table-borderless" id="customer" style="border: 1px solid black">
+                    <tbody>
+                        <tr style="background-color:darkblue; text-align:center">
+                            <td style="color: white; width: 40px; text-align: center">No</td>
+                            <td style="color: white">Skema Pembayaran</td>
+                            <td style="color: white; width: 150px">Jumlah</td>
+                            <td style="color: white">Jadwal</td>
+                            <td style="color: white">Keterangan</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">1</td>
+                            <td>Booking Fee</td>
+                            <td>Rp &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                                @rp($bf->jumlah_tagihan)</td>
+                            <td>
+                                {{-- {{ $bf->jatuh_tempo }} --}}
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">2</td>
+                            <td>Downpayment</td>
+                            <td>Rp &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                                @rp($dp->jumlah_tagihan)</td>
+                            <td>
+                                {{-- {{ $dp->jatuh_tempo }} --}}
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">3</td>
+                            <td>Angsuran 1 sd {{ $angs }}</td>
+                            <td>Rp &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @rp($tg->jumlah_tagihan)</td>
+                            <td></td>
+                            <td>x {{ $angs }}</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">4</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">5</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">6</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr style="background-color: darkblue; font-weight: 700;">
+                            <td style="color: white; font-weight: 700" colspan="2">Total Pembayaran
+                            </td>
+                            <td style="color: white">
+                                {{-- @currency($dp->jumlah_tagihan + ($spr->harga_net -
+                                                    $dp->jumlah_tagihan) + $bf->jumlah_tagihan) --}}
+                                Rp &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; @rp($dp->jumlah_tagihan +
+                                $bf->jumlah_tagihan +
+                                $tg->jumlah_tagihan)
+                            </td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
         </div>
     </div>
+
+
+
 
 </body>
 

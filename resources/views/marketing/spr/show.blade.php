@@ -98,13 +98,18 @@
                                     <td style="width: 200px">Type</td>
                                     <td style="width: 20px">:</td>
                                     <td colspan="4"> {{ $spr->unit->type }}
-
+                                              {{-- <tr> --}}
+                                    <td style="width: 200px">Informasi</td>
+                                    <td style="width: 20px">:</td>
+                                    <td>
+                                        {{ $spr->sumber_informasi }}
+                                    </td>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="width: 200px">Blok</td>
                                     <td style="width: 20px">:</td>
-                                    <td> {{ $spr->unit->blok }}
+                                    <td colspan="4"> {{ $spr->unit->blok }} </td>
 
                                         {{-- <tr> --}}
                                     <td style="width: 200px">No</td>
@@ -118,14 +123,14 @@
                                 <tr>
                                     <td style="width: 200px">Luas tanah</td>
                                     <td style="width: 20px">:</td>
-                                    <td colspan="4">
+                                    <td colspan="7">
                                         {{ $spr->unit->lt }} M<sup>2</sup>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="width: 200px">Luas Bangunan</td>
                                     <td style="width: 20px">:</td>
-                                    <td colspan="4">
+                                    <td colspan="7">
                                         {{ $spr->unit->lb }} M<sup>2</sup>
 
                                     </td>
@@ -133,14 +138,14 @@
                                 <tr>
                                     <td style="width: 200px">Penambahan Luas Tanah</td>
                                     <td style="width: 20px">:</td>
-                                    <td>
+                                    <td colspan="4">
                                         @php
-                                            $string = preg_replace("/[^0-9]/","",$spr->unit->nstd);
-                                           if ($spr->unit->nstd == $string) {
+                                            $string = preg_replace('/[^0-9]/', '', $spr->unit->nstd);
+                                            if ($spr->unit->nstd == $string) {
                                                 echo $spr->unit->nstd . ' M<sup>2</sup>';
-                                           }elseif ($spr->unit->nstd != $string ) {
-                                               echo "-";
-                                           }
+                                            } elseif ($spr->unit->nstd != $string) {
+                                                echo '-';
+                                            }
                                         @endphp
                                     </td>
                                     <td style="width: 200px">Total</td>
@@ -156,14 +161,44 @@
                                     <td style="width: 20px">:</td>
                                     <td>
                                         @currency($spr->harga_jual)
-
+                                    </td>
+                                    <td style="width: 100px">Diskon</td>
+                                    <td style="width: 20px">:</td>
+                                    <td>
+                                        {{-- @if ($spr->diskon != NULL)
+                                        @currency($spr->diskon)
+                                         @else
+                                         -   
+                                        @endif --}}
+                                        @currency($spr->diskon)
+                                    </td>
                                     <td style="width: 200px">Harga Net</td>
                                     <td style="width: 20px">:</td>
                                     <td>
                                         @currency($spr->harga_net)
+                                    </td> 
+                                </tr>
+                                <tr>
+                                    <td style="width: 200px">Nilai penambahan luas</td>
+                                    <td style="width: 20px">:</td>
+                                    <td>
+                                        @currency($spr->harga_tanah_lebih)
                                     </td>
-
+                                    <td style="width: 100px">Diskon</td>
+                                    <td style="width: 20px">:</td>
+                                    <td>
+                                        {{-- @if ($spr->diskon != NULL)
+                                        @currency($spr->diskon)
+                                         @else
+                                         -   
+                                        @endif --}}
+                                        @currency($spr->harga_tanah_lebih - $spr->harga_net_tanah)
                                     </td>
+                                    <td style="width: 200px">Harga Net</td>
+                                    <td style="width: 20px">:</td>
+                                    <td>
+                                        @currency($spr->harga_net_tanah)
+                                    </td> 
                                 </tr>
                             </tbody>
                         </table>
