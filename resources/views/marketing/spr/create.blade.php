@@ -298,9 +298,9 @@
                 </div>
                 <div class="form-group">
                     <label for="phone_number">Potongan Penambahan Luas tanah</label>
-                    <input type="number" name="potongans" id="potongans" class="form-control" maxlength="9"
+                    <input type="text" name="potongans" id="potongans" class="form-control" maxlength="15"
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
-
+                    <input type="text" name="potonganss" id="potonganss" class="form-control">
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -308,7 +308,8 @@
                 <div class="form-group">
                     <label for="phone_number">Harga Net Penambahan Luas tanah</label>
                     <input type="text" name="tambah_net" id="tambah_net" class="form-control" maxlength="9"
-                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" readonly>
+                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                        readonly>
 
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
@@ -329,9 +330,9 @@
 
                 <div class="form-group">
                     <label for="phone_number">Potongan Harga Jual</label>
-                    <input type="number" name="potongan" id="potongan" class="form-control" maxlength="9"
+                    <input type="text" name="potongan" id="potongan" class="form-control" maxlength="15"
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
-
+                    <input type="text" name="potongan1" id="potongan1" class="form-control">
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -651,8 +652,10 @@
             $("#potongan").keyup(function() {
                 var harga_jual = parseInt($("#harga_juals").val());
                 var total_harga = parseInt($("#harga_nettt").val());
-                var potongan = parseInt($("#potongan").val());
+                var potongan = $(this).val();
+                var potongans = potongan.replace(/[^\w\s]/gi, '');
                 var tanah_lebih = parseInt($("#harga_nets").val());
+                var potonganss = document.getElementById('potongan1').value = potongans;
                 if (potongan == 0 || isNaN(potongan)) {
                     var totals = harga_jual + tanah_lebih;
                     var numRp = new Intl.NumberFormat("id-ID", {
@@ -665,7 +668,7 @@
                         totals;
                 } else {
 
-                    var total = total_harga - potongan;
+                    var total = total_harga - potonganss;
                     var numRp = new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR"
@@ -682,9 +685,12 @@
             $("#potongans").keyup(function() {
                 var harga_jual = parseInt($("#harga_juals").val());
                 var total_harga = parseInt($("#harga_nett").val());
-                var potongan = parseInt($("#potongans").val());
+                var potongan = $(this).val();
+                var potongans = potongan.replace(/[^\w\s]/gi, '');
                 var tanah_lebih = parseInt($("#harga_nets").val());
                 var tanah_lebihs = parseInt($("#nilai_tambahs").val());
+                var potonganss = document.getElementById('potonganss').value = potongans;
+               
                 if (potongan == 0 || isNaN(potongan)) {
                     var total = tanah_lebihs + 0;
                     var harganet = harga_jual + total;
@@ -698,11 +704,11 @@
                         tanah_lebihs;
                     document.getElementById('harga_net').value =
                         numRp.format(harganet);
-                   
+
                     document.getElementById('harga_nettt').value =
                         harganet;
                 } else {
-                    var total = tanah_lebihs - potongan;
+                    var total = tanah_lebihs - potonganss;
                     var harganet = harga_jual + total;
                     var numRp = new Intl.NumberFormat("id-ID", {
                         style: "currency",
@@ -714,12 +720,38 @@
                         total;
                     document.getElementById('harga_net').value =
                         numRp.format(harganet);
-                  
+
                     document.getElementById('harga_nettt').value =
                         harganet;
+                   
                 }
 
             });
+
+            var rupiah = document.getElementById('potongan');
+            rupiah.addEventListener('keyup', function(e) {
+                // tambahkan 'Rp.' pada saat form di ketik
+                // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+                rupiah.value = formatRupiah(this.value);
+            });
+
+            /* Fungsi formatRupiah */
+            function formatRupiah(angka, prefix) {
+                var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                    split = number_string.split(','),
+                    sisa = split[0].length % 3,
+                    rupiah = split[0].substr(0, sisa),
+                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                // tambahkan titik jika yang di input sudah menjadi angka ribuan
+                if (ribuan) {
+                    separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+            }
         });
 
         $(document).ready(function() {
@@ -728,14 +760,52 @@
                 var plt = parseInt($("#plt").val());
                 var total = lt + plt;
                 var nilai = plt * 2750000;
+                var tanah_net = parseInt($('#harga_nets').val());
+                var harga_rmh = parseInt($('#harga_juals').val());
+                var total_net = harga_rmh + tanah_net;
                 var numRp = new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR"
-                    })
+                    style: "currency",
+                    currency: "IDR"
+                })
+
+                if (plt == 0 || isNaN(plt)) {
+                  document.getElementById('')  
+                } 
+
                 document.getElementById('nilai_tambah').value = numRp.format(nilai);
                 document.getElementById('tambah_net').value = numRp.format(nilai);
+                document.getElementById('harga_nets').value = nilai;
+                document.getElementById('nilai_tambahs').value = nilai;
+                document.getElementById('harga_nettt').value = total_net;
+                document.getElementById('harga_nett').value = total_net;
+                document.getElementById('harga_net').value = numRp.format(total_net);
                 $("#tlt").val(total);
             });
+
+            var rupiah = document.getElementById('potongans');
+            rupiah.addEventListener('keyup', function(e) {
+                // tambahkan 'Rp.' pada saat form di ketik
+                // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+                rupiah.value = formatRupiah(this.value);
+            });
+
+            /* Fungsi formatRupiah */
+            function formatRupiah(angka, prefix) {
+                var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                    split = number_string.split(','),
+                    sisa = split[0].length % 3,
+                    rupiah = split[0].substr(0, sisa),
+                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                // tambahkan titik jika yang di input sudah menjadi angka ribuan
+                if (ribuan) {
+                    separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+            }
         });
     </script>
 @stop

@@ -46,16 +46,15 @@
                                     $i = 0;
                                 @endphp
                                 @foreach ($parent as $item)
-                              
                                     <tr>
                                         <td> {{ ++$i }} </td>
                                         <td>
                                             {{ $item->kode }}
                                         </td>
-                                        <td style="font-weight: 500">
-                                           {{ $item->deskripsi }} 
-                                           
-                                        </td>
+                                        
+                                            <td style="font-weight: 500">
+                                                {{ $item->deskripsi }} </td>
+
                                         <td style="font-weight: 500"> {{ $item->category->nama_cat }} </td>
                                         <td> @currency($item->balance) </td>
                                         <td>
@@ -65,25 +64,45 @@
                                         </td>
                                     </tr>
                                     @foreach ($item->children as $child)
-                                   <tr>
-                                    <td> {{++$i}} </td>
-                                    <td>
-                                        {{ $child->kode }}
-                                    </td>
-                                    <td>
-                                      &nbsp; &nbsp; &nbsp; {{ $child->deskripsi }}
-                                       
-                                    </td>
-                                    <td> {{ $child->category->nama_cat }} </td>
-                                    <td> @currency($child->balance) </td>
-                                    <td>
-                                        <a href="#" class="btn btn-warning">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                    </td>
-                                    
-                                   </tr>
-                                   @endforeach
+                                        <tr>
+                                            <td> {{ ++$i }} </td>
+                                            <td>
+                                                {{ $child->kode }}
+                                            </td>
+                                            <td>
+                                                &nbsp; &nbsp; &nbsp; {{ $child->deskripsi }}
+
+                                            </td>
+                                            <td> {{ $child->category->nama_cat }} </td>
+                                            <td> @currency($child->balance) </td>
+                                            <td>
+                                                <a href="#" class="btn btn-warning">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                        @foreach ($child->children as $subchild)
+                                            <tr>
+                                                <td> {{ ++$i }} </td>
+                                                <td>
+                                                    {{ $subchild->kode }}
+                                                </td>
+                                                <td>
+                                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {{ $subchild->deskripsi }}
+
+                                                </td>
+                                                <td> {{ $subchild->category->nama_cat }} </td>
+                                                <td> @currency($subchild->balance) </td>
+                                                <td>
+                                                    <a href="#" class="btn btn-warning">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </a>
+                                                </td>
+
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
                                 @endforeach
                             </tbody>
                         </table>
@@ -203,7 +222,7 @@
                 // serverSide: true,
                 orderCellsTop: true,
                 fixedHeader: true,
-                dom: 'Bfrtip',
+                dom: 'Blfrtip',
                 columnDefs: [{
                         targets: 5,
                         className: 'dt-body-center'
