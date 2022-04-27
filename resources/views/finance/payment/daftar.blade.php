@@ -41,7 +41,9 @@
                                             @endforeach
                                         </td>
                                         <td>
-                                            @currency($item->nominal)
+                                            @currency($item->nominal) <input type="hidden" name="nominal" id="nominal"
+                                                value="{{ $item->nominal }}">
+
                                         </td>
                                         <td>
                                             @if ($item->status_approval == 'pending')
@@ -65,7 +67,8 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <form action="{{ route('finance.payment.status', $item->id) }}" method="POST">
+                                            <form action="{{ route('finance.payment.status', $item->id) }}"
+                                                method="POST">
                                                 @csrf
                                                 <!-- Button trigger modal -->
                                                 <div class="text-center">
@@ -110,6 +113,8 @@
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
                                                                                     {{ $item->no_detail_transaksi }}
+                                                                                    <input type="hidden" name="no_transaksi"
+                                                                                        value="{{ $item->no_detail_transaksi }}">
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -119,6 +124,8 @@
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
                                                                                     @currency( $item->nominal )
+                                                                                    <input type="hidden" name="nominal"
+                                                                                        value="{{ $item->nominal }}">
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -141,6 +148,10 @@
                                                                             <tr>
                                                                                 <td style="width: 200px">Tujuan
                                                                                     Pembayaran
+                                                                                    @php
+                                                                                        
+                                                                                        $status = App\Pembayaran::where('id', $item->id)->first();
+                                                                                    @endphp
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
@@ -167,11 +178,7 @@
                                                                                 <td>
                                                                                     <select name="status" id="status"
                                                                                         class="form-control rincian">
-                                                                                        @php
-                                                                                            foreach ($bayar as $key) {
-                                                                                                $status = App\Pembayaran::where('id', $key->id)->first();
-                                                                                            }
-                                                                                        @endphp
+                                                                                       
 
                                                                                         <option
                                                                                             value="{{ $status->id }}">

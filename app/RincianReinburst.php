@@ -12,5 +12,7 @@ class RincianReinburst extends Model
     {
         return $this->belongsTo(Barang::class, 'barang_id');
     }
+
+  
  
 }

@@ -41,14 +41,14 @@
         <div class="table-responsive">
             <table class="table table-striped custom-table report" id="accreinburst" width="100%">
                 <thead>
-                    <tr class="text-left">
+                    <tr class="text-center">
                         <th >No</th>
-                        <th style="width: 20%;">Nomor Reinburst</th>
-                        <th style="width: 20%;">Tanggal Reinburst</th>
+                        <th>Nomor Reinburst</th>
+                        <th>Tanggal Reinburst</th>
                         <th  style="width: 5%;">Total Item</th>
-                        <th style="width: 20%;">Total Pembelian</th>
-                        <th style="width: 20%;">Status Hrd</th>
-                        <th style="width: 15%;">Status Pembayaran</th>
+                        <th style="width: 20%; text-align:right;">Total Pembelian</th>
+                        <th>Status Hrd</th>
+                        <th>Status Pembayaran</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -309,36 +309,44 @@
                 },
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'DT_RowIndex',
+                        className: "text-center"
                     },
                     {
                         data: 'no_reinburst',
-                        name: 'no_reinburst'
+                        name: 'no_reinburst',
+                         className: "text-center"
                     },
                     {
                         data: 'tanggal',
-                        name: 'tanggal'
+                        name: 'tanggal',
+                         className: "text-center"
                     },
                     {
                         data: 'total',
-                        name: 'total'
+                        name: 'total',
+                        className: "text-center"
                     },
                     {
                         data: 'pembelian',
                         name: 'pembelian',
-                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.')
+                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.'),
+                        className: "text-right"
                     },
 
                     {
                         data: 'status_hrd',
-                        name: 'status_hrd'
+                        name: 'status_hrd',
+                         className: "text-center"
                     }, {
                         data: 'status_pembayaran',
-                        name: 'status_pembayaran'
+                        name: 'status_pembayaran',
+                         className: "text-center"
                     },
                     {
                         data: 'action',
-                        name: 'action'
+                        name: 'action',
+                         className: "text-center"
                     }
 
                 ],

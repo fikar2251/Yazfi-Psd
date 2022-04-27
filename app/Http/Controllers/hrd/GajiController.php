@@ -34,11 +34,16 @@ class GajiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+    { 
+        $noUrutAkhir = Penggajian::max('id');
+        $nama ='SL';
+        // dd($noUrutAkhir);
+         
         return view('hrd.gaji.create', [
             'pegawais' => User::get(),
             'penerimaan' => MstPenerimaan::get(),
-            'potongan' => MstPotongan::get()
+            'potongan' => MstPotongan::get(),
+            'nourut' => $nama . '/' .  sprintf("%02s", abs($noUrutAkhir + 1)) . '/' . sprintf("%05s", abs($noUrutAkhir + 1))
         ]);
     }
 
@@ -50,6 +55,13 @@ class GajiController extends Controller
      */
     public function store(Request $request)
     {    
+        $this->validate($request, [
+            'pegawai_id' => 'required',
+            'tanggal' => 'required|date',
+            'total_penerimaan' => 'required',
+            'total_potongan' => 'required',
+            'total' => 'required'
+        ]);
         $pegawai = Penggajian::select('pegawai_id','bulan_tahun')->where('pegawai_id',$request->pegawai_id)->where('bulan_tahun',$request->bulan_tahun)->get();
         // dd($pegawai);
     
@@ -61,9 +73,11 @@ class GajiController extends Controller
                 'divisi' => $request->roles,
                 'bulan_tahun' => $request->bulan_tahun, 
                 'tanggal' => $request->tanggal,
-                'gaji_pokok' => str_replace(',', '', $request->penerimaan['gaji pokok']),
+                'gaji_pokok' => str_replace(',', '', $request->penerimaan['Gaji Pokok']),
                 'jabatan' => $request->jabatans,
                 'perusahaan' => $request->perusahaans,
+                'slip_gaji' => $request->slip_gaji,
+                'note' => $request->note,
                 'admin' => auth()->user()->name,
                 'status_penerimaan' => 'pending',
             ]);
@@ -84,6 +98,38 @@ class GajiController extends Controller
                     'nominal' => str_replace(',', '', $value)
                 ]);
             }
+
+            $beban = DB::table('new_chart_of_account')->where('id', 59)->select('balance')->first();
+            $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+    
+            $transaction = [
+                ['chart_id' => 59,
+                    'no_transaksi' => $request->slip_gaji,
+                    'month' => Carbon::now()->format('m'),
+                    'year' => Carbon::now()->format('Y'),
+                    'date' => Carbon::now()->format('d-m-Y'),
+                    'time' => Carbon::now()->format('h:i:s'),
+                    'credit' =>'',
+                    'debit' =>  $request->total,
+                    'last_balance' => $beban->balance - $request->total ,
+                    'template_id' => 7,
+                    'is_active' => 1
+    
+                ],
+                ['chart_id' => 28,
+                    'no_transaksi' => $request->slip_gaji,
+                    'month' => Carbon::now()->format('m'),
+                    'year' => Carbon::now()->format('Y'),
+                    'date' => Carbon::now()->format('d-m-Y'),
+                    'time' => Carbon::now()->format('h:i:s'),
+                    'credit' =>  $request->total,
+                    'debit' => '',
+                    'last_balance' => $hutang->balance + $request->total,
+                    'template_id' => 8,
+                    'is_active' => 1
+                ],
+            ];
+            DB::table('transactions')->insert($transaction);
 
             DB::commit();
             return redirect()->route('hrd.gaji.index')->with('success', 'Penggajian has been added');
@@ -120,7 +166,7 @@ class GajiController extends Controller
     {
         return view('hrd.gaji.edit', [
              'pegawais' => User::get(),
-            'penggajian' => Penggajian::findOrFail($id)
+                'penggajian' => Penggajian::findOrFail($id)
         ]);
       
     }
@@ -150,8 +196,9 @@ class GajiController extends Controller
                 'divisi' => $request->roles,
                 'bulan_tahun' => $request->bulan_tahun, 
                 'tanggal' => $request->tanggal,
-                'gaji_pokok' => str_replace(',', '', $request->penerimaan['gaji pokok']),
+                'gaji_pokok' => str_replace(',', '', $request->penerimaan['Gaji Pokok']),
                 'jabatan' => $request->jabatans,
+                'note' => $request->note,
                 'perusahaan' => $request->perusahaans,
                 'admin' => auth()->user()->name,
             ]);
@@ -173,6 +220,39 @@ class GajiController extends Controller
                     'nominal' => str_replace(',', '', $value)
                 ]);
             }
+
+            $beban = DB::table('new_chart_of_account')->where('id', 59)->select('balance')->first();
+            $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+    
+            $transaction = [
+                ['chart_id' => 59,
+                    'no_transaksi' => $request->slip_gaji,
+                    'month' => Carbon::now()->format('m'),
+                    'year' => Carbon::now()->format('Y'),
+                    'date' => Carbon::now()->format('d-m-Y'),
+                    'time' => Carbon::now()->format('h:i:s'),
+                    'credit' =>'',
+                    'debit' =>  $request->total,
+                    'last_balance' => $beban->balance - $request->total ,
+                    'template_id' => 7,
+                    'is_active' => 1
+    
+                ],
+                ['chart_id' => 28,
+                    'no_transaksi' => $request->slip_gaji,
+                    'month' => Carbon::now()->format('m'),
+                    'year' => Carbon::now()->format('Y'),
+                    'date' => Carbon::now()->format('d-m-Y'),
+                    'time' => Carbon::now()->format('h:i:s'),
+                    'credit' =>  $request->total,
+                    'debit' => '',
+                    'last_balance' => $hutang->balance + $request->total,
+                    'template_id' => 8,
+                    'is_active' => 1
+                ],
+            ];
+            DB::table('transactions')->insert($transaction);
+
             DB::commit();
             return redirect()->route('hrd.gaji.index')->with('success', 'Penggajian has been updated');
     }
@@ -248,7 +328,17 @@ class GajiController extends Controller
     }
 
     
-  
+      public function loadpegawai(Request $request)
+    {
+        $data = [];
+        $pegawai =  User::select('name','id')
+            ->where('name', 'like', '%' . $request->q . '%')
+            ->get();
+        foreach ($pegawai as $row) {
+            $data[] = ['id' => $row->id,  'text' => $row->name];
+        }
+    		return response()->json($data);
+        
 
-    
+    }
 }

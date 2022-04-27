@@ -52,7 +52,7 @@
                                             {{ $item->kode }}
                                         </td>
                                         
-                                            <td style="font-weight: 500">
+                                            <td >
                                                 {{ $item->deskripsi }} </td>
 
                                         <td style="font-weight: 500"> {{ $item->category->nama_cat }} </td>

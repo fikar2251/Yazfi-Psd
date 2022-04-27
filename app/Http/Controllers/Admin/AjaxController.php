@@ -53,6 +53,9 @@ class AjaxController extends Controller
             }
             return datatables()
                 ->of($gaji)
+                ->editColumn('slip', function ($gajian) {
+                    return $gajian->slip_gaji;
+                })
                 ->editColumn('pegawai', function ($gajian) {
                     return $gajian->pegawai->name;
                 })
@@ -95,14 +98,18 @@ class AjaxController extends Controller
                          }
                 })
                 ->editColumn('action', function ($gajian) {
-                    
-                    Penggajian::where('id', $gajian->id)->get();
-            
-                    
-                    return '<a href="' . route('hrd.gaji.print', $gajian->id) . '"class="btn btn-sm btn-secondary"><i class="fa-solid fa-print"></i></a>
+                $penggajian = Penggajian::where('id', $gajian->id)->where('status_penerimaan', 'pending')->get();
+                if (count($penggajian)==0){
+                    return "Not Found";
+                }else {
+                   return '<a href="' . route('hrd.gaji.print', $gajian->id) . '"class="btn btn-sm btn-secondary"><i class="fa-solid fa-print"></i></a>
                      <a href="' . route('hrd.gaji.show', $gajian->id) . '"class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
                     <a href="' . route('hrd.gaji.edit', $gajian->id) . '"class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square"></i></a> 
                     <a href="' . route('hrd.gaji.hapus', $gajian->id) . '"   class="delete-form btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>';
+             
+                } 
+                    
+    
                 })
                 ->addIndexColumn()
                 ->rawColumns(['pegawai','action', 'status'])
@@ -250,8 +257,10 @@ class AjaxController extends Controller
         ->editColumn('action', function ($data) {
             
             Reinburst::where('id', $data->id)->get();
-            $button = '<a href="' . route('hrd.penerimaan.statuscompleted', $data->id) . '"  class="custom-badge status-green"><i class="fa-solid fa-check-to-slot"></i></a>';
-            return $button;
+            return '<a href="' . route('hrd.penerimaan.statuscompleted', $data->id) . '"  class="btn btn-sm status-green"><i class="fa-solid fa-check-to-slot"></i></a>
+            <a href="' . route('hrd.penerimaan.download', $data->id) . '" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
+            <input type="text" name="no_transaksi" value="'.$data->nomor_reinburst.'"> 
+            <input type="text" name="nominal" value="'.$data->total.'">';
             
             // return '<a href="' . route('hrd.penerimaan.statuscompleted', $data->id) . '"  class="custom-badge status-green"><i class="fa-solid fa-check-to-slot"></i></a>
             // <a href="' . route('hrd.penerimaan.update', $data->id) . '"  class="custom-badge status-orange"><i class="fa-solid fa-eye"></i></a>';

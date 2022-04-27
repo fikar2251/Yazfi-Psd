@@ -62,10 +62,54 @@ class PenerimaanController extends Controller
     {
         abort_unless(\Gate::allows('reinburst-edit'), 403);
         $reinbursts = Reinburst::where('id',$id)->get();
+
+        $reinburstss = Reinburst::
+            leftJoin('rincian_reinbursts','reinbursts.nomor_reinburst','=','rincian_reinbursts.nomor_reinburst')
+            ->select('reinbursts.id_user','reinbursts.nomor_reinburst','reinbursts.status_hrd','reinbursts.status_pembayaran','reinbursts.tanggal_reinburst',
+            'rincian_reinbursts.total','reinbursts.id')->where('reinbursts.status_hrd','!=','completed')
+            ->whereIn('reinbursts.id', $reinbursts)
+            ->groupBy('reinbursts.nomor_reinburst')
+            ->orderBy('reinbursts.id', 'desc')
+            ->get();
        
         DB::table('reinbursts')->whereIn('id', $reinbursts)->update(array( 
             'status_hrd' => 'completed'));
 
+            $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+            $beban = DB::table('new_chart_of_account')->where('id', 59)->select('balance')->first();
+            
+          foreach ($reinburstss as $key) {
+              # code...
+              $transaction = [
+                  ['chart_id' => 28,
+                      'no_transaksi' => $key->nomor_reinburst,
+                      'month' => Carbon::now()->format('m'),
+                      'year' => Carbon::now()->format('Y'),
+                      'date' => Carbon::now()->format('d-m-Y'),
+                      'time' => Carbon::now()->format('h:i:s'),
+                      'credit' => $key->total,
+                      'debit' => '',
+                      'last_balance' => $key->total + $hutang->balance,
+                      'template_id' => 3,
+                      'is_active' => 1
+  
+                  ],
+                  ['chart_id' => 59,
+                      'no_transaksi' => $key->nomor_reinburst,
+                      'month' => Carbon::now()->format('m'),
+                      'year' => Carbon::now()->format('Y'),
+                      'date' => Carbon::now()->format('d-m-Y'),
+                      'time' => Carbon::now()->format('h:i:s'),
+                      'credit' => '',
+                      'debit' => $key->total,
+                      'last_balance' => $beban->balance - $key->total,
+                      'template_id' => 4,
+                      'is_active' => 1
+                  ],
+              ];
+              DB::table('transactions')->insert($transaction);
+
+          }   
 
         return redirect()->route('hrd.penerimaan.index')->with('success', 'Update Status berhasil');
     }

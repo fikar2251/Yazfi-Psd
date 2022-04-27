@@ -47,16 +47,17 @@
     <div class="col-md-12">
         <div class="table-responsive">
             <table class="table table-striped custom-table report" id="gaji"style="width:125%;">
-                <thead>
-                    <tr >
+                <thead> 
+                    <tr style="text-align:center;">
                         <th style="width: 5%;">No</th>
+                        <th style="width: 5%;">Slip gaji </th>
                         <th style="width: 5%;">Pegawai </th>
                         <th style="width: 5%;">Tanggal</th>
                         <th style="width: 5%;">Bulan&Tahun</th>
-                        <th style="width: 10%;">Gaji Pokok</th>
-                        <th style="width: 10%;">Penerimaan</th>
-                        <th style="width: 10%;">Potongan</th>
-                        <th style="width: 10%;">Total</th>
+                        <th style="width: 10%; text-align:right;">Gaji Pokok</th>
+                        <th style="width: 10%; text-align:right;">Penerimaan</th>
+                        <th style="width: 10%; text-align:right;">Potongan</th>
+                        <th style="width: 10%; text-align:right;">Total</th>
                         <th style="width: 5%;">Jabatan</th>
                         <th style="width: 5%;">Divisi</th>
                         <th style="width: 5%;">Admin</th>
@@ -106,6 +107,8 @@
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
                          <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
@@ -218,7 +221,7 @@
                   
                     // Total over this page
                     pageTotal = api
-                        .column(4, {
+                        .column(5, {
                             page: 'current'
                         })
                         .data()
@@ -227,7 +230,7 @@
                         }, 0);
                     // Total over this page
                     Total = api
-                        .column(5, {
+                        .column(6, {
                             page: 'current'
                         })
                         .data()
@@ -235,7 +238,15 @@
                             return intVal(a) + intVal(b);
                         }, 0);
                     Total_all = api
-                        .column(6, {
+                        .column(7, {
+                            page: 'current'
+                        })
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+                    Total_all_out = api
+                        .column(8, {
                             page: 'current'
                         })
                         .data()
@@ -244,14 +255,17 @@
                         }, 0);
 
                     // Update footer
-                    $(api.column(4).footer()).html(
+                    $(api.column(5).footer()).html(
                         'Rp.' + pageTotal + ' '
                     );
-                    $(api.column(5).footer()).html(
+                    $(api.column(6).footer()).html(
                         'Rp.' + Total + ' '
                     );
-                    $(api.column(6).footer()).html(
+                    $(api.column(7).footer()).html(
                         'Rp.' + Total_all + ' '
+                    );
+                    $(api.column(8).footer()).html(
+                        'Rp.' + Total_all_out + ' '
                     );
                 },
                 initComplete: function () {
@@ -316,58 +330,76 @@
                 },
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'DT_RowIndex',
+                         className: "text-center"
+                    },
+                    {
+                        data: 'slip',
+                        name: 'slip',
+                         className: "text-center"
                     },
                     {
                         data: 'pegawai',
-                        name: 'pegawai'
+                        name: 'pegawai',
+                         className: "text-center"
                     },
                     {
                         data: 'tanggal',
-                        name: 'tanggal'
+                        name: 'tanggal',
+                         className: "text-center"
                     },
                     {
                         data: 'bulan_tahun',
-                        name: 'bulan_tahun'
+                        name: 'bulan_tahun',
+                         className: "text-center"
                     },
                     {
                         data: 'gaji_pokok',
                         name: 'gaji_pokok',
-                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.')
+                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.'),
+                         className: "text-right"
                     },
                     {
                         data: 'penerimaan',
                         name: 'penerimaan',
-                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.')
+                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.'),
+                         className: "text-right"
                     },
                     {
                         data: 'potongan',
                         name: 'potongan',
-                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.')
+                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.'),
+                         className: "text-right"
                     },
                     {
                         data: 'total',
                         name: 'total',
-                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.')
+                        render: $.fn.dataTable.render.number('.', ',', 0, 'Rp.'),
+                         className: "text-right"
                     },
                     {
                         data: 'jabatan',
-                        name: 'jabatan'
+                        name: 'jabatan',
+                         className: "text-center"
                     },
                     {
                         data: 'divisi',
-                        name: 'divisi'
+                        name: 'divisi',
+                         className: "text-center"
                     }, {
                         data: 'admin',
-                        name: 'admin'
+                        name: 'admin',
+                         className: "text-center"
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                         className: "text-center"
                     },
                     {
                         data: 'action',
-                        name: 'action'
+                        name: 'action',
+                         className: "text-center"
                     },
 
                 ],

@@ -329,6 +329,9 @@ Route::middleware('auth')->group(function () {
             Route::resource('penerimaan', 'PenerimaanController');
 
             Route::get('hrd/penerimaan/{penerimaan}', 'PenerimaanController@edit')->name('penerimaan.edit');
+            Route::get('hrd/penerimaan/{penerimaan}/download', 'PenerimaanController@download')->name('penerimaan.download');
+            Route::get('/penerimaan/export/{penerimaan}', 'PenerimaanController@export')->name('penerimaan.export');
+
             Route::get('hrd/penerimaan/{penerimaan}', 'PenerimaanController@statuscompleted')->name('penerimaan.statuscompleted');
 
 
@@ -346,9 +349,13 @@ Route::middleware('auth')->group(function () {
            
         
             Route::post('gaji/filter','GajiController@filter')->name('gaji.filter');
+
+            Route::PATCH ('roles','RolesController@storeJabatan')->name('roles.storeJabatan');
+            Route::get('roles/showJabatan/{id}','RolesController@showJabatan')->name('roles.showJabatan');
+            Route::get('roles/createJabatan/{id}','RolesController@createJabatan')->name('roles.createJabatan');
             
             Route::resource('gaji', 'GajiController');
-    
+            Route::get('/where/loadpegawai', 'GajiController@loadpegawai');
             Route::get('/where/searchPegawai', 'GajiController@searchPegawai');
             Route::get('gaji/ajax', 'GajiController@ajax')->name('gaji.ajax');
 
