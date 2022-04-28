@@ -9,6 +9,7 @@ use App\TeamSales;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class KomisiController extends Controller
@@ -56,6 +57,7 @@ class KomisiController extends Controller
         // }
         $authid = auth()->user()->id;
         $manager = TeamSales::where('user_id', $authid)->first();
+        
         $nospr = request()->get('no_transaksi');
         if ($nospr) {
 
@@ -116,6 +118,45 @@ class KomisiController extends Controller
             'nominal_manager' => $request->nominal_manager,
             'status_pembayaran' => 'unpaid',
             'is_active' => 1,
+        ]);
+
+        $kewajiban = DB::table('new_chart_of_account')->where('id', 34)->select('balance')->first();
+        $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+        $total =  $request->nominal_sales +  $request->nominal_spv +  $request->nominal_manager;
+
+        $transaction = [
+            ['chart_id' => 34,
+                'no_transaksi' => $request->no_komisi,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>'',
+                'debit' =>  $total,
+                'last_balance' => $kewajiban->balance - $total,
+                'template_id' => 11,
+                'is_active' => 1
+
+            ],
+            ['chart_id' => 28,
+                'no_transaksi' => $request->no_komisi,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>  $total,
+                'debit' => '',
+                'last_balance' => $hutang->balance + $total,
+                'template_id' => 12,
+                'is_active' => 1
+            ],
+        ];
+        DB::table('transactions')->insert($transaction);
+        DB::table('new_chart_of_account')->where('id', 34)->update([
+            'balance' => $kewajiban->balance - $total
+        ]);
+        DB::table('new_chart_of_account')->where('id', 28)->update([
+            'balance' =>  $hutang->balance + $total
         ]);
 
         return redirect('/supervisor/komisi');

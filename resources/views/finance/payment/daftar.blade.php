@@ -58,9 +58,9 @@
 
                                         </td>
                                         <td style="width: 110px" class="text-center">
-                                            @if ($item->bank_tujuan == 'Bri')
+                                            @if ($item->bank_tujuan == 'Bank BRI')
                                                 BRI
-                                            @elseif ($item->bank_tujuan == 'Bca')
+                                            @elseif ($item->bank_tujuan == 'Bank BCA')
                                                 BCA
                                             @else
                                                 Mandiri
@@ -155,7 +155,7 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <select name="tujuan" id="tujuan"
+                                                                                    {{-- <select name="tujuan" id="tujuan"
                                                                                         class="form-control">
                                                                                         <option value="0">
                                                                                             {{ $item->bank_tujuan }}
@@ -168,6 +168,46 @@
                                                                                                 </option>
                                                                                             @endif
                                                                                         @endforeach
+                                                                                    </select> --}}
+                                                                                    <select name="tujuan" id="tujuan"
+                                                                                        class="form-control">
+                                                                                        @foreach ($bank as $bk)
+                                                                                            @if ($bk->deskripsi == $item->bank_tujuan)
+                                                                                                @if ($item->bank_tujuan == 'Bank BCA')
+                                                                                                    <option
+                                                                                                       selected value="{{ $bk->id }}">
+                                                                                                        BCA
+                                                                                                    </option>
+                                                                                                    @elseif ($item->bank_tujuan == 'Bank BRI')
+                                                                                                    <option
+                                                                                                       selected value="{{ $bk->id }}">
+                                                                                                        BRI
+                                                                                                    </option>
+                                                                                                @else
+                                                                                                    <option
+                                                                                                      selected  value="{{ $bk->id }}">
+                                                                                                        Mandiri
+                                                                                                    </option>
+                                                                                                @endif
+                                                                                            @else
+                                                                                                @if ($bk->deskripsi == 'Bank BCA')
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        BCA
+                                                                                                    </option>
+                                                                                                    @elseif ($bk->deskripsi == 'Bank BRI')
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        BRI
+                                                                                                    </option>
+                                                                                                @else
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        Mandiri
+                                                                                                    </option>
+                                                                                                @endif
+                                                                                            @endif
+                                                                                        @endforeach
                                                                                     </select>
                                                                                 </td>
                                                                             </tr>
@@ -178,7 +218,7 @@
                                                                                 <td>
                                                                                     <select name="status" id="status"
                                                                                         class="form-control rincian">
-                                                                                       
+
 
                                                                                         <option
                                                                                             value="{{ $status->id }}">

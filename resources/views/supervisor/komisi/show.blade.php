@@ -184,7 +184,7 @@
 
                                             </tr>
                                             <tr>
-                                                <td style="width: 200px">Manager ($manager->manager->name)</td> <input type="hidden"
+                                                <td style="width: 200px">Manager ({{$manager->manager->name}})</td> <input type="hidden"
                                                     name="nama_manager" value="Yanto">
                                                 <td style="width: 20px">:</td>
                                                 <td class="d-flex">

@@ -130,6 +130,12 @@ class GajiController extends Controller
                 ],
             ];
             DB::table('transactions')->insert($transaction);
+            DB::table('new_chart_of_account')->where('id', 59)->update([
+                'balance' => $beban->balance - $request->total
+            ]);
+            DB::table('new_chart_of_account')->where('id', 28)->update([
+                'balance' => $hutang->balance + $request->total
+            ]);
 
             DB::commit();
             return redirect()->route('hrd.gaji.index')->with('success', 'Penggajian has been added');

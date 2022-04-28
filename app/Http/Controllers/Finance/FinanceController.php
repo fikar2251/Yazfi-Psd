@@ -111,8 +111,11 @@ class FinanceController extends Controller
     {
         $komisi = Komisi::orderBy('id', 'desc')->whereIn('status_pembayaran', ['unpaid', 'reject'])->get();
         $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
+        $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
+            'Bank BCA', 'Bank BRI', 'Bank  Mandiri'
+        ])->get();
 
-        return view('finance.komisi.daftar', compact('komisi', 'account'));
+        return view('finance.komisi.daftar', compact('komisi', 'account', 'bank'));
     }
 
     public function storeKomisi(Request $request)
@@ -142,10 +145,12 @@ class FinanceController extends Controller
         $bayar = Pembayaran::whereIn('status_approval', ['pending', 'reject'])->orderBy('id', 'desc')->get();
 
         $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
-       
         
+        $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
+            'Bank BCA', 'Bank BRI', 'Bank  Mandiri'
+        ])->get();
 
-        return view('finance.payment.daftar', compact('bayar', 'account'));
+        return view('finance.payment.daftar', compact('bayar', 'account', 'bank'));
 
     }
 
@@ -254,12 +259,12 @@ class FinanceController extends Controller
                 ));
             }
 
-            $kas = DB::table('new_chart_of_account')->where('id', 1)->select('balance')->first();
+            $kas = DB::table('new_chart_of_account')->where('id', $request->tujuan)->select('balance')->first();
             $revenue = DB::table('new_chart_of_account')->where('id', 41)->select('balance')->first();
             
-
+            
             $transaction = [
-                ['chart_id' => 1,
+                ['chart_id' => $request->tujuan,
                     'no_transaksi' => $request->no_transaksi,
                     'month' => Carbon::now()->format('m'),
                     'year' => Carbon::now()->format('Y'),
@@ -286,6 +291,12 @@ class FinanceController extends Controller
                 ],
             ];
             DB::table('transactions')->insert($transaction);
+            DB::table('new_chart_of_account')->where('id', $request->tujuan)->update([
+                'balance' =>  $request->nominal + $kas->balance
+            ]);
+            DB::table('new_chart_of_account')->where('id', 41)->update([
+                'balance' => $revenue->balance - $request->nominal
+            ]);
 
         }
         return redirect()->back();
@@ -339,6 +350,44 @@ class FinanceController extends Controller
         $komisi->update([
             'status_pembayaran' => $request->status,
             'tanggal_pembayaran' => $request->tanggal_pembayaran,
+        ]);
+        $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+        $kas = DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->select('balance')->first();
+        $total = $komisi->nominal_sales + $komisi->nominal_spv + $komisi->nominal_manager;
+        
+        $transaction = [
+            ['chart_id' => 28,
+                'no_transaksi' => $komisi->no_komisi,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>'',
+                'debit' =>  $total,
+                'last_balance' => $hutang->balance - $total ,
+                'template_id' => 13,
+                'is_active' => 1
+
+            ],
+            ['chart_id' => $request->sumber_pembayaran,
+                'no_transaksi' => $komisi->no_komisi,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>  $total,
+                'debit' => '',
+                'last_balance' => $kas->balance + $total,
+                'template_id' => 14,
+                'is_active' => 1
+            ],
+        ];
+        DB::table('transactions')->insert($transaction);
+        DB::table('new_chart_of_account')->where('id', 28)->update([
+            'balance' => $hutang->balance - $total
+        ]);
+        DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->update([
+            'balance' => $kas->balance + $total
         ]);
         if ($komisi->status_pembayaran == 'paid') {
             return redirect('/finance/komisi');
@@ -854,12 +903,19 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($reinburst) {
 
                     Reinburst::where('id', $reinburst->id)->get();
+                    $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
+                        'Bank BCA', 'Bank BRI', 'Bank  Mandiri'
+                    ])->get();
                     $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
                     $options = '';
-                    foreach ($account as $key) {
-                        if ($key->nama_bank != '') {
+                    foreach ($bank as $key) {
+                        if ($key->deskripsi == 'Bank BCA') {
 
-                            $options .= '<option value="' . $key->id_chart_of_account . '">' . $key->nama_bank . '</option>';
+                            $options .= '<option value="' . $key->id . '"> BCA </option>';
+                        }elseif ($key->deskripsi == 'Bank BRI') {
+                            $options .= '<option value="' . $key->id . '"> BRI </option>';
+                        }else{
+                            $options .= '<option value="' . $key->id . '"> Mandiri </option>';
                         }
                     }
 
@@ -1015,7 +1071,7 @@ class FinanceController extends Controller
         ->first();
 
         $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
-        $kas = DB::table('new_chart_of_account')->where('id', 4)->select('balance')->first();
+        $kas = DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->select('balance')->first();
 
         $transaction = [
             ['chart_id' => 28,
@@ -1031,7 +1087,7 @@ class FinanceController extends Controller
                 'is_active' => 1
 
             ],
-            ['chart_id' => 4,
+            ['chart_id' => $request->sumber_pembayaran,
                 'no_transaksi' => $update->nomor_reinburst,
                 'month' => Carbon::now()->format('m'),
                 'year' => Carbon::now()->format('Y'),
@@ -1045,6 +1101,12 @@ class FinanceController extends Controller
             ],
         ];
         DB::table('transactions')->insert($transaction);
+        DB::table('new_chart_of_account')->where('id', 28)->update([
+            'balance' => $hutang->balance - $reinbursts->total
+        ]);
+        DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->update([
+            'balance' => $kas->balance + $reinbursts->total
+        ]);
 
         return redirect()->route('finance.reinburst')->with('success', 'Status Pembayaran Complete');
     }
@@ -1118,12 +1180,19 @@ class FinanceController extends Controller
 
                     Penggajian::where('id', $gajian->id)->get();
 
+                    $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
+                        'Bank BCA', 'Bank BRI', 'Bank  Mandiri'
+                    ])->get();
                     $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
                     $options = '';
-                    foreach ($account as $key) {
-                        if ($key->nama_bank != '') {
+                    foreach ($bank as $key) {
+                        if ($key->deskripsi == 'Bank BCA') {
 
-                            $options .= '<option value="' . $key->id_chart_of_account . '">' . $key->nama_bank . '</option>';
+                            $options .= '<option value="' . $key->id . '">BCA</option>';
+                        }elseif ($key->deskripsi == 'Bank BRI'){
+                            $options .= '<option value="' . $key->id . '">BRI</option>';
+                        }else{
+                            $options .= '<option value="' . $key->id . '">Mandiri</option>';
                         }
                     }
 
@@ -1254,8 +1323,48 @@ class FinanceController extends Controller
         $update = Penggajian::find($id);
         // $update->status_penerimaan = 'paid';
         // $update->save();
+        $currency = $update->gaji_pokok + (($update->penerimaan->sum('nominal') - $update->gaji_pokok) - $update->potongan->sum('nominal'));
+        
         $update->update([
             'status_penerimaan' => $request->status,
+        ]);
+
+        $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
+        $kas = DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->select('balance')->first();
+
+        $transaction = [
+            ['chart_id' => 28,
+                'no_transaksi' => $update->slip_gaji,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>'',
+                'debit' =>  $currency,
+                'last_balance' => $hutang->balance - $currency ,
+                'template_id' => 9,
+                'is_active' => 1
+
+            ],
+            ['chart_id' => $request->sumber_pembayaran,
+                'no_transaksi' => $update->slip_gaji,
+                'month' => Carbon::now()->format('m'),
+                'year' => Carbon::now()->format('Y'),
+                'date' => Carbon::now()->format('d-m-Y'),
+                'time' => Carbon::now()->format('h:i:s'),
+                'credit' =>  $currency,
+                'debit' => '',
+                'last_balance' => $kas->balance + $currency,
+                'template_id' => 10,
+                'is_active' => 1
+            ],
+        ];
+        DB::table('transactions')->insert($transaction);
+        DB::table('new_chart_of_account')->where('id', 28)->update([
+            'balance' => $hutang->balance - $currency
+        ]);
+        DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->update([
+            'balance' => $kas->balance + $currency
         ]);
 
         return redirect()->route('finance.gaji')->with('success', 'Status Penerimaan Complete');

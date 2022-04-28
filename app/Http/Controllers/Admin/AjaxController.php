@@ -258,9 +258,7 @@ class AjaxController extends Controller
             
             Reinburst::where('id', $data->id)->get();
             return '<a href="' . route('hrd.penerimaan.statuscompleted', $data->id) . '"  class="btn btn-sm status-green"><i class="fa-solid fa-check-to-slot"></i></a>
-            <a href="' . route('hrd.penerimaan.download', $data->id) . '" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>
-            <input type="text" name="no_transaksi" value="'.$data->nomor_reinburst.'"> 
-            <input type="text" name="nominal" value="'.$data->total.'">';
+            <a href="' . route('hrd.penerimaan.download', $data->id) . '" class="btn btn-sm btn-success"><i class="fa-solid fa-eye"></i></a>';
             
             // return '<a href="' . route('hrd.penerimaan.statuscompleted', $data->id) . '"  class="custom-badge status-green"><i class="fa-solid fa-check-to-slot"></i></a>
             // <a href="' . route('hrd.penerimaan.update', $data->id) . '"  class="custom-badge status-orange"><i class="fa-solid fa-eye"></i></a>';

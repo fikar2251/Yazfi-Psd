@@ -148,15 +148,21 @@
                                                                         <td>
                                                                             <select class="form-control"
                                                                                 name="sumber_pembayaran" id="sumber">
-                                                                                {{-- <option selected
-                                                                                        value="{{ $item->sumber->id_chart_of_account }}">
-                                                                                        {{ $item->sumber->nama_bank }}
-                                                                                    </option> --}}
-                                                                                @foreach ($account as $item)
-                                                                                    @if ($item->nama_bank != '')
+                                                                                @foreach ($bank as $item)
+                                                                                    @if ($item->deskripsi == 'Bank BCA')
                                                                                         <option
-                                                                                            value="{{ $item->id_chart_of_account }}">
-                                                                                            {{ $item->nama_bank }}
+                                                                                            value="{{ $item->id }}">
+                                                                                            BCA
+                                                                                        </option>
+                                                                                        @elseif ($item->deskripsi == 'Bank BRI')
+                                                                                        <option
+                                                                                            value="{{ $item->id }}">
+                                                                                            BRI
+                                                                                        </option>
+                                                                                    @else
+                                                                                        <option
+                                                                                            value="{{ $item->id }}">
+                                                                                            Mandiri
                                                                                         </option>
                                                                                     @endif
                                                                                 @endforeach
@@ -214,7 +220,8 @@
                                                                                 @endphp
 
                                                                                 <option value="{{ $status->id }}">
-                                                                                    {{ $status->status_pembayaran }}</option>
+                                                                                    {{ $status->status_pembayaran }}
+                                                                                </option>
                                                                                 <option value="paid">paid</option>
                                                                                 <option value="reject">reject
                                                                                 </option>

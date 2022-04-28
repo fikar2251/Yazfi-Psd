@@ -151,9 +151,9 @@
                                                 <select name="bank_tujuan" id="bank_tujuan" class="form-control"
                                                     style="width: 200px">
                                                     <option selected value="">-- Bank tujuan --</option>
-                                                    <option value="Bri">BRI</option>
-                                                    <option value="Bca">BCA</option>
-                                                    <option value="Mandiri">Mandiri</option>
+                                                    <option value="Bank BRI">BRI</option>
+                                                    <option value="Bank BCA">BCA</option>
+                                                    <option value="Bank Mandiri">Mandiri</option>
                                             </td>
                                         </tr>
                                         <tr>
@@ -277,9 +277,9 @@
                                                     @currency($item->nominal)
                                                 </td>
                                                 <td>
-                                                    @if ($item->bank_tujuan == 'Bri')
+                                                    @if ($item->bank_tujuan == 'Bank BRI')
                                                         BRI
-                                                    @elseif ($item->bank_tujuan == 'Bca')
+                                                    @elseif ($item->bank_tujuan == 'Bank BCA')
                                                         BCA
                                                     @else
                                                         Mandiri
@@ -365,54 +365,6 @@
 
     <script>
         $(document).ready(function() {
-            // $('#rincian_id').multiselect({
-            //     nonSelectedText: '--Pembayaran--',
-            //     onChange: function (option,selected) {
-            //         var rincian = this.$select.val();
-            //         var nominal = this.$select.val();
-            //         var div = $(this).parent();
-            //         var op = " ";
-            //         var token = $("input[name='_token']").val();
-            //         if (rincian.length > 0) {
-            //             $.ajax({
-            //                 url:  `/supervisor/nominal`,
-            //                 method: "get",
-            //                 data: {
-            //                     'rincian': rincian,
-            //                     'nominal' : nominal,
-
-            //                 },
-            //                 success: function(data) {
-            //             // if (data) {
-            //             console.log(data);
-
-            //             for (var i = 0; i < data.length; i++) {
-            //                 if (data[i].jumlah_tagihan) {
-            //                     var nominal = data[i].jumlah_tagihan;
-            //                     var numb = nominal;
-            //                     var format = numb.toString().split('').reverse().join('');
-            //                     var convert = format.match(/\d{1,3}/g);
-            //                     var rupiah = convert.join('.').split('').reverse()
-            //                         .join('')
-            //                 } else {
-
-            //                     var nominal = data;
-
-
-            //                 }
-            //                 document.getElementById('nominal').value = nominal;
-            //                 document.getElementById('nominals').value = nominal;
-            //                 console.log(rupiah);
-            //             };
-
-            //         },
-            //         error: function() {
-
-            //         },
-            //             })
-            //         }
-            //     }
-            // });
             $('#rincian-id').multiselect({
                 nonSelectedText: '--Pembayaran--',
                 onChange: function() {
@@ -464,55 +416,6 @@
                     })
                 }
             })
-
-            // $('.rincian').change(function() {
-            //     var rincian_id = $(this).val();
-            //     var nominal = $(this).val();
-            //     var div = $(this).parent();
-            //     var op = " ";
-
-            //     console.log(rincian_id);
-            //     $.ajax({
-            //         url: `/supervisor/nominal`,
-            //         method: "get",
-            //         data: {
-            //             'rincian_id': rincian_id,
-            //             'nominal': nominal,
-            //         },
-
-            //         success: function(data) {
-            //             // if (data) {
-            //             console.log(data);
-
-            //             for (var i = 0; i < data.length; i++) {
-            //                 if (data[i].jumlah_tagihan) {
-            //                     var nominal = data[i].jumlah_tagihan;
-            //                     var numb = nominal;
-            //                     var format = numb.toString().split('').reverse().join('');
-            //                     var convert = format.match(/\d{1,3}/g);
-            //                     var rupiah = convert.join('.').split('').reverse()
-            //                         .join('')
-            //                 } else {
-
-            //                     var nominal = data;
-
-
-            //                 }
-            //                 document.getElementById('nominal').value = nominal;
-            //                 document.getElementById('nominals').value = nominal;
-            //                 console.log(rupiah);
-            //             };
-
-            //         },
-            //         error: function() {
-
-            //         },
-
-
-
-            //     })
-            // })
-
 
         })
 
