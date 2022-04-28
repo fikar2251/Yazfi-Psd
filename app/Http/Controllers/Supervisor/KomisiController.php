@@ -21,7 +21,7 @@ class KomisiController extends Controller
 
             $id = auth()->user()->id;
             $user = TeamSales::where('user_id', $id)->get();
-            $komisi = Komisi::orderBy('id', 'desc')->get(); 
+            $komisi = Komisi::orderBy('id', 'desc')->get();
 
             return view('supervisor.komisi.index', compact('user', 'komisi'));
         }
@@ -33,7 +33,7 @@ class KomisiController extends Controller
         if (auth()->user()->roles()->first()->name == 'supervisor') {
             $user = User::where('id_roles', 4)->get();
 
-            $komisi = Komisi::orderBy('id', 'desc')->get(); 
+            $komisi = Komisi::orderBy('id', 'desc')->get();
 
             return DataTables::of($komisi)
                 ->editColumn('status_pembayaran', function($komisi){
@@ -57,7 +57,7 @@ class KomisiController extends Controller
         // }
         $authid = auth()->user()->id;
         $manager = TeamSales::where('user_id', $authid)->first();
-        
+
         $nospr = request()->get('no_transaksi');
         if ($nospr) {
 
@@ -120,12 +120,12 @@ class KomisiController extends Controller
             'is_active' => 1,
         ]);
 
-        $kewajiban = DB::table('new_chart_of_account')->where('id', 34)->select('balance')->first();
+        $kewajiban = DB::table('new_chart_of_account')->where('id', 100)->select('balance')->first();
         $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
         $total =  $request->nominal_sales +  $request->nominal_spv +  $request->nominal_manager;
 
         $transaction = [
-            ['chart_id' => 34,
+            ['chart_id' => 100,
                 'no_transaksi' => $request->no_komisi,
                 'month' => Carbon::now()->format('m'),
                 'year' => Carbon::now()->format('Y'),
@@ -152,7 +152,7 @@ class KomisiController extends Controller
             ],
         ];
         DB::table('transactions')->insert($transaction);
-        DB::table('new_chart_of_account')->where('id', 34)->update([
+        DB::table('new_chart_of_account')->where('id', 100)->update([
             'balance' => $kewajiban->balance - $total
         ]);
         DB::table('new_chart_of_account')->where('id', 28)->update([
@@ -162,31 +162,31 @@ class KomisiController extends Controller
         return redirect('/supervisor/komisi');
     }
 
-    
+
 
     // public function show(Booking $komisi)
     // {
-    //     
+    //
     // }
 
     // public function edit(RincianKomisi $komisi)
     // {
-    //   
+    //
     // }
 
     // public function update(RincianKomisi $komisi)
     // {
-    //  
+    //
     // }
 
     // public function change(RincianKomisi $komisi)
     // {
-    //   
+    //
     // }
 
     // public function updatechange($id)
     // {
-        
+
     // }
 
     // public function destroy(RincianKomisi $komisi)

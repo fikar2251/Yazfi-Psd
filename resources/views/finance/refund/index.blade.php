@@ -178,6 +178,7 @@
                                                 <td style="width: 20px">:</td>
                                                 <td>
                                                     unpaid
+                                                    <input type="hidden" name="totals" id="totals" class="form-control" value="">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -186,10 +187,18 @@
                                                 <td>
                                                     <select name="sumber_pembayaran" id="" class="form-control">
                                                         <option value="">--Select sumber pembayaran--</option>
-                                                        @foreach ($account as $item)
-                                                            @if ($item->nama_bank != '')
-                                                                <option value="{{ $item->id_chart_of_account }}">
-                                                                    {{ $item->nama_bank }}
+                                                        @foreach ($bank as $item)
+                                                            @if ($item->deskripsi == 'Bank BCA')
+                                                                <option value="{{ $item->id }}">
+                                                                    BCA
+                                                                </option>
+                                                            @elseif ($item->deskripsi == 'Bank BRI')
+                                                             <option value="{{ $item->id }}">
+                                                                    BRI
+                                                                </option>
+                                                            @else
+                                                            <option value="{{ $item->id }}">
+                                                                    Mandiri
                                                                 </option>
                                                             @endif
                                                         @endforeach
@@ -237,6 +246,7 @@
 
                 document.getElementById("total_refund").value = angkatotal;
                 document.getElementById("total").innerHTML = angkatotal;
+                document.getElementById("totals").value = total;
             });
         });
 

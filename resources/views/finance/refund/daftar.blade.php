@@ -55,7 +55,7 @@
                                             {{ $item->pembatalan->spr->user->name }}
                                         </td>
                                         <td>
-                                            {{ $item->total_refund }}
+                                            @currency($item->total_refund )
                                         </td>
                                         <td>
                                             @if ($item->status == 'unpaid')
@@ -119,6 +119,7 @@
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
                                                                                     {{ $item->no_refund }}
+                                                                                    <input type="hidden" name="no_refund" value="{{$item->no_refund}}">
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -126,7 +127,8 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    {{ $item->total_refund }}
+                                                                                    @currency($item->total_refund)
+                                                                                    <input type="hidden" name="total_refund" value="{{$item->total_refund}}">
                                                                                 </td>
                                                                             </tr>
                                                                             <tr>
@@ -151,7 +153,7 @@
                                                                                 </td>
                                                                                 <td style="width: 20px">:</td>
                                                                                 <td>
-                                                                                    <select class="form-control"
+                                                                                    {{-- <select class="form-control"
                                                                                         name="sumber_pembayaran"
                                                                                         id="sumber">
                                                                                         <option selected
@@ -164,6 +166,46 @@
                                                                                                     value="{{ $item->id_chart_of_account }}">
                                                                                                     {{ $item->nama_bank }}
                                                                                                 </option>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </select> --}}
+                                                                                     <select name="tujuan" id="tujuan"
+                                                                                        class="form-control">
+                                                                                        @foreach ($bank as $bk)
+                                                                                            @if ($bk->id == $item->sumber_pembayaran)
+                                                                                                @if ($item->sumber_pembayaran == 39)
+                                                                                                    <option
+                                                                                                       selected value="{{ $bk->id }}">
+                                                                                                        BCA
+                                                                                                    </option>
+                                                                                                    @elseif ($item->sumber_pembayaran == 40)
+                                                                                                    <option
+                                                                                                       selected value="{{ $bk->id }}">
+                                                                                                        BRI
+                                                                                                    </option>
+                                                                                                @else
+                                                                                                    <option
+                                                                                                      selected  value="{{ $bk->id }}">
+                                                                                                        Mandiri
+                                                                                                    </option>
+                                                                                                @endif
+                                                                                            @else
+                                                                                                @if ($bk->deskripsi == 'Bank BCA')
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        BCA
+                                                                                                    </option>
+                                                                                                    @elseif ($bk->deskripsi == 'Bank BRI')
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        BRI
+                                                                                                    </option>
+                                                                                                @else
+                                                                                                    <option
+                                                                                                        value="{{ $bk->id }}">
+                                                                                                        Mandiri
+                                                                                                    </option>
+                                                                                                @endif
                                                                                             @endif
                                                                                         @endforeach
                                                                                     </select>
@@ -199,11 +241,11 @@
                                                                                         class="form-control rincian">
                                                                                         @php
                                                                                         foreach ($refund as $key) {
-                                                                                            
+
                                                                                             $status = App\Refund::where('id', $key->id)->first();
                                                                                         }
                                                                                         @endphp
-                                                                                        
+
                                                                                         <option value="{{$status->id}}">{{$status->status}}</option>
                                                                                         <option value="paid">paid</option>
                                                                                         <option value="reject">reject
