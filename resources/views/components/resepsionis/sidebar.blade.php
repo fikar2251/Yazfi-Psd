@@ -34,7 +34,7 @@
                 <a href="{{ route('finance.chart') }}"><span>Chart of account</span></a>
             </li>
             <li class="{{ request()->is('finance/refund/list') ? 'active' : '' }}">
-                <a href="{{ route('finance.refund.list') }}"><span>List Refund</span></a>
+                <a href="{{ route('finance.refund.list') }}"><span>Transactions</span></a>
             </li>
         </ul>
     </li>

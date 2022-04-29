@@ -271,6 +271,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/chart/json', 'FinanceController@ajax_chart')->name('ajax.chart');
             Route::get('/chart/create', 'FinanceController@createChart')->name('chart.create');
             Route::post('/chart/store', 'FinanceController@storeChart')->name('store.chart');
+            Route::put('/chart/update/{id}', 'FinanceController@updateChart')->name('update.chart');
             Route::get('/account', 'FinanceController@account')->name('account');
         });
 

@@ -109,7 +109,6 @@
                     </tr>
                     @endforeach --}}
                     </tbody>
-
                     <tfoot>
                         <tr>
                             <td>Total : </td>
@@ -131,6 +130,106 @@
                         </tr>
                     </tfoot>
                 </table>
+                @foreach ($tukar as $item)
+                <form action="{{ route('finance.tukar.update', $item->id) }}" method="POST">
+                    @csrf
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal{{ $item->id}}" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                        <div class="modal-dialog " style="max-width: 650px">
+                            <div class="modal-content">
+                               
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="exampleModalLabel">
+                                            {{ $item->no_faktur }}</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered custom-table table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="width: 200px">Tanggal Pengajuan
+                                                        </td>
+                                                        <td style="width: 20px">:</td>
+                                                        <td>
+                                                            {{ Carbon\Carbon::parse($item->tanggal_tukar_faktur)->format('d/m/Y') }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width: 200px">Total Pembayaran
+                                                        </td>
+                                                        <td style="width: 20px">:</td>
+                                                        <td>
+                                                            @currency($item->nilai_invoice)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width: 200px">Supplier
+                                                        </td>
+                                                        <td style="width: 20px">:</td>
+                                                        <td>
+                                                            {{ $item->supplier->nama }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width: 200px">Sumber Pembayaran
+                                                        </td>
+                                                        <td style="width: 20px">:</td>
+                                                        <td>
+                                                            <select class="form-control" name="sumber_pembayaran"
+                                                                id="sumber">
+
+                                                                @foreach ($bank as $key)
+                                                                    @if ($key->deskripsi == 'Bank BCA')
+
+                                                                        <option value="{{ $key->id }}"> BCA
+                                                                        </option>
+                                                                    @elseif ($key->deskripsi == 'Bank BRI')
+                                                                        <option value="{{ $key->id }}"> BRI
+                                                                        </option>
+                                                                    @else
+                                                                        <option value="{{ $key->id }}"> Mandiri
+                                                                        </option>
+                                                                    @endif
+                                                                @endforeach
+
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td style="width: 200px">Status Pembayaran
+                                                        </td>
+                                                        <td style="width: 20px">:</td>
+                                                        <td>
+                                                            <select name="status" id="status"
+                                                                class="form-control rincian">
+
+                                                                <option value="{{ $item->id }}">
+                                                                    {{ $item->status_pembayaran }}</option>
+                                                                <option value="completed">completed</option>
+                                                                <option value="reject">reject
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="reset" class="btn btn-secondary">Batal</button>
+                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                    </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                @endforeach
             </div>
         </div>
     </div>

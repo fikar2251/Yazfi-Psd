@@ -81,6 +81,81 @@
                     </tr>
                 </tfoot>
             </table>
+            @foreach ($pengajuans as $item)
+            <form action="{{route('finance.pengajuan.update', $item->id)}}" method="POST">
+                @csrf
+              <!-- Modal -->
+              <div class="modal fade" id="exampleModal{{$item->id}}" tabindex="-1"
+                aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                <div class="modal-dialog " style="max-width: 650px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="exampleModalLabel">
+                                {{$item->nomor_pengajuan}}</h4>
+                            <button type="button" class="close"
+                                data-dismiss="modal" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table
+                                    class="table table-bordered custom-table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 200px">Tanggal Pengajuan
+                                            </td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+
+                                                {{ Carbon\Carbon::parse($item->tanggal_pengajuan)->format('d/m/Y') }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 200px">Total Pengajuan
+                                            </td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+                                              @currency($item->grandtotal)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 200px">Karyawan
+                                            </td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+                                               {{$item->admin->name}}
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td style="width: 200px">Status Pembayaran
+                                            </td>
+                                            <td style="width: 20px">:</td>
+                                            <td>
+                                                <select name="status" id="status"
+                                                    class="form-control rincian">
+
+                                                    <option value="{{$item->id}}">{{$item->status_approval}}</option>
+                                                    <option value="completed">completed</option>
+                                                    <option value="reject">reject
+                                                    </option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn btn-secondary">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+            @endforeach
         </div>
     </div>
 </div>

@@ -51,16 +51,17 @@
                                         <td>
                                             {{ $item->kode }}
                                         </td>
-                                        
-                                            <td >
-                                                {{ $item->deskripsi }} </td>
+
+                                        <td>
+                                            {{ $item->deskripsi }} </td>
 
                                         <td style="font-weight: 500"> {{ $item->category->nama_cat }} </td>
                                         <td> @currency($item->balance) </td>
                                         <td>
-                                            <a href="#" class="btn btn-warning">
+                                            <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                data-target="#editModal{{ $item->id }}">
                                                 <i class="fa-solid fa-pen-to-square"></i>
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     @foreach ($item->children as $child)
@@ -76,9 +77,10 @@
                                             <td> {{ $child->category->nama_cat }} </td>
                                             <td> @currency($child->balance) </td>
                                             <td>
-                                                <a href="#" class="btn btn-warning">
+                                                <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                    data-target="#editModal{{ $child->id }}">
                                                     <i class="fa-solid fa-pen-to-square"></i>
-                                                </a>
+                                                </button>
                                             </td>
 
                                         </tr>
@@ -95,9 +97,10 @@
                                                 <td> {{ $subchild->category->nama_cat }} </td>
                                                 <td> @currency($subchild->balance) </td>
                                                 <td>
-                                                    <a href="#" class="btn btn-warning">
+                                                    <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                        data-target="#editModal{{ $subchild->id }}">
                                                         <i class="fa-solid fa-pen-to-square"></i>
-                                                    </a>
+                                                    </button>
                                                 </td>
 
                                             </tr>
@@ -106,12 +109,118 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        @foreach ($chart as $ch)
+                            <!-- Modal Edit Chart of Account -->
+                            <div class="modal fade" id="editModal{{ $ch->id }}" tabindex="-1"
+                                aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
+                                <div class="modal-dialog " style="max-width: 650px">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel">
+                                                Edit Chart of account</h4>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">&times;</button>
+                                        </div>
+                                        <form action="{{ route('finance.update.chart', $ch->id) }}" method="POST">
+                                            @csrf
+                                            @method('put')
+                                            <div class="modal-body">
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Account type</label>
+                                                    <div class="col-md-9">
+                                                        <select class="form-control type" name="cat_id" id="cat_id">
+                                                            <option>--Select Type--</option>
+                                                            @foreach ($cat as $item)
+                                                                @if ($item->id_cat == $ch->cat_id)
+                                                                    
+                                                                <option selected value="{{ $item->id_cat }}">
+                                                                    {{ $item->nama_cat }}</option>
+                                                                @else
+                                                                <option  value="{{ $item->id_cat }}">
+                                                                    {{ $item->nama_cat }}</option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Account No</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" name="kode"
+                                                            value="{{ $ch->kode }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Name</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" name="deskripsi"
+                                                            value="{{ $ch->deskripsi }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row"> 
+                                                    <label class="col-md-3 col-form-label ">Sub Account</label>
+                                                    <div class="col-md-9">
+                                                        <select name="child_numb" id="child-numb" class="form-control root">
+                                                            @php
+                                                                foreach ($cat as $key) {
+                                                                    if ($key->id_cat == $ch->cat_id) {
+                                                                        $idcat = $key->id_cat;
+                                                                    }
+                                                                }
+                                                                $data = DB::table('new_chart_of_account')->where('cat_id', $idcat)->get();
+                                                               
+                                                                
+                                                            @endphp
+                                                            <option selected value="0">--Select sub account--</option>
+                                                            @foreach ($data as $dt)
+                                                               <option value="{{$dt->id}}">{{$dt->deskripsi}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Opening Balance</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control" name="balance"
+                                                            value="{{ $ch->balance }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Tanggal</label>
+                                                    <div class="col-md-9">
+                                                        <input type="date" class="form-control" name="tanggal"
+                                                            value="{{ $ch->tanggal }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label">Notes</label>
+                                                    <div class="col-md-9">
+                                                        <textarea name="notes" id="notes" rows="5" cols="53">
+
+                                                </textarea>
+                                                    </div>
+                                                </div>
+                                                {{-- <div class="text-right">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div> --}}
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="reset" class="btn btn-secondary">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal Add Chart of Account -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
         role="dialog">
         <div class="modal-dialog " style="max-width: 650px">
@@ -188,6 +297,8 @@
             </div>
         </div>
     </div>
+
+
 
 @stop
 @section('footer')

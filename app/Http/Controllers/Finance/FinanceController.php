@@ -298,46 +298,7 @@ class FinanceController extends Controller
         }
         return redirect()->back();
 
-        // if ($bayar->status_approval == 'paid') {
-        //     $bayar = Pembayaran::select('nominal', 'rincian_id')->where('id', $id)->first();
-        //     $where = [
-
-        //         'id_rincian' => $bayar->rincian_id,
-        //     ];
-
-        //     $tagihan = Tagihan::where($where)->first();
-
-        //     $rincianid = $bayar->rincian_id;
-        //     $bayar1 = Pembayaran::where('rincian_id', $rincianid)->sum('nominal');
-        //     $sum = (int) $bayar1;
-
-        //     if ($bayar->nominal == $tagihan->jumlah_tagihan) {
-        //         $tagihan->status_pembayaran = 'paid';
-        //     } elseif ($bayar->nominal < $tagihan->jumlah_tagihan && $sum < $tagihan->jumlah_tagihan) {
-        //         $tagihan->status_pembayaran = 'partial';
-        //     } elseif ($sum == $tagihan->jumlah_tagihan) {
-        //         $tagihan->status_pembayaran = 'paid';
-        //     }
-        //     $tagihan->save();
-
-        //     $spr = $tagihan->id_spr;
-        //     $spr1 = Spr::where('id_transaksi', $spr)->first();
-        //     if ($tagihan->tipe == 1) {
-        //         $spr1->status_booking = 'paid';
-        //     } elseif ($tagihan->tipe == 2) {
-        //         $spr1->status_dp = 'paid';
-        //     }
-        //     $spr1->save();
-
-        //     $unit = $spr1->id_unit;
-        //     $rumah = Rumah::where('id_unit_rumah', $unit)->first();
-        //     $rumah->status_penjualan = 'Sold';
-        //     $rumah->save();
-
-        //     return redirect('/finance/payment');
-        // } else {
-        //     return redirect()->back();
-        // }
+        
     }
 
     public function updateKomisi(Request $request, $id)
@@ -398,8 +359,19 @@ class FinanceController extends Controller
 
     public function tukarFaktur()
     {
+        $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
+            'Bank BCA', 'Bank BRI', 'Bank  Mandiri',
+        ])->get();
 
-        return view('finance.tukar-faktur.index');
+        $tukar = TukarFaktur::
+        whereIn('status_pembayaran', ['pending', 'reject'])->
+        groupBy('tukar_fakturs.no_faktur')
+        ->orderBy('tukar_fakturs.id', 'desc')
+        ->get();
+        // $tgl = Carbon::parse($tukars->tanggal_tukar_faktur)->format('d/m/Y');
+
+
+        return view('finance.tukar-faktur.index', compact('bank','tukar'));
     }
 
     public function ajax_faktur(Request $request)
@@ -463,125 +435,18 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($tukars) {
 
                     TukarFaktur::where('id', $tukars->id)->get();
-                    $account = DB::table('chart_of_account')->select('id_chart_of_account', 'nama_bank')->get();
-                    $bank = DB::table('new_chart_of_account')->select('deskripsi', 'id')->whereIn('deskripsi', [
-                        'Bank BCA', 'Bank BRI', 'Bank  Mandiri',
-                    ])->get();
+                   
 
                     // return '<a href="' . route('finance.tukar.update', $tukars->id) . '"   class="delete-form btn btn-sm btn-warning"><i class="fa-solid fa-pencil"></i></a>';
-                    $options = '';
-                    foreach ($bank as $key) {
-                        if ($key->deskripsi == 'Bank BCA') {
-
-                            $options .= '<option value="' . $key->id . '"> BCA </option>';
-                        } elseif ($key->deskripsi == 'Bank BRI') {
-                            $options .= '<option value="' . $key->id . '"> BRI </option>';
-                        } else {
-                            $options .= '<option value="' . $key->id . '"> Mandiri </option>';
-                        }
-
-                    }
-
-                    $stats = '';
-
-                    $stats .= '<option value="' . $tukars->id . '">' . $tukars->status_pembayaran . '</option>';
-
-                    $currency = '';
-                    $currency = number_format($tukars->nilai_invoice);
-
-                    $tgl = Carbon::parse($tukars->tanggal_tukar_faktur)->format('d/m/Y');
-
-                    return ' <form action="' . route('finance.tukar.update', $tukars->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
+                   
+                    return ' 
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
                             data-target="#exampleModal' . $tukars->id . '">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                    </div>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal' . $tukars->id . '" tabindex="-1"
-                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
-                        <div class="modal-dialog " style="max-width: 650px">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="exampleModalLabel">
-                                        ' . $tukars->no_faktur . '</h4>
-                                    <button type="button" class="close"
-                                        data-dismiss="modal" aria-label="Close">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="table-responsive">
-                                        <table
-                                            class="table table-bordered custom-table table-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <td style="width: 200px">Tanggal Pengajuan
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-
-                                                        ' . $tgl . '
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width: 200px">Total Pembayaran
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                      Rp ' . $currency . '
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width: 200px">Supplier
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                        ' . $tukars->supplier->nama . '
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width: 200px">Sumber Pembayaran
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                        <select class="form-control"
-                                                            name="sumber_pembayaran" id="sumber">
-                                                        ' . $options . '
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style="width: 200px">Status Pembayaran
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                        <select name="status" id="status"
-                                                            class="form-control rincian">
-
-                                                            ' . $stats . '
-                                                            <option value="completed">completed</option>
-                                                            <option value="reject">reject
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="reset" class="btn btn-secondary">Batal</button>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>';
+                    </div>';
 
                 })
                 ->addIndexColumn()
@@ -665,12 +530,32 @@ class FinanceController extends Controller
         if (request('from') && request('to')) {
             $from = Carbon::createFromFormat('d/m/Y', request('from'))->format('Y-m-d');
             $to = Carbon::createFromFormat('d/m/Y', request('to'))->format('Y-m-d');
-            $pengajuans = Pengajuan::groupBy('nomor_pengajuan')->whereBetween('tanggal_pengajuan', [$from, $to])->get();
+            // $pengajuans = Pengajuan::groupBy('nomor_pengajuan')->whereBetween('tanggal_pengajuan', [$from, $to])->get();
+
+            $pengajuans = Pengajuan::
+            leftJoin('rincian_pengajuans', 'pengajuans.nomor_pengajuan', '=', 'rincian_pengajuans.nomor_pengajuan')
+            ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
+            ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
+                'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
+            ->whereIn('status_approval', ['pending', 'reject'])
+            ->whereBetween('pengajuans.tanggal_pengajuan', array($from, $to))
+            ->groupBy('pengajuans.nomor_pengajuan')
+            ->orderBy('pengajuans.id', 'desc')
+            ->get();
 
         } else {
-            $pengajuans = Pengajuan::orderBy('id', 'desc')
+            // $pengajuans = Pengajuan::orderBy('id', 'desc')
+            //     ->whereIn('status_approval', ['pending', 'reject'])
+            //     ->groupBy('nomor_pengajuan')
+            //     ->get();
+            
+                $pengajuans = Pengajuan::
+                leftJoin('rincian_pengajuans', 'pengajuans.nomor_pengajuan', '=', 'rincian_pengajuans.nomor_pengajuan')
+                ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
+                ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
+                    'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
                 ->whereIn('status_approval', ['pending', 'reject'])
-                ->groupBy('nomor_pengajuan')
+                ->orderBy('pengajuans.id', 'desc')
                 ->get();
         }
 
@@ -753,87 +638,14 @@ class FinanceController extends Controller
 
                     $currency = number_format($data->grandtotal);
 
-                    return ' <form action="' . route('finance.pengajuan.update', $data->id) . '" method="POST">
-                    <input type="hidden" name="_token" value=" ' . csrf_token() . ' ">
+                    return ' 
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
                             data-target="#exampleModal' . $data->id . '">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                    </div>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal' . $data->id . '" tabindex="-1"
-                        aria-labelledby="exampleModalLabel" aria-hidden="true" role="dialog">
-                        <div class="modal-dialog " style="max-width: 650px">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="exampleModalLabel">
-                                        ' . $data->nomor_pengajuan . '</h4>
-                                    <button type="button" class="close"
-                                        data-dismiss="modal" aria-label="Close">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="table-responsive">
-                                        <table
-                                            class="table table-bordered custom-table table-striped">
-                                            <tbody>
-                                                <tr>
-                                                    <td style="width: 200px">Tanggal Pengajuan
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-
-                                                        ' . $tgl . '
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width: 200px">Total Pengajuan
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                      Rp ' . $currency . '
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width: 200px">Karyawan
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                        ' . $data->admin->name . '
-                                                    </td>
-                                                </tr>
-
-
-                                                <tr>
-                                                    <td style="width: 200px">Status Pembayaran
-                                                    </td>
-                                                    <td style="width: 20px">:</td>
-                                                    <td>
-                                                        <select name="status" id="status"
-                                                            class="form-control rincian">
-
-                                                            ' . $stats . '
-                                                            <option value="completed">completed</option>
-                                                            <option value="reject">reject
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="reset" class="btn btn-secondary">Batal</button>
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>';
+                    </div>';
                 })
                 ->addIndexColumn()
                 ->rawColumns(['no_pengajuan', 'status', 'action'])
@@ -1419,16 +1231,14 @@ class FinanceController extends Controller
     {
         $cat = DB::table('cat_chart_of_account')->get();
         $parent = ChartOfAccount::with('children')->root()->get();
-
-        return view('finance.accounting.chart_of_account.index', compact('cat', 'parent'));
+        $chart = ChartOfAccount::with('children')->get();
+        
+        
+        return view('finance.accounting.chart_of_account.index', compact('cat', 'parent', 'chart'));
     }
 
     public function ajax_chart()
     {
-        // $chart = DB::table('new_chart_of_account')
-        //     ->leftJoin('cat_chart_of_account', 'cat_chart_of_account.id_cat', '=', 'new_chart_of_account.cat_id')
-        //     ->get();
-
         $parent = ChartOfAccount::with('children')->get();
 
         return DataTables::of($parent)
@@ -1444,9 +1254,10 @@ class FinanceController extends Controller
             })
 
             ->editColumn('action', function ($parent) {
-                return '<a href="#" class="btn btn-warning">
+                return '<button type="button" class="btn btn-warning" data-toggle="modal"
+                data-target="#editModal' . $parent->id . '">
               <i class="fa-solid fa-pen-to-square"></i>
-          </a>';
+          </button>';
             })
 
             ->addIndexColumn()
@@ -1483,6 +1294,20 @@ class FinanceController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Chart of account berhasil ditambahkan');
+    }
+
+    public function updateChart(Request $request, $id)
+    {
+        $update = ChartOfAccount::find($id);
+        $update->update([
+            'cat_id' => $request->cat_id,
+            'kode' => $request->kode,
+            'deskripsi' => $request->deskripsi,
+            'child_numb' => $request->child_numb,
+            'balance' => $request->balance,
+            'tanggal' => $request->tanggal,
+            'notes' => $request->notes,
+        ]);
     }
 
 }
