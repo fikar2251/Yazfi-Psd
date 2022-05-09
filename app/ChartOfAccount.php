@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ChartOfAccount extends Model
 {
     protected $table = 'new_chart_of_account';
+    protected $guarded = [];
+    public $timestamps = false;
     
     public function parent()
     {

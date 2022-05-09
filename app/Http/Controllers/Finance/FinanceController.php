@@ -31,7 +31,7 @@ class FinanceController extends Controller
     {
         if (request()->ajax()) {
             if (!empty($request->from_date)) {
-                # code...
+              
                 $bayar = Pembayaran::where('status_approval', 'paid')
                     ->whereBetween('tanggal_pembayaran', array($request->from_date, $request->to_date))
                     ->get();
@@ -67,9 +67,18 @@ class FinanceController extends Controller
                     return $ket;
 
                 })
+                ->editColumn('action', function ($bayar) { 
+                    return 
+                    '<a href="#">
+                    <button type="submit" class="btn btn-danger"><i
+                            class="fa fa-trash"></i>
+                    </button> 
+                    </a>';
+
+                })
 
                 ->addIndexColumn()
-                ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan'])
+                ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan', 'action'])
                 ->make(true);
         }
     }
@@ -1298,16 +1307,28 @@ class FinanceController extends Controller
 
     public function updateChart(Request $request, $id)
     {
+      
         $update = ChartOfAccount::find($id);
         $update->update([
             'cat_id' => $request->cat_id,
             'kode' => $request->kode,
             'deskripsi' => $request->deskripsi,
-            'child_numb' => $request->child_numb,
+            'child_numb' => $request->child_numb == 0 ? NULL : $request->child_numb,
             'balance' => $request->balance,
             'tanggal' => $request->tanggal,
             'notes' => $request->notes,
         ]);
+
+        return redirect()->back();
+    }
+
+    public function transaction()
+    {
+        $transactions = DB::table('transactions')
+        ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
+        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+        ->get();
+        return view('finance.accounting.transactions.index', compact('transactions'));
     }
 
 }

@@ -132,12 +132,11 @@
                                                             <option>--Select Type--</option>
                                                             @foreach ($cat as $item)
                                                                 @if ($item->id_cat == $ch->cat_id)
-                                                                    
-                                                                <option selected value="{{ $item->id_cat }}">
-                                                                    {{ $item->nama_cat }}</option>
+                                                                    <option selected value="{{ $item->id_cat }}">
+                                                                        {{ $item->nama_cat }}</option>
                                                                 @else
-                                                                <option  value="{{ $item->id_cat }}">
-                                                                    {{ $item->nama_cat }}</option>
+                                                                    <option value="{{ $item->id_cat }}">
+                                                                        {{ $item->nama_cat }}</option>
                                                                 @endif
                                                             @endforeach
                                                         </select>
@@ -157,7 +156,7 @@
                                                             value="{{ $ch->deskripsi }}">
                                                     </div>
                                                 </div>
-                                                <div class="form-group row"> 
+                                                <div class="form-group row">
                                                     <label class="col-md-3 col-form-label ">Sub Account</label>
                                                     <div class="col-md-9">
                                                         <select name="child_numb" id="child-numb" class="form-control root">
@@ -167,13 +166,15 @@
                                                                         $idcat = $key->id_cat;
                                                                     }
                                                                 }
-                                                                $data = DB::table('new_chart_of_account')->where('cat_id', $idcat)->get();
-                                                               
+                                                                $data = DB::table('new_chart_of_account')
+                                                                    ->where('cat_id', $idcat)
+                                                                    ->get();
                                                                 
                                                             @endphp
-                                                            <option selected value="0">--Select sub account--</option>
+                                                            <option value="0">--Select sub account--</option>
                                                             @foreach ($data as $dt)
-                                                               <option value="{{$dt->id}}">{{$dt->deskripsi}}</option>
+                                                                <option value="{{ $dt->id }}">{{ $dt->deskripsi }}
+                                                                </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -188,8 +189,9 @@
                                                 <div class="form-group row">
                                                     <label class="col-md-3 col-form-label">Tanggal</label>
                                                     <div class="col-md-9">
-                                                        <input type="date" class="form-control" name="tanggal"
+                                                        <input type="text" class=" date form-control" name="tanggal"
                                                             value="{{ $ch->tanggal }}">
+                                                           
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -314,7 +316,19 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
-
+    <!-- Bootstrap DatePicker -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css"
+        type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"
+        type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('.date').datepicker({
+                format: 'dd-mm-yyyy'  
+            });
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $.noConflict();

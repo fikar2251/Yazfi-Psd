@@ -49,6 +49,7 @@
                                     <th style="text-align: left">Nominal</th>
                                     <th>Status</th>
                                     <th>Bank tujuan</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -255,7 +256,7 @@
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
-
+                            className: 'dt-body-center'
                         },
                         {
                             data: 'no_detail_transaksi',
@@ -277,13 +278,18 @@
                         {
                             data: 'status_approval',
                             name: 'status_approval',
-
+                            className: 'dt-body-center'
 
                         },
 
                         {
                             data: 'bank_tujuan',
                             name: 'bank_tujuan',
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            className: 'dt-body-center'
                         },
                     ]
                 });

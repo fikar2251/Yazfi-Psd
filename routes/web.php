@@ -220,7 +220,6 @@ Route::middleware('auth')->group(function () {
         // Route Finance
         Route::prefix('finance')->namespace('Finance')->as('finance.')->group(function () {
           
-
             // Route Payment
             Route::get('/payment', 'FinanceController@index')->name('payment');
             Route::post('/payment/updatestatus/{id}', 'FinanceController@ubahStatus')->name('payment.status');
@@ -273,6 +272,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/chart/store', 'FinanceController@storeChart')->name('store.chart');
             Route::put('/chart/update/{id}', 'FinanceController@updateChart')->name('update.chart');
             Route::get('/account', 'FinanceController@account')->name('account');
+            Route::get('/transactions', 'FinanceController@transaction')->name('transactions');
         });
 
         // Route Supervisor
