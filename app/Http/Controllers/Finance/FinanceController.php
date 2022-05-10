@@ -24,9 +24,43 @@ class FinanceController extends Controller
     {
         $bayar = Pembayaran::where('status_approval', 'paid')->get();
 
+        
+
         return view('finance.payment.index', compact('bayar'));
     }
 
+    public function deletePayment($id)
+    {
+        $test = DB::table('transactions')->where('transaksi_id', $id)
+        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+        ->get();
+
+       foreach ($test as $key) {
+           if ($key->credit != '') {
+              DB::table('new_chart_of_account')->where('id', $key->chart_id)
+            //   ->where('debit', '')
+              ->update([
+                'balance' => $key->balance - $key->credit
+              ]);
+           }elseif ($key->debit != ''){
+                DB::table('new_chart_of_account')->where('id', $key->chart_id)
+                // ->where('credit', '')
+                ->update([
+                    'balance' => $key->balance + $key->debit
+                ]);
+           }
+        }
+
+        Pembayaran::where('id', $id)->update([
+            'status_approval' => 'pending'
+        ]);
+
+        DB::table('transactions')->where('transaksi_id', $id)->delete();
+
+        return redirect()->back();
+        
+    }
+ 
     public function paymentJson(Request $request)
     {
         if (request()->ajax()) {
@@ -69,19 +103,20 @@ class FinanceController extends Controller
                 })
                 ->editColumn('action', function ($bayar) { 
                     return 
-                    '<a href="#">
+                    '<a href="' . route('finance.payment.delete', $bayar->id) . '">
                     <button type="submit" class="btn btn-danger"><i
                             class="fa fa-trash"></i>
                     </button> 
                     </a>';
 
                 })
-
+                
                 ->addIndexColumn()
                 ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan', 'action'])
                 ->make(true);
         }
     }
+
 
     public function komisiFinance()
     {

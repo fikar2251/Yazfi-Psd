@@ -224,6 +224,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/payment', 'FinanceController@index')->name('payment');
             Route::post('/payment/updatestatus/{id}', 'FinanceController@ubahStatus')->name('payment.status');
             Route::get('/payment/json', 'FinanceController@paymentJson')->name('payment.json');
+            Route::get('/payment/delete/{id}', 'FinanceController@deletePayment')->name('payment.delete');
 
             // Route Daftar Pembayaran
             Route::get('/daftar', 'FinanceController@listPayment')->name('daftar');
@@ -273,6 +274,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/chart/update/{id}', 'FinanceController@updateChart')->name('update.chart');
             Route::get('/account', 'FinanceController@account')->name('account');
             Route::get('/transactions', 'FinanceController@transaction')->name('transactions');
+
+            
         });
 
         // Route Supervisor
@@ -360,10 +363,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/where/searchPegawai', 'GajiController@searchPegawai');
             Route::get('gaji/ajax', 'GajiController@ajax')->name('gaji.ajax');
 
-
-           
-        
-    
             Route::resource('attendance', 'AttendanceController');
             Route::post('attendance/laporan', 'AttendanceController@laporan')->name('attendance.laporan');
             Route::resource('holidays', 'HolidaysController');
