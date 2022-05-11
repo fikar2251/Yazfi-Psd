@@ -38,13 +38,11 @@ class FinanceController extends Controller
        foreach ($test as $key) {
            if ($key->credit != '') {
               DB::table('new_chart_of_account')->where('id', $key->chart_id)
-            //   ->where('debit', '')
               ->update([
                 'balance' => $key->balance - $key->credit
               ]);
            }elseif ($key->debit != ''){
                 DB::table('new_chart_of_account')->where('id', $key->chart_id)
-                // ->where('credit', '')
                 ->update([
                     'balance' => $key->balance + $key->debit
                 ]);
@@ -56,6 +54,15 @@ class FinanceController extends Controller
         ]);
 
         DB::table('transactions')->where('transaksi_id', $id)->delete();
+
+        $batag = BayarTagihan::where('pembayaran_id', $id)->select('rincian_id')->get();
+        $btg = $batag->toArray();
+        $array = array_column($btg, 'rincian_id');
+
+        Tagihan::whereIn('id_rincian', $array)->update(array(
+            'status_pembayaran' => 'unpaid'
+        ));
+            
 
         return redirect()->back();
         
@@ -110,9 +117,16 @@ class FinanceController extends Controller
                     </a>';
 
                 })
+                ->editColumn('nominal', function ($bayar) { 
+                    $nominal = number_format($bayar->nominal,0,",",".");
+
+                    return 
+                    '<div> Rp. <p style = "display: inline; float: right;">' . $nominal . ' </p> </div>';
+
+                })
                 
                 ->addIndexColumn()
-                ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan', 'action'])
+                ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan', 'action', 'nominal'])
                 ->make(true);
         }
     }
@@ -316,7 +330,7 @@ class FinanceController extends Controller
                     'last_balance' => $request->nominal + $kas->balance,
                     'template_id' => 1,
                     'is_active' => 1,
-
+                    'transaksi_id' =>$id, 
                 ],
                 ['chart_id' => 41,
                     'no_transaksi' => $request->no_transaksi,
@@ -329,6 +343,7 @@ class FinanceController extends Controller
                     'last_balance' => $revenue->balance - $request->nominal,
                     'template_id' => 2,
                     'is_active' => 1,
+                    'transaksi_id' => $id,
                 ],
             ];
             DB::table('transactions')->insert($transaction);

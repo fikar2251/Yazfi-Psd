@@ -97,7 +97,6 @@
             </div>
         </div>
     </div>
-
 @stop
 
 @section('footer')
@@ -108,8 +107,10 @@
     <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <link href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" rel="stylesheet">
-    <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.2.2/css/fixedHeader.dataTables.min.css">
+   
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
@@ -136,15 +137,11 @@
 
             function load_data(from_date = '', to_date = '') {
                 var table = $('#payment').DataTable({
-                    columnDefs: [{
-                        "targets": 4, 
-                        "className": "dt-body-right",
-                    }],
                     processing: true,
                     serverSide: true,
                     orderCellsTop: true,
                     fixedHeader: true,
-                    dom: 'Bfrtip',
+                    dom: 'Blfrtip',
                     // buttons: [
                     //     'copy', 'csv', 'excel', 'pdf', 'print'
                     // ],
@@ -273,7 +270,8 @@
                         {
                             data: 'nominal',
                             name: 'nominal',
-                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                            width: '15%' 
+                            // render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
                         },
                         {
                             data: 'status_approval',

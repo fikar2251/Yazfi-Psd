@@ -69,8 +69,11 @@
                                             {{ $item->total }} M<sup>2</sup>
                                         </td>
                                         <td>
-
-                                           Rp. {{ $item->harga_jual }}
+                                            @if ($item->harga_tanah_lebih != '' )
+                                            Rp. {{ $item->total_harga }}
+                                            @else
+                                            Rp. {{ $item->harga_jual }}
+                                            @endif
                                         </td>
                                         <td>
 
@@ -170,6 +173,7 @@
             var table = $('#unit').DataTable({
                 orderCellsTop: true,
                 fixedHeader: true,
+               
                 initComplete: function() {
                     var api = this.api();
 

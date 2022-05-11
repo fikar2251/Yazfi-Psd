@@ -175,7 +175,7 @@
                                     <td style="width: 200px">Harga Net</td>
                                     <td style="width: 20px">:</td>
                                     <td>
-                                        @currency($spr->harga_net)
+                                        @currency($spr->harga_jual - $spr->diskon)
                                     </td> 
                                 </tr>
                                 <tr>
@@ -198,6 +198,13 @@
                                     <td style="width: 20px">:</td>
                                     <td>
                                         @currency($spr->harga_net_tanah)
+                                    </td> 
+                                </tr>
+                                <tr>
+                                    <td colspan="7">Total Harga Net</td>
+                                    <td >:</td>
+                                    <td>
+                                        @currency($spr->harga_jual - $spr->diskon + $spr->harga_net_tanah)
                                     </td> 
                                 </tr>
                             </tbody>
