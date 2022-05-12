@@ -24,33 +24,31 @@ class FinanceController extends Controller
     {
         $bayar = Pembayaran::where('status_approval', 'paid')->get();
 
-        
-
         return view('finance.payment.index', compact('bayar'));
     }
 
     public function deletePayment($id)
     {
         $test = DB::table('transactions')->where('transaksi_id', $id)
-        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
-        ->get();
+            ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+            ->get();
 
-       foreach ($test as $key) {
-           if ($key->credit != '') {
-              DB::table('new_chart_of_account')->where('id', $key->chart_id)
-              ->update([
-                'balance' => $key->balance - $key->credit
-              ]);
-           }elseif ($key->debit != ''){
+        foreach ($test as $key) {
+            if ($key->credit != '') {
                 DB::table('new_chart_of_account')->where('id', $key->chart_id)
-                ->update([
-                    'balance' => $key->balance + $key->debit
-                ]);
-           }
+                    ->update([
+                        'balance' => $key->balance - $key->credit,
+                    ]);
+            } elseif ($key->debit != '') {
+                DB::table('new_chart_of_account')->where('id', $key->chart_id)
+                    ->update([
+                        'balance' => $key->balance + $key->debit,
+                    ]);
+            }
         }
 
         Pembayaran::where('id', $id)->update([
-            'status_approval' => 'pending'
+            'status_approval' => 'pending',
         ]);
 
         DB::table('transactions')->where('transaksi_id', $id)->delete();
@@ -60,19 +58,18 @@ class FinanceController extends Controller
         $array = array_column($btg, 'rincian_id');
 
         Tagihan::whereIn('id_rincian', $array)->update(array(
-            'status_pembayaran' => 'unpaid'
+            'status_pembayaran' => 'unpaid',
         ));
-            
 
         return redirect()->back();
-        
+
     }
- 
+
     public function paymentJson(Request $request)
     {
         if (request()->ajax()) {
             if (!empty($request->from_date)) {
-              
+
                 $bayar = Pembayaran::where('status_approval', 'paid')
                     ->whereBetween('tanggal_pembayaran', array($request->from_date, $request->to_date))
                     ->get();
@@ -108,29 +105,28 @@ class FinanceController extends Controller
                     return $ket;
 
                 })
-                ->editColumn('action', function ($bayar) { 
-                    return 
+                ->editColumn('action', function ($bayar) {
+                    return
                     '<a href="' . route('finance.payment.delete', $bayar->id) . '">
                     <button type="submit" class="btn btn-danger"><i
                             class="fa fa-trash"></i>
-                    </button> 
+                    </button>
                     </a>';
 
                 })
-                ->editColumn('nominal', function ($bayar) { 
-                    $nominal = number_format($bayar->nominal,0,",",".");
+                ->editColumn('nominal', function ($bayar) {
+                    $nominal = number_format($bayar->nominal, 0, ",", ".");
 
-                    return 
-                    '<div> Rp. <p style = "display: inline; float: right;">' . $nominal . ' </p> </div>';
+                    return
+                        '<div> Rp. <p style = "display: inline; float: right;">' . $nominal . ' </p> </div>';
 
                 })
-                
+
                 ->addIndexColumn()
                 ->rawColumns(['status_approval', 'bank_tujuan', 'keterangan', 'action', 'nominal'])
                 ->make(true);
         }
     }
-
 
     public function komisiFinance()
     {
@@ -330,7 +326,7 @@ class FinanceController extends Controller
                     'last_balance' => $request->nominal + $kas->balance,
                     'template_id' => 1,
                     'is_active' => 1,
-                    'transaksi_id' =>$id, 
+                    'transaksi_id' => $id,
                 ],
                 ['chart_id' => 41,
                     'no_transaksi' => $request->no_transaksi,
@@ -357,7 +353,6 @@ class FinanceController extends Controller
         }
         return redirect()->back();
 
-        
     }
 
     public function updateKomisi(Request $request, $id)
@@ -371,7 +366,7 @@ class FinanceController extends Controller
         $hutang = DB::table('new_chart_of_account')->where('id', 28)->select('balance')->first();
         $kas = DB::table('new_chart_of_account')->where('id', $request->sumber_pembayaran)->select('balance')->first();
         $total = $komisi->nominal_sales + $komisi->nominal_spv + $komisi->nominal_manager;
-        
+
         $transaction = [
             ['chart_id' => 28,
                 'no_transaksi' => $komisi->no_komisi,
@@ -423,14 +418,13 @@ class FinanceController extends Controller
         ])->get();
 
         $tukar = TukarFaktur::
-        whereIn('status_pembayaran', ['pending', 'reject'])->
-        groupBy('tukar_fakturs.no_faktur')
-        ->orderBy('tukar_fakturs.id', 'desc')
-        ->get();
+            whereIn('status_pembayaran', ['pending', 'reject'])->
+            groupBy('tukar_fakturs.no_faktur')
+            ->orderBy('tukar_fakturs.id', 'desc')
+            ->get();
         // $tgl = Carbon::parse($tukars->tanggal_tukar_faktur)->format('d/m/Y');
 
-
-        return view('finance.tukar-faktur.index', compact('bank','tukar'));
+        return view('finance.tukar-faktur.index', compact('bank', 'tukar'));
     }
 
     public function ajax_faktur(Request $request)
@@ -494,11 +488,10 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($tukars) {
 
                     TukarFaktur::where('id', $tukars->id)->get();
-                   
 
                     // return '<a href="' . route('finance.tukar.update', $tukars->id) . '"   class="delete-form btn btn-sm btn-warning"><i class="fa-solid fa-pencil"></i></a>';
-                   
-                    return ' 
+
+                    return '
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -533,7 +526,6 @@ class FinanceController extends Controller
         foreach ($tukar_fakturs as $tukar) {
 
             $penerimaan = TukarFaktur::whereIn('no_faktur', $tukar)->select('no_po_vendor', 'no_faktur')->get();
-
 
             $tukars = DB::table('tukar_fakturs')->whereIn('no_faktur', $penerimaan)->update(array(
                 'status_pembayaran' => $request->status));
@@ -592,23 +584,23 @@ class FinanceController extends Controller
             // $pengajuans = Pengajuan::groupBy('nomor_pengajuan')->whereBetween('tanggal_pengajuan', [$from, $to])->get();
 
             $pengajuans = Pengajuan::
-            leftJoin('rincian_pengajuans', 'pengajuans.nomor_pengajuan', '=', 'rincian_pengajuans.nomor_pengajuan')
-            ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
-            ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
-                'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
-            ->whereIn('status_approval', ['pending', 'reject'])
-            ->whereBetween('pengajuans.tanggal_pengajuan', array($from, $to))
-            ->groupBy('pengajuans.nomor_pengajuan')
-            ->orderBy('pengajuans.id', 'desc')
-            ->get();
+                leftJoin('rincian_pengajuans', 'pengajuans.nomor_pengajuan', '=', 'rincian_pengajuans.nomor_pengajuan')
+                ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
+                ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
+                    'rincian_pengajuans.grandtotal', 'pengajuans.id_perusahaan', 'pengajuans.id_roles')
+                ->whereIn('status_approval', ['pending', 'reject'])
+                ->whereBetween('pengajuans.tanggal_pengajuan', array($from, $to))
+                ->groupBy('pengajuans.nomor_pengajuan')
+                ->orderBy('pengajuans.id', 'desc')
+                ->get();
 
         } else {
             // $pengajuans = Pengajuan::orderBy('id', 'desc')
             //     ->whereIn('status_approval', ['pending', 'reject'])
             //     ->groupBy('nomor_pengajuan')
             //     ->get();
-            
-                $pengajuans = Pengajuan::
+
+            $pengajuans = Pengajuan::
                 leftJoin('rincian_pengajuans', 'pengajuans.nomor_pengajuan', '=', 'rincian_pengajuans.nomor_pengajuan')
                 ->leftJoin('roles', 'pengajuans.id_roles', '=', 'roles.id')
                 ->select('roles.name', 'pengajuans.id', 'pengajuans.status_approval', 'pengajuans.id_user', 'pengajuans.nomor_pengajuan', 'pengajuans.tanggal_pengajuan',
@@ -697,7 +689,7 @@ class FinanceController extends Controller
 
                     $currency = number_format($data->grandtotal);
 
-                    return ' 
+                    return '
                     <!-- Button trigger modal -->
                     <div class="text-center">
                         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -1291,8 +1283,7 @@ class FinanceController extends Controller
         $cat = DB::table('cat_chart_of_account')->get();
         $parent = ChartOfAccount::with('children')->root()->get();
         $chart = ChartOfAccount::with('children')->get();
-        
-        
+
         return view('finance.accounting.chart_of_account.index', compact('cat', 'parent', 'chart'));
     }
 
@@ -1357,13 +1348,13 @@ class FinanceController extends Controller
 
     public function updateChart(Request $request, $id)
     {
-      
+
         $update = ChartOfAccount::find($id);
         $update->update([
             'cat_id' => $request->cat_id,
             'kode' => $request->kode,
             'deskripsi' => $request->deskripsi,
-            'child_numb' => $request->child_numb == 0 ? NULL : $request->child_numb,
+            'child_numb' => $request->child_numb == 0 ? null : $request->child_numb,
             'balance' => $request->balance,
             'tanggal' => $request->tanggal,
             'notes' => $request->notes,
@@ -1375,10 +1366,62 @@ class FinanceController extends Controller
     public function transaction()
     {
         $transactions = DB::table('transactions')
-        ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
-        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
-        ->get();
+            ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
+            ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+            ->get();
         return view('finance.accounting.transactions.index', compact('transactions'));
+    }
+
+    public function neraca()
+    {
+        $balance = DB::table('new_chart_of_account')->whereIn('id', [1, 39, 40])
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $parent = ChartOfAccount::with('children')->root()->whereIn('id', [7, 8])->get();
+
+        $inventory = DB::table('new_chart_of_account')->where('id', 11)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $fixed = DB::table('new_chart_of_account')->where('cat_id', 1)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $accumulated = DB::table('new_chart_of_account')->where('cat_id', 2)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $other = DB::table('new_chart_of_account')->where('cat_id', 3)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $hutang = DB::table('new_chart_of_account')->where('cat_id', 4)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $liability = DB::table('new_chart_of_account')->where('cat_id', 5)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $rev = DB::table('new_chart_of_account')->where('id', 41)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->first();
+
+        $cogs = DB::table('new_chart_of_account')->where('id', 47)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->first();
+            
+            $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+           
+            
+        $equity = DB::table('new_chart_of_account')->where('cat_id', 7)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        return view('finance.accounting.transactions.neraca', compact('balance', 'parent', 'inventory', 'fixed', 'accumulated', 'other', 'hutang', 'liability', 'rev', 'cogs', 'biaya', 'equity'));
     }
 
 }

@@ -28,6 +28,15 @@
             <div class="card shadow">
                 <div class="card-body"> --}}
                     <div class="table-responsive">
+                        <div class="w-25 d-flex flex-row mb-3">
+                            <select name="laporan" id="" class="form-control ">
+                                <option value="">Select</option>
+                                <option value="1">Balance of Sheet</option>
+                            </select>
+                            <a style="margin-left: 10px" href="" class="btn btn-primary">
+                                Laporan
+                            </a>
+                        </div>
                         <table class="table table-bordered custom-table table-striped" id="transactions" style="width: 100%">
                             <thead>
                                 <tr>
