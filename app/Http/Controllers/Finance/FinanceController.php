@@ -1363,16 +1363,17 @@ class FinanceController extends Controller
         return redirect()->back();
     }
 
-    public function transaction()
+    public function transaction(Request $request)
     {
         $transactions = DB::table('transactions')
             ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
             ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
             ->get();
+
         return view('finance.accounting.transactions.index', compact('transactions'));
     }
 
-    public function neraca()
+    public function neraca(Request $request)
     {
         $balance = DB::table('new_chart_of_account')->whereIn('id', [1, 39, 40])
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
@@ -1411,17 +1412,22 @@ class FinanceController extends Controller
         $cogs = DB::table('new_chart_of_account')->where('id', 47)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->first();
-            
-            $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
+
+        $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
-           
-            
+
         $equity = DB::table('new_chart_of_account')->where('cat_id', 7)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
 
-        return view('finance.accounting.transactions.neraca', compact('balance', 'parent', 'inventory', 'fixed', 'accumulated', 'other', 'hutang', 'liability', 'rev', 'cogs', 'biaya', 'equity'));
+        
+            $profit = ChartOfAccount::with('children')->root()->get();
+        if ($request->laporan == 1) {
+            return view('finance.accounting.transactions.neraca', compact('balance', 'parent', 'inventory', 'fixed', 'accumulated', 'other', 'hutang', 'liability', 'rev', 'cogs', 'biaya', 'equity',));
+        } elseif ($request->laporan == 2) {
+            return view('finance.accounting.transactions.profit', compact('profit'));
+        }
     }
 
 }

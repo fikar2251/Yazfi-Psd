@@ -274,7 +274,8 @@ Route::middleware('auth')->group(function () {
             Route::put('/chart/update/{id}', 'FinanceController@updateChart')->name('update.chart');
             Route::get('/account', 'FinanceController@account')->name('account');
             Route::get('/transactions', 'FinanceController@transaction')->name('transactions');
-            Route::get('/balance', 'FinanceController@neraca')->name('balance');
+            Route::post('/balance', 'FinanceController@neraca')->name('balance');
+            Route::post('/profit', 'FinanceController@profit')->name('profit');
             
         });
 

@@ -56,7 +56,21 @@
                                             {{ $item->deskripsi }} </td>
 
                                         <td style="font-weight: 500"> {{ $item->category->nama_cat }} </td>
-                                        <td> @currency($item->balance) </td>
+                                        <td> 
+                                            @php
+                                                $sum = 0;
+                                            @endphp
+                                           @foreach ($item->children as $ch)
+                                               @php
+                                                   $sum += $ch->balance
+                                               @endphp
+                                           @endforeach
+                                           @if ($sum != 0 && $item->id != 48)
+                                           @currency($sum) 
+                                           @else
+                                           @currency($item->balance)    
+                                           @endif
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-warning" data-toggle="modal"
                                                 data-target="#editModal{{ $item->id }}">

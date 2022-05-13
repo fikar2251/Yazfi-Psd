@@ -9,7 +9,7 @@
     </style>
 @endsection
 @section('content')
-    <div class="row">
+    <div>
         <div class="col-sm-4 col-3">
             <h4 class="page-title">Balance of Sheet</h4>
         </div>
@@ -17,6 +17,10 @@
     <x-alert></x-alert>
     <br />
     <div>
+        <a href="{{route('finance.transactions')}}" class="btn btn-success mb-2">
+            Back
+        </a> <br>
+        <hr>
         <b> ASSETS </b>
         <hr>
     </div>
@@ -311,7 +315,7 @@
         </table>
     </div>
 
-    <div>
+    <div class="mb-5">
         <b>
          TOTAL AKTIVA / ASSET = @currency($cash + $total + $inv + $fix + $accumu + $oth)
         </b>
@@ -487,6 +491,6 @@
 
     <div>
         <b>
-         TOTAL AKTIVA / ASSET = @currency($payable + $lia + $equ + ($rev->balance - $cogs->balance - $baya))
+         TOTAL KEWAJIBAN / LIABILITY = @currency($payable + $lia + $equ + ($rev->balance - $cogs->balance - $baya))
     </div>
 @stop

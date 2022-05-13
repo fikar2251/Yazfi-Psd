@@ -27,65 +27,69 @@
         <div class="col-lg-12">
             <div class="card shadow">
                 <div class="card-body"> --}}
-                    <div class="table-responsive">
-                        <div class="w-25 d-flex flex-row mb-3">
-                            <select name="laporan" id="" class="form-control ">
-                                <option value="">Select</option>
-                                <option value="1">Balance of Sheet</option>
-                            </select>
-                            <a style="margin-left: 10px" href="" class="btn btn-primary">
-                                Laporan
-                            </a>
-                        </div>
-                        <table class="table table-bordered custom-table table-striped" id="transactions" style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: center; width: 5%">No</th>
-                                    <th style="width: 25%">Sumber</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Akun</th>
-                                    <th>Debit</th>
-                                    <th>Credit</th>
-                                    <th>Saldo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- @php
+    <div class="table-responsive">
+        <form action="{{route('finance.balance')}}" method="POST" >
+            @csrf
+            <div class="w-25 d-flex flex-row mb-3">
+                <select name="laporan" id="" class="form-control ">
+                    <option value="">Select</option>
+                    <option value="1">Balance of Sheet</option>
+                    <option value="2">Profit & Loss</option>
+                </select>
+                <button style="margin-left: 10px" type="submit" class="btn btn-primary">
+                    Laporan
+                </button>
+            </div>
+        </form>
+        <table class="table table-bordered custom-table table-striped" id="transactions" style="width: 100%">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 5%">No</th>
+                    <th style="width: 25%">Sumber</th>
+                    <th>Tanggal</th>
+                    <th>Nama Akun</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Saldo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{-- @php
                                     $i = 0;
                                 @endphp --}}
-                                @foreach ($transactions as $item)
-                                    <tr>
-                                        <td> {{ $loop->iteration }} </td>
-                                        <td>
-                                            {{ $item->name }} {{$item->no_transaksi}}
-                                        </td>
-                                        <td> {{Carbon\Carbon::parse($item->date)->format('d-m-Y')}} </td>
-                                        <td> {{$item->deskripsi}} </td>
-                                        <td>
-                                           @if ($item->debit == '')
-                                           @else
-                                            @currency($item->debit)
-                                           @endif
-                                        </td>
-                                       
-                                        <td>
-                                            @if ($item->credit == '')
-                                            @else
-                                             @currency($item->credit)
-                                            @endif
-                                        </td>
-                                        <td> 
-                                            @if ($item->last_balance == '')
-                                           @else
-                                            @currency($item->last_balance)
-                                           @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                {{-- </div>
+                @foreach ($transactions as $item)
+                    <tr>
+                        <td> {{ $loop->iteration }} </td>
+                        <td>
+                            {{ $item->name }} {{ $item->no_transaksi }}
+                        </td>
+                        <td> {{ Carbon\Carbon::parse($item->date)->format('d-m-Y') }} </td>
+                        <td> {{ $item->deskripsi }} </td>
+                        <td>
+                            @if ($item->debit == '')
+                            @else
+                                @currency($item->debit)
+                            @endif
+                        </td>
+
+                        <td>
+                            @if ($item->credit == '')
+                            @else
+                                @currency($item->credit)
+                            @endif
+                        </td>
+                        <td>
+                            @if ($item->last_balance == '')
+                            @else
+                                @currency($item->last_balance)
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    {{-- </div>
             </div>
         </div>
     </div> --}}
@@ -144,14 +148,14 @@
                     //     targets: 0,
                     //     className: 'dt-body-center'
                     // },
-                //     {
-                //         targets: 1,
-                //         width: '15%'
-                //     },
-                //     {
-                //         targets: 4,
-                //         width: '20%'
-                //     }
+                    //     {
+                    //         targets: 1,
+                    //         width: '15%'
+                    //     },
+                    //     {
+                    //         targets: 4,
+                    //         width: '20%'
+                    //     }
                 ],
                 buttons: [{
                         extend: 'copy',
