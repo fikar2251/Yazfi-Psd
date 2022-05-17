@@ -28,7 +28,7 @@
             <div class="card shadow">
                 <div class="card-body"> --}}
     <div class="table-responsive">
-        <form action="{{route('finance.balance')}}" method="POST" >
+        <form action="{{route('finance.balance')}}" method="POST" target="_blank    " >
             @csrf
             <div class="w-25 d-flex flex-row mb-3">
                 <select name="laporan" id="" class="form-control ">

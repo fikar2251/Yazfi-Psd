@@ -40,11 +40,16 @@
             </thead>
             <tbody>
                 @php
+                    $i = 0;
                     $cash = 0;
+                    $cashs = 0;
+                    $balances = 0;
                 @endphp
                 @foreach ($balance as $bl)
+               
+
                     <tr>
-                        <td style="text-align: center"> {{ $loop->iteration }} </td>
+                        <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
                             {{ $bl->kode }}
                         </td>
@@ -54,11 +59,12 @@
                             @currency($bl->balance)
                             
                         </td>
+                        @php
+                            $cash += $bl->balance;
+                        @endphp
                     </tr>
-                    @php
-                        $cash += $bl->balance;
-                        
-                    @endphp
+                   
+                  
                 @endforeach
             </tbody>
         </table>
@@ -86,6 +92,7 @@
                     $total = 0;
                 @endphp
                 @foreach ($parent as $pr)
+                @if ($pr->id == 7 && 8)
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -118,6 +125,7 @@
                         $total += $acc += $accs;
                     @endphp
                     @endforeach
+                    @endif
                 @endforeach
             </tbody>
         </table>
@@ -142,7 +150,10 @@
                     $i = 0;
                     $inv = 0;
                 @endphp
-                @foreach ($inventory as $in)
+                @foreach ($fixed as $in)
+                @if ($in->id == 11)
+                    
+              
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -157,6 +168,7 @@
                     @php
                         $inv += $in->balance;
                     @endphp
+                      @endif
                 @endforeach
             </tbody>
         </table>
@@ -218,6 +230,7 @@
                     $fix = 0;
                 @endphp
                 @foreach ($fixed as $fx)
+                @if ($fx->cat_id == 1)
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -232,6 +245,7 @@
                     @php
                         $fix =+ $fx->balance;
                     @endphp
+                     @endif
                 @endforeach
             </tbody>
         </table>
@@ -256,7 +270,9 @@
                     $i = 0;
                     $accumu = 0;
                 @endphp
-                @foreach ($accumulated as $acc)
+                @foreach ($fixed as $acc)
+                @if ($acc->cat_id == 2)
+                    
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -271,6 +287,7 @@
                     @php
                         $accumu =+ $acc->balance;
                     @endphp
+                       @endif
                 @endforeach
             </tbody>
         </table>
@@ -295,7 +312,8 @@
                     $i = 0;
                     $oth = 0;
                 @endphp
-                @foreach ($other as $ot)
+                @foreach ($fixed as $ot)
+                @if ($ot->cat_id == 3)
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -310,6 +328,7 @@
                     @php
                         $oth =+ $ot->balance;
                     @endphp
+                      @endif
                 @endforeach
             </tbody>
         </table>
@@ -343,7 +362,8 @@
                 @php
                     $payable = 0;
                 @endphp
-                @foreach ($hutang as $ht)
+                @foreach ($fixed as $ht)
+                @if ($ht->cat_id == 4)
                     <tr>
                         <td style="text-align: center"> {{ $loop->iteration }} </td>
                         <td>
@@ -360,6 +380,7 @@
                         $payable += $ht->balance;
                         
                     @endphp
+                      @endif
                 @endforeach
             </tbody>
         </table>
@@ -385,7 +406,8 @@
                     $i = 0;
                     $lia = 0;
                 @endphp
-                @foreach ($liability as $lb)
+                @foreach ($fixed as $lb)
+                @if ($lb->cat_id == 5)
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -400,6 +422,7 @@
                     @php
                         $lia += $lb->balance;
                     @endphp
+                     @endif
                 @endforeach
             </tbody>
         </table>
@@ -469,7 +492,8 @@
                     $i = 0;
                     $equ = 0;
                 @endphp
-                @foreach ($equity as $eq)
+                @foreach ($fixed as $eq)
+                @if ($eq->cat_id == 7)
                     <tr>
                         <td style="text-align: center"> {{ ++$i }} </td>
                         <td>
@@ -484,11 +508,11 @@
                     @php
                         $equ += $eq->balance;
                     @endphp
+                       @endif
                 @endforeach
             </tbody>
         </table>
     </div>
-
     <div>
         <b>
          TOTAL KEWAJIBAN / LIABILITY = @currency($payable + $lia + $equ + ($rev->balance - $cogs->balance - $baya))

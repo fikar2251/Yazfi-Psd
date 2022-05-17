@@ -1375,56 +1375,26 @@ class FinanceController extends Controller
 
     public function neraca(Request $request)
     {
-        $balance = DB::table('new_chart_of_account')->whereIn('id', [1, 39, 40])
+        $fixed = DB::table('new_chart_of_account')
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
-
-        $parent = ChartOfAccount::with('children')->root()->whereIn('id', [7, 8])->get();
-
-        $inventory = DB::table('new_chart_of_account')->where('id', 11)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        $fixed = DB::table('new_chart_of_account')->where('cat_id', 1)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        $accumulated = DB::table('new_chart_of_account')->where('cat_id', 2)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        $other = DB::table('new_chart_of_account')->where('cat_id', 3)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        $hutang = DB::table('new_chart_of_account')->where('cat_id', 4)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        $liability = DB::table('new_chart_of_account')->where('cat_id', 5)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
+     
+        $parent = ChartOfAccount::with('children')->root()->get();
+        $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
+        ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+        ->get();
         $rev = DB::table('new_chart_of_account')->where('id', 41)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->first();
-
         $cogs = DB::table('new_chart_of_account')->where('id', 47)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->first();
-
-        $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
+        $profit = ChartOfAccount::with('children')->root()->get();
+        $balance = DB::table('new_chart_of_account')->whereIn('id', [1, 39, 40])
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
-
-        $equity = DB::table('new_chart_of_account')->where('cat_id', 7)
-            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-            ->get();
-
-        
-            $profit = ChartOfAccount::with('children')->root()->get();
         if ($request->laporan == 1) {
-            return view('finance.accounting.transactions.neraca', compact('balance', 'parent', 'inventory', 'fixed', 'accumulated', 'other', 'hutang', 'liability', 'rev', 'cogs', 'biaya', 'equity',));
+            return view('finance.accounting.transactions.neraca', compact( 'fixed', 'parent', 'biaya', 'rev', 'cogs', 'balance'));
         } elseif ($request->laporan == 2) {
             return view('finance.accounting.transactions.profit', compact('profit'));
         }
