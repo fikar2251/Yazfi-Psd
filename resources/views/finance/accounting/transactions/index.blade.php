@@ -57,7 +57,7 @@
                 {{-- @php
                                     $i = 0;
                                 @endphp --}}
-                @foreach ($transactions as $item)
+                {{-- @foreach ($transactions as $item)
                     <tr>
                         <td> {{ $loop->iteration }} </td>
                         <td>
@@ -85,7 +85,7 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @endforeach --}}
             </tbody>
         </table>
     </div>
@@ -136,7 +136,7 @@
 
             $('#transactions').DataTable({
                 processing: true,
-                // serverSide: true,
+                serverSide: true,
                 orderCellsTop: true,
                 fixedHeader: true,
                 dom: 'lfrtip',
@@ -249,6 +249,53 @@
                 // order: [
                 //     [0, 'desc']
                 // ],
+
+                // ajax: {
+                //         url: '/finance/ajax_transcation',
+                //         get: 'get',
+                //         // data: {
+                //         //     from_date: from_date,
+                //         //     to_date: to_date
+                //         // }
+
+                //     },
+
+                    ajax: "/finance/transction/json",
+
+                    columns: [{
+                            data: 'id',
+                            name: 'id',
+                            className: 'dt-body-center'
+                        },
+                        {
+                            data: 'sumber',
+                            name: 'sumber',
+                        },
+                        {
+                            data: 'tanggal',
+                            name: 'tanggal',
+                        },
+                        {
+                            data: 'deskripsi',
+                            name: 'deskripsi',
+                        },
+                        {
+                            data: 'debit',
+                            name: 'debit',
+                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                        },
+                        {
+                            data: 'credit',
+                            name: 'credit',
+                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                        },
+
+                        {
+                            data: 'last_balance',
+                            name: 'last_balance',
+                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                        },
+                    ]
             });
         });
     </script>

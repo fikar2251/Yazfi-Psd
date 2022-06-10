@@ -90,6 +90,9 @@ Route::middleware('auth')->group(function () {
             Route::get('ajax/ajax_purchase', 'AjaxController@ajax_purchase');
             Route::get('ajax/ajax_product', 'AjaxController@ajax_product');
 
+            Route::get('ajax/ajax_transaction', 'AjaxController@ajax_transaction');
+           
+
             Route::resource('supplier', 'SupplierController');
             Route::get('/where/product', 'PurchaseController@WhereProduct');
             Route::get('/where/service', 'PurchaseController@WhereService');
@@ -274,6 +277,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/chart/update/{id}', 'FinanceController@updateChart')->name('update.chart');
             Route::get('/account', 'FinanceController@account')->name('account');
             Route::get('/transactions', 'FinanceController@transaction')->name('transactions');
+            Route::get('/transaction/json', 'FinanceController@ajax_transaction');
             Route::post('/balance', 'FinanceController@neraca')->name('balance');
             Route::post('/profit', 'FinanceController@profit')->name('profit');
             

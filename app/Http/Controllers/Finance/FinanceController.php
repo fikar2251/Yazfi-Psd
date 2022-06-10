@@ -1373,6 +1373,49 @@ class FinanceController extends Controller
         return view('finance.accounting.transactions.index', compact('transactions'));
     }
 
+    public function ajax_transaction()
+    {
+        $transactions = DB::table('transactions')
+        ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
+        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+        ->get();
+
+        return DataTables::of($transactions)
+            ->editColumn('sumber', function ($transactions) {
+                return ' ' . $transactions->name . ' ' . $transactions->no_transaksi . ' ';
+            })
+            ->editColumn('tanggal', function ($transactions) {
+               $tanggal = Carbon::parse($transactions->date)->format('d-m-Y');
+               return $tanggal;
+            })
+
+            ->editColumn('debit', function ($transactions) {
+                if ($transactions->debit == '') {
+                    return ' ';
+                }else{
+                    return $transactions->debit;
+                }
+            })
+            ->editColumn('credit', function ($transactions) {
+                if ($transactions->credit == '') {
+                    return ' ';
+                }else{
+                    return $transactions->credit;
+                }
+            })
+            ->editColumn('last_balance', function ($transactions) {
+                if ($transactions->last_balance == '') {
+                    return ' ';
+                }else{
+                    return $transactions->last_balance;
+                }
+            })
+
+            ->addIndexColumn()
+            ->rawColumns(['sumber', 'tanggal', 'debit', 'credit', 'last_balance'])
+            ->make(true);
+    }
+
     public function neraca(Request $request)
     {
         $fixed = DB::table('new_chart_of_account')
