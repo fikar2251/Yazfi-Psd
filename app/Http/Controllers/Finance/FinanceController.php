@@ -1373,59 +1373,16 @@ class FinanceController extends Controller
         return view('finance.accounting.transactions.index', compact('transactions'));
     }
 
-    public function ajax_transaction()
-    {
-        $transactions = DB::table('transactions')
-        ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
-        ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
-        ->get();
-
-        return DataTables::of($transactions)
-            ->editColumn('sumber', function ($transactions) {
-                return ' ' . $transactions->name . ' ' . $transactions->no_transaksi . ' ';
-            })
-            ->editColumn('tanggal', function ($transactions) {
-               $tanggal = Carbon::parse($transactions->date)->format('d-m-Y');
-               return $tanggal;
-            })
-
-            ->editColumn('debit', function ($transactions) {
-                if ($transactions->debit == '') {
-                    return ' ';
-                }else{
-                    return $transactions->debit;
-                }
-            })
-            ->editColumn('credit', function ($transactions) {
-                if ($transactions->credit == '') {
-                    return ' ';
-                }else{
-                    return $transactions->credit;
-                }
-            })
-            ->editColumn('last_balance', function ($transactions) {
-                if ($transactions->last_balance == '') {
-                    return ' ';
-                }else{
-                    return $transactions->last_balance;
-                }
-            })
-
-            ->addIndexColumn()
-            ->rawColumns(['sumber', 'tanggal', 'debit', 'credit', 'last_balance'])
-            ->make(true);
-    }
-
     public function neraca(Request $request)
     {
         $fixed = DB::table('new_chart_of_account')
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
-     
+
         $parent = ChartOfAccount::with('children')->root()->get();
         $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
-        ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
-        ->get();
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
         $rev = DB::table('new_chart_of_account')->where('id', 41)
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->first();
@@ -1437,10 +1394,40 @@ class FinanceController extends Controller
             ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
             ->get();
         if ($request->laporan == 1) {
-            return view('finance.accounting.transactions.neraca', compact( 'fixed', 'parent', 'biaya', 'rev', 'cogs', 'balance'));
+            return view('finance.accounting.transactions.neraca', compact('fixed', 'parent', 'biaya', 'rev', 'cogs', 'balance'));
         } elseif ($request->laporan == 2) {
             return view('finance.accounting.transactions.profit', compact('profit'));
         }
+    }
+
+    public function exportNeraca()
+    {
+        $fixed = DB::table('new_chart_of_account')
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+
+        $parent = ChartOfAccount::with('children')->root()->get();
+        $biaya = DB::table('new_chart_of_account')->where('child_numb', 69)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+        $rev = DB::table('new_chart_of_account')->where('id', 41)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->first();
+        $cogs = DB::table('new_chart_of_account')->where('id', 47)
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->first();
+        $profit = ChartOfAccount::with('children')->root()->get();
+        $balance = DB::table('new_chart_of_account')->whereIn('id', [1, 39, 40])
+            ->leftJoin('cat_chart_of_account', 'new_chart_of_account.cat_id', '=', 'cat_chart_of_account.id_cat')
+            ->get();
+        
+        return view('finance.accounting.transactions.export-neraca', compact('fixed', 'parent', 'biaya', 'rev', 'cogs', 'balance'));
+    }
+
+    public function exportProfit()
+    {
+        $profit = ChartOfAccount::with('children')->root()->get();
+        return view('finance.accounting.transactions.export-profit', compact('profit'));
     }
 
 }

@@ -1,15 +1,41 @@
-@extends('layouts.master', ['title' => 'Profit & Loss'])
-@section('auto')
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    @php
+        header('Content-type: application/vnd-ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename=Laporan Profit & Loss.xls');
+    @endphp
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Profit & Loss</title>
+
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.6/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css"> --}}
+
     <style>
-        #transactions td,
-        #transactions th,
-        #transactions table {
-            font-size: 12px;
-            font-family: Helvetica;
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
         }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            padding: 3px 8px;
+        }
+
     </style>
-@endsection
-@section('content')
+</head>
+
+<body>
     <div>
         <div class="col-sm-4 col-3">
             <h4 class="page-title">Profit & Loss</h4>
@@ -18,13 +44,6 @@
     <x-alert></x-alert>
     <br />
     <div>
-        <a href="{{ route('finance.transactions') }}" class="btn btn-success mb-2">
-            Back
-        </a>
-        <a href="{{ route('finance.exportprofit') }}" class="btn btn-primary mb-2">
-            Export Excel
-        </a> <br>
-        <hr>
         <b> PENDAPATAN / <i>REVENUE</i> </b>
         <hr>
     </div>
@@ -123,7 +142,7 @@
         </table>
     </div>
 
-    <div class="mb-5">
+    <div class="mb-5" style="margin-bottom: 10px;">
         <b>
             LABA KOTOR / <i>GROSS PROFIT</i> = @currency($rev - $hpp)
         </b>
@@ -201,9 +220,9 @@
         </table>
     </div>
 
-    <div class="mb-5">
+    <div class="mb-5" style="margin-bottom: 10px;">
         <b>
-            LABA OPERASI / <i>OPERATING PROFIT</i> = @currency($rev - $hpp - $costs)
+            LABA OPERASI / <i>OPERATING PROFIT</i> = @currency(($rev - $hpp) - $costs)
         </b>
     </div>
 
@@ -315,15 +334,54 @@
         </table>
     </div>
 
-    <div class="mb-2">
+    <div class="mb-2" style="margin-bottom: 10px;">
         <b>
-            LABA RUGI BERSIH (BEFORE TAX) = @currency($rev - $hpp - $costs)
+            LABA RUGI BERSIH (BEFORE TAX) = @currency(($rev - $hpp) - $costs)
         </b>
     </div>
 
     <div class="mb-5">
         <b>
-            LABA RUGI BERSIH (AFTER TAX) = @currency($rev - $hpp - $costs)
+            LABA RUGI BERSIH (AFTER TAX) = @currency(($rev - $hpp) - $costs)
         </b>
     </div>
-@stop
+
+
+    {{-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.print.min.js"></script> --}}
+    <script>
+        // $('#table').DataTable({
+        //     "bSortCellsTop": true,
+        //     dom: 'Blfrtip',
+        //     buttons: [{
+        //             extend: 'excelHtml5',
+        //             footer: true,
+        //             exportOptions: {
+        //                 modifier: {
+        //                     page: 'all',
+        //                     selected: null,
+        //                 },
+        //                 columns: ':visible',
+
+        //             }
+
+        //         },
+        //         'copy', 'csv', 'pdf', 'print'
+        //     ],
+        //     columnDefs: [{
+        //         visible: true
+        //     }],
+        //     "paging": true,
+        //     "ordering": true,
+        //     "searching": true
+        // })
+    </script>
+</body>
+
+</html>

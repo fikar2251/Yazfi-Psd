@@ -279,6 +279,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/transactions', 'FinanceController@transaction')->name('transactions');
             Route::get('/transaction/json', 'FinanceController@ajax_transaction');
             Route::post('/balance', 'FinanceController@neraca')->name('balance');
+            Route::get('/exportbalance', 'FinanceController@exportNeraca')->name('exportbalance');
+            Route::get('/exportprofit', 'FinanceController@exportProfit')->name('exportprofit');
             Route::post('/profit', 'FinanceController@profit')->name('profit');
             
         });

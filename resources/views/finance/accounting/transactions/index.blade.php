@@ -246,9 +246,9 @@
                                 });
                         });
                 },
-                // order: [
-                //     [0, 'desc']
-                // ],
+                order: [
+                    [0, 'desc']
+                ],
 
                 // ajax: {
                 //         url: '/finance/ajax_transcation',
@@ -260,11 +260,11 @@
 
                 //     },
 
-                    ajax: "/finance/transction/json",
+                    ajax: "/admin/ajax/ajax_transaction",
 
                     columns: [{
-                            data: 'id',
-                            name: 'id',
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
                             className: 'dt-body-center'
                         },
                         {
@@ -291,10 +291,12 @@
                         },
 
                         {
-                            data: 'last_balance',
-                            name: 'last_balance',
+                            data: 'saldo',
+                            name: 'saldo',
                             render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
                         },
+
+                      
                     ]
             });
         });

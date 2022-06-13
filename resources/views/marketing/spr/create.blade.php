@@ -138,7 +138,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="phone_number">No. Telp</label>
-                    <input type="number" name="no_tlp" id="no_tlp" class="form-control" maxlength="11" required
+                    <input type="number" name="no_tlp" id="no_tlp" class="form-control" maxlength="16" required
                         oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
 
                     @error('phone_number')

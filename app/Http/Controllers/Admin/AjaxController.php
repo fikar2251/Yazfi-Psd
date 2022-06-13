@@ -872,15 +872,21 @@ class AjaxController extends Controller
         $transactions = DB::table('transactions')
         ->leftJoin('template_accounting', 'template_accounting.id', '=', 'transactions.template_id')
         ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
+        ->select('template_accounting.name','transactions.id', 'transactions.no_transaksi', 'transactions.date', 'new_chart_of_account.deskripsi', 'transactions.credit', 'transactions.debit',
+        'transactions.last_balance')
         ->get();
 
-        return DataTables::of($transactions)
+        return datatables()
+            ->of($transactions)
             ->editColumn('sumber', function ($transactions) {
                 return ' ' . $transactions->name . ' ' . $transactions->no_transaksi . ' ';
             })
             ->editColumn('tanggal', function ($transactions) {
                $tanggal = Carbon::parse($transactions->date)->format('d-m-Y');
                return $tanggal;
+            })
+            ->editColumn('deskripsi', function ($transactions) {
+               return $transactions->deskripsi;
             })
 
             ->editColumn('debit', function ($transactions) {
@@ -897,7 +903,7 @@ class AjaxController extends Controller
                     return $transactions->credit;
                 }
             })
-            ->editColumn('last_balance', function ($transactions) {
+            ->editColumn('saldo', function ($transactions) {
                 if ($transactions->last_balance == '') {
                     return ' ';
                 }else{
@@ -906,7 +912,7 @@ class AjaxController extends Controller
             })
 
             ->addIndexColumn()
-            ->rawColumns(['sumber', 'tanggal', 'debit', 'credit', 'last_balance'])
+            ->rawColumns(['sumber', 'tanggal', 'deskripsi' , 'debit', 'credit', 'saldo'])
             ->make(true);
     }
 
