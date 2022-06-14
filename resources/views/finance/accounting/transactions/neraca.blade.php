@@ -21,7 +21,7 @@
         <a href="{{ route('finance.transactions') }}" class="btn btn-success mb-2">
             Back
         </a>
-        <a href="{{ route('finance.exportbalance') }}" class="btn btn-primary mb-2">
+        <a href="{{ route('admin.exportbalance') }}" class="btn btn-primary mb-2">
             Export Excel
         </a> <br>
         <hr>
