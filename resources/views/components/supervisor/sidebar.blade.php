@@ -18,7 +18,9 @@
      <li class="{{ request()->is('supervisor/cancel') ? 'active' : '' }}">
         <a href="{{ route('supervisor.cancel.index') }}"><i class="fa fa-money"></i> <span>Pembatalan</span></a>
     </li>
-
+    <li class="{{ request()->is('supervisor/reinburst') ? 'active' : '' }}">
+        <a href="{{ route('supervisor.reinburst.index') }}"><i class="fa-solid fa-hand-holding-dollar"></i> <span>Reinburst</span></a>
+    </li>
 
 
 

@@ -36,6 +36,12 @@
             <li class="{{ request()->is('finance/transactions') ? 'active' : '' }}">
                 <a href="{{ route('finance.transactions') }}"><span>Transactions</span></a>
             </li>
+            <li class="{{ request()->is('finance/reinburst') ? 'active' : '' }}">
+                <a href="{{ route('finance.reinburst.index') }}"><span>Reinburst</span></a>
+            </li>
+            <li class="{{ request()->is('finance/jurnal') ? 'active' : '' }}">
+                <a href="{{ route('finance.jurnal.index') }}"><span>Jurnal Voucher</span></a>
+            </li>
         </ul>
     </li>
 

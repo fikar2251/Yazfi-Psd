@@ -220,6 +220,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/kota', 'SprController@kota');
             Route::get('/kecamatan', 'SprController@kecamatan');
             Route::get('/desa', 'SprController@desa');
+            Route::resource('/reinburst', 'ReinburstController');
+            Route::get('/ajax/ajax_reinburst', 'ReinburstController@ajax_reinburst');
+            Route::get('/reinburst/pdf/{id}','ReinburstController@pdf')->name('reinburst.pdf');
           
         });
 
@@ -283,6 +286,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/transaction/json', 'FinanceController@ajax_transaction');
             Route::post('/balance', 'FinanceController@neraca')->name('balance');
             Route::post('/profit', 'FinanceController@profit')->name('profit');
+
+            Route::resource('/reinburst', 'ReinburstController');
+            Route::get('/ajax/ajax_reinburst', 'ReinburstController@ajax_reinburst');
+            Route::get('/reinburst/pdf/{id}','ReinburstController@pdf')->name('reinburst.pdf');
+
+            Route::resource('/jurnal', 'JurnalVoucherController');
             
         });
 
@@ -308,6 +317,10 @@ Route::middleware('auth')->group(function () {
             Route::get('payment/delete/{id}', 'BayarController@hapuskonfirmasi')->name('payment.delete');
             
             Route::get('autocomplete',array('as'=>'autocomplete','uses'=>'BayarController@autoComplete'));
+
+            Route::resource('/reinburst', 'ReinburstController');
+            Route::get('/ajax/ajax_reinburst', 'ReinburstController@ajax_reinburst');
+            Route::get('/reinburst/pdf/{id}','ReinburstController@pdf')->name('reinburst.pdf');
 
         });
 

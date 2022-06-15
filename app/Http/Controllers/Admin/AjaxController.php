@@ -334,6 +334,8 @@ class AjaxController extends Controller
                 ->make(true);
         }
     }
+
+
     public function ajax_pengajuan(Request $request)
     {
 
