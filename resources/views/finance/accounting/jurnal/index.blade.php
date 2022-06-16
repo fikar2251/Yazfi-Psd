@@ -23,28 +23,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-6 col-sg-4 m-b-4">
 
-                        <h5>Invoice to:</h5>
-                        <ul class="list-unstyled">
-                            <li>
-                                <h5><strong></strong></h5>
-                            </li>
-                            <li><span></span></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <form action="{{ route('finance.reinburst.store') }}" method="post" enctype="multipart/form-data">
+                <form action="{{route('finance.jurnal.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-sm-6 col-sg-4 m-b-4">
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="nomor_reinburst">Number Reinburst <span style="color: red">*</span></label>
-                                        <input required="" type="text" name="nomor_reinburst" value="" id="nomor_reinburst" class="form-control">
+                                        <label for="nomor_reinburst">No Voucher <span style="color: red">*</span></label>
+                                        <input  type="text" name="no_voucher" value="{{$nourut}}" id="nomor_reinburst" class="form-control" readonly >
                                     </div>
                                 </li>
                             </ul>
@@ -53,7 +41,7 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="nama">Nama <span style="color: red">*</span></label>
+                                        <label for="nama">Name <span style="color: red">*</span></label>
                                         <input type="text" value="{{ auth()->user()->name }}" class="form-control" readonly>
                                     </div>
                                     <div class="form-group">
@@ -66,8 +54,8 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                       <label for="tanggal">Tanggal Reinburst <span style="color: red">*</span></label>
-                                        <input type="date" name="tanggal_reinburst" id="tanggal_reinburst" required=""class="form-control">
+                                       <label for="tanggal">Tanggal <span style="color: red">*</span></label>
+                                        <input type="date" name="date" id="date" class="form-control">
                                     </div>
                                 </li>
                             </ul>
@@ -76,15 +64,16 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="cabang">Project <span style="color: red">*</span></label>
-                                       <select name="id_project" id="id_project" class="form-control" required>
+                                        <label for="cabang">Description <span style="color: red">*</span></label>
+                                       {{-- <select name="id_project" id="id_project" class="form-control" required>
                                             <option value="">-- Select Project --</option>
-                                        </select>
+                                        </select> --}}
+                                        <textarea name="desc" id="desc" cols="30" rows="5" class="form-control"></textarea>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                        <div class="col-sm-6 col-sg-4 m-b-4">
+                        {{-- <div class="col-sm-6 col-sg-4 m-b-4">
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
@@ -94,7 +83,7 @@
                                     </div>
                                 </li>
                             </ul>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <button type="button" id="add" class="btn btn-primary mb-2">Tambah Row Baru</button>
@@ -104,10 +93,10 @@
                             <div class="table-responsive">
                                 <table class="table table-hover border" id="table-show">
                                     <tr class="bg-success">
-                                        <th class="text-light">Nota/Bon/Kwitansi</th>
-                                        <th class="text-light">Catatan</th>
-                                        <th class="text-light">Harga</th>
-                                        <th class="text-light">Total</th>
+                                        <th class="text-light">Account Name</th>
+                                        <th class="text-light">Debit</th>
+                                        <th class="text-light">Credit</th>
+                                        <th class="text-light">Memo</th>
                                         <th class="text-light">#</th>
                                     </tr>
                                     <tbody id="dynamic_field">
@@ -116,48 +105,32 @@
                             </div>
                         </div>
                     </div>
-                    <p class="text-info">*Mohon Untuk Input Dengan Benar dan Berurut : <span class="badge badge-primary" id="counter"></span></p>
-                    <div class="row invoice-payment">
-                        <div class="col-sm-4 offset-sm-8">
+                    {{-- <p class="text-info">*Mohon Untuk Input Dengan Benar dan Berurut : <span class="badge badge-primary" id="counter"></span></p> --}}
+                    <div class="row d-flex justify-content-end">
+                        <div class="col-lg-3">
                             <h6>Total due</h6>
-                            <div class="row">
-                                <div class="col-md-12">
+                            
                                     <div class="form-group">
-                                        <label>Total</label>
+                                        <label>Total Debit</label>
+                                        <input type="text" id="sub_total1" name="total" required readonly class="form-control">
+                                    </div>
+                               
+                        </div>
+                        <div class="col-lg-3">
+                            <h6>Total due</h6>
+                           
+                            
+                                    <div class="form-group">
+                                        <label>Total Credit</label>
                                         <input type="text" id="sub_total" name="total" required readonly class="form-control">
                                     </div>
-                                </div>
-                                {{-- <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Include PPN</label>
-                                        <input type="type" id="PPN" onchange="HowAboutIt()" class="form-control">
-                                    </div>
-                                </div> --}}
-                                {{-- <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Grand Total</label>
-                                        <input type="text" id="grandtotal" name="grandtotal" readonly class="form-control">
-                                    </div>
-                                </div> --}}
-                            </div>
-                        </div>
-                        <div class="col-sm-1 offset-sm-8">
-                            <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+                               
                         </div>
                     </div>
-                <div class="row">
-                    <div class="col-sm-6 col-sg-4 m-b-4">
-                        <ul class="list-unstyled">
-                            <li>
-                                <div class="form-group">
-                                      <label for="name"><span style="color: red">(*) Data wajib diisi</span></label>
-
-                                </div>
-                            </li>
-                        </ul>
+                    
+                    <div class=" float-right">
+                        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                     </div>
-                </div>
-                    <br>
                 </form>
             </div>
         </div>
@@ -170,7 +143,7 @@
     var formatter = function(num) {
         var str = num.toString().replace("", ""),
             parts = false,
-            output = [],
+            output = [], 
             i = 13,
             formatted = null;
         if (str.indexOf(".") > 0) {
@@ -196,23 +169,27 @@
 
     function form_dinamic() {
         let index = $('#dynamic_field tr').length + 1
-        document.getElementById('counter').innerHTML = index
+        // document.getElementById('counter').innerHTML = index
         let template = `
                 <tr class="rowComponent">
                     <td hidden>
                         <input type="hidden" name="barang_id[${index}]" class="barang_id-${index}">
                     </td>
                     <td>
-                        <input  required type="text" name="no_kwitansi[${index}]"  class="form-control no_kwitansi-${index}" placeholder="Tulis Kwitansi">
+                        
+                        <select required name="account_name[]" id="${index}" class="form-control select-${index}"></select>
                     </td>
                     <td>
-                    <input  type="text" name="catatan[${index}]" required  class="form-control catatan-${index}" placeholder="Catatan">
+                         <input  type="number" name="debit[]"   class="form-control debit-${index}" placeholder="0" data-debit="${index}" onkeyup="hitung1(this), TotalAbout1(this)">
+                         <input  type="number" required name="total1[${index}]" disabled class="form-control total1-${index} total-form1"  placeholder="0">
                     </td>
                     <td>
-                         <input required type="number" id="rupiah" name="harga_beli[${index}]" class="form-control harga_beli-${index} waktu" placeholder="0"  data="${index}" onkeyup="hitung(this), TotalAbout(this)">
+                         <input  type="number" id="rupiah" name="credit[]" class="form-control credit-${index} waktu" placeholder="0"  data="${index}" onkeyup="hitung(this), TotalAbouts(this)">
+                         <input  type="number" required name="total[${index}]" disabled class="form-control totals-${index} total-forms"  placeholder="0">
                     </td>
                     <td>
-                        <input type="number" required name="total[${index}]" disabled class="form-control total-${index} total-form"  placeholder="0">
+                        <input type="text" name="memo[${index}]"  class="form-control memo-${index} total-form2"  placeholder="Memo">
+                       
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm" onclick="remove(this)">Delete</button>
@@ -222,9 +199,9 @@
         $('#dynamic_field').append(template)
 
         $(`.select-${index}`).select2({
-            placeholder: 'Select Product',
+            placeholder: 'Account Name',
             ajax: {
-                url: `/admin/where/product`,
+                url: `/finance/acc/name`,
                 processResults: function(data) {
                     console.log(data)
                     return {
@@ -248,7 +225,7 @@
     function hitung(e) {
         let harga = e.value
         let attr = $(e).attr('data')
-        let beli = $(`.harga_beli-${attr}`).val()
+        let beli = $(`.credit-${attr}`).val()
         console.log(beli);
         let total = parseInt(beli);
         console.log(total);
@@ -256,6 +233,7 @@
 
 
     }
+    
 
     function TotalAbout(e) {
         let sub_total = document.getElementById('sub_total')
@@ -268,6 +246,7 @@
         sub_total.value = total
         document.getElementById('grandtotal').value = total;
     }
+   
 
     function HowAboutIt(e) {
         let sub_total = document.getElementById('sub_total')

@@ -201,6 +201,8 @@ Route::middleware('auth')->group(function () {
             Route::resource('/setting', 'SettingController');
         });
 
+      
+
         Route::prefix('marketing')->name('marketing.')->namespace('Marketing')->group(function () {
             Route::get('/', function () {
                 return redirect()->route('dashboard');
@@ -292,6 +294,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/reinburst/pdf/{id}','ReinburstController@pdf')->name('reinburst.pdf');
 
             Route::resource('/jurnal', 'JurnalVoucherController');
+            Route::get('/acc/name', 'JurnalVoucherController@accName');
             
         });
 
