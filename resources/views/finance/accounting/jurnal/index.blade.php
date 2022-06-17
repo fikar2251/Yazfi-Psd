@@ -6,7 +6,7 @@
         <h1 class="page-title">Jurnal Voucher</h1>
     </div>
 </div>
-
+<x-alert></x-alert>
 <div class="row">
     <div class="col-md-12">
         <div class="card shadow" id="card">
@@ -31,7 +31,7 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="nomor_reinburst">No Voucher <span style="color: red">*</span></label>
+                                        <label for="nomor_reinburst">No Voucher </label>
                                         <input  type="text" name="no_voucher" value="{{$nourut}}" id="nomor_reinburst" class="form-control" readonly >
                                     </div>
                                 </li>
@@ -41,7 +41,7 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="nama">Name <span style="color: red">*</span></label>
+                                        <label for="nama">Name </label>
                                         <input type="text" value="{{ auth()->user()->name }}" class="form-control" readonly>
                                     </div>
                                     <div class="form-group">
@@ -54,7 +54,7 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                       <label for="tanggal">Tanggal <span style="color: red">*</span></label>
+                                       <label for="tanggal">Tanggal </label>
                                         <input type="date" name="date" id="date" class="form-control">
                                     </div>
                                 </li>
@@ -64,7 +64,7 @@
                             <ul class="list-unstyled">
                                 <li>
                                     <div class="form-group">
-                                        <label for="cabang">Description <span style="color: red">*</span></label>
+                                        <label for="cabang">Description </label>
                                        {{-- <select name="id_project" id="id_project" class="form-control" required>
                                             <option value="">-- Select Project --</option>
                                         </select> --}}
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                     {{-- <p class="text-info">*Mohon Untuk Input Dengan Benar dan Berurut : <span class="badge badge-primary" id="counter"></span></p> --}}
-                    <div class="row d-flex justify-content-end">
+                    {{-- <div class="row d-flex justify-content-end">
                         <div class="col-lg-3">
                             <h6>Total due</h6>
                             
@@ -122,11 +122,11 @@
                             
                                     <div class="form-group">
                                         <label>Total Credit</label>
-                                        <input type="text" id="sub_total" name="total" required readonly class="form-control">
+                                        <input type="text" id="sub_total" name="totals" required readonly class="form-control">
                                     </div>
                                
                         </div>
-                    </div>
+                    </div> --}}
                     
                     <div class=" float-right">
                         <button type="submit" class="btn btn-primary" id="submit">Submit</button>
@@ -180,12 +180,12 @@
                         <select required name="account_name[]" id="${index}" class="form-control select-${index}"></select>
                     </td>
                     <td>
-                         <input  type="number" name="debit[]"   class="form-control debit-${index}" placeholder="0" data-debit="${index}" onkeyup="hitung1(this), TotalAbout1(this)">
-                         <input  type="number" required name="total1[${index}]" disabled class="form-control total1-${index} total-form1"  placeholder="0">
+                         <input  type="number" name="debit[]"   class="form-control debit-${index} total-form" placeholder="0"  data-debit="${index}" onkeyup=" TotalAbout(this)">
+                         <input hidden type="number" required name="total1[${index}]" disabled class="form-control total1-${index} total-form1"  placeholder="0">
                     </td>
                     <td>
-                         <input  type="number" id="rupiah" name="credit[]" class="form-control credit-${index} waktu" placeholder="0"  data="${index}" onkeyup="hitung(this), TotalAbouts(this)">
-                         <input  type="number" required name="total[${index}]" disabled class="form-control totals-${index} total-forms"  placeholder="0">
+                         <input  type="number" id="rupiah" name="credit[]" class="form-control credit-${index} total-forms waktu" placeholder="0"   data="${index}" onkeyup=" TotalAbouts(this)">
+                         <input hidden type="number" required name="total[${index}]" disabled class="form-control totals-${index} total-form1"  placeholder="0">
                     </td>
                     <td>
                         <input type="text" name="memo[${index}]"  class="form-control memo-${index} total-form2"  placeholder="Memo">
@@ -236,9 +236,20 @@
     
 
     function TotalAbout(e) {
-        let sub_total = document.getElementById('sub_total')
+        let sub_total = document.getElementById('sub_total1')
         let total = 0;
         let coll = document.querySelectorAll('.total-form')
+        for (let i = 0; i < coll.length; i++) {
+            let ele = coll[i]
+            total += parseInt(ele.value)
+        }
+        sub_total.value = total
+        document.getElementById('grandtotal').value = total;
+    }
+    function TotalAbouts(e) {
+        let sub_total = document.getElementById('sub_total')
+        let total = 0;
+        let coll = document.querySelectorAll('.total-forms')
         for (let i = 0; i < coll.length; i++) {
             let ele = coll[i]
             total += parseInt(ele.value)

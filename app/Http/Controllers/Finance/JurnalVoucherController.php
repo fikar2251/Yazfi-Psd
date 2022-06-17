@@ -24,11 +24,14 @@ class JurnalVoucherController extends Controller
         $noawal = 0;
         $nourut = ($AWAL) . ($date) . 0 . ($noawal + 1);
         $end = substr($nourut, 11);
-        if ($end == 1) {
+        if ($end == 0) {
             return view('finance.accounting.jurnal.index', compact('nourut'));
-        }else{
-            return 'false';
-            return view('finance.accounting.jurnal.index');
+        }elseif($end != 0){
+            // return 'false';
+            $query = DB::table('transactions')->select('no_transaksi')->where('no_transaksi', 'like', '%JV%')->max('no_transaksi');
+            $last =  substr($query, 11);
+            $nourut = ($AWAL) . ($date) . 0 . ($last + 1);
+            return view('finance.accounting.jurnal.index', compact('nourut'));
         }
         // dd($end);
         // return max($end,0);
@@ -73,31 +76,52 @@ class JurnalVoucherController extends Controller
         // ]);
 
         $account = $request->input('account_name', []);
+
+        // $debit = DB::table('new_chart_of_account')->where('id', $account)->select('balance')->first();
+        // $credit = DB::table('new_chart_of_account')->where('id', $account)->select('balance')->first();
         
         $attr = [];
         $in = [];
         // dd($request->all());
         DB::beginTransaction();
+        $sum = 0;
         foreach ($account as $key => $no) {
-            $attr[] = [
-                'chart_id' => $request->account_name[$key],
-                'debit' => $request->debit[$key],
-                'credit' => $request->credit[$key],
-                'no_transaksi' => $request->no_voucher,
-                'month' => Carbon::now()->format('m'),
-                'year' => Carbon::now()->format('Y'),
-                'date' => Carbon::now()->format('d-m-Y'),
-                'time' => Carbon::now()->format('h:i:s'),
-                'last_balance' => 0,
-                'template_id' => 23,
-                'is_active' => 1,
-                'transaksi_id' => 0,
-            ];
-
-           
+            $debits = DB::table('new_chart_of_account')->where('id', $request->account_name[$key])->get();
+            foreach ($debits as $deb) {
+                # code...
+                $attr[] = [
+                    'chart_id' => $request->account_name[$key],
+                    'debit' => $request->debit[$key] ? $request->debit[$key] : '',
+                    'credit' => $request->credit[$key] ? $request->credit[$key] : '',
+                    'no_transaksi' => $request->no_voucher,
+                    'month' => Carbon::now()->format('m'),
+                    'year' => Carbon::now()->format('Y'),
+                    'date' => Carbon::now()->format('d-m-Y'),
+                    'time' => Carbon::now()->format('h:i:s'),
+                    'last_balance' => $request->debit[$key] != '' ? $deb->balance - $request->debit[$key] :  (
+                        $request->credit[$key] != '' ? $deb->balance + $request->credit[$key] : ''
+                    ),
+                    'template_id' => 25,
+                    'is_active' => 1,
+                    'transaksi_id' => 0,
+                ];
+                
+                if ($request->debit[$key] != '') {
+                    DB::table('new_chart_of_account')->where('id', $request->account_name[$key])->update([
+                        'balance' => $deb->balance - $request->debit[$key],
+                    ]);
+                }elseif ($request->credit[$key] != 0) {
+                    DB::table('new_chart_of_account')->where('id', $request->account_name[$key])->update([
+                        'balance' => $deb->balance + $request->credit[$key],
+                    ]);
+                }
+            } 
+            
+            
         }
-
         DB::table('transactions')->insert($attr);
+        
+        // return $attr;
 
         DB::commit();
 
