@@ -171,7 +171,7 @@ class JurnalVoucherController extends Controller
                     'transaksi_id' => 0,
                 ];
                
-                if ($request->debit[$key] != '') {
+                if ($request->debit[$key] != 0) {
                     if ($request->total == $request->totals) {
                         DB::table('new_chart_of_account')->where('id', $request->account_name[$key])->update([
                             'balance' => $deb->balance - $request->debit[$key],
