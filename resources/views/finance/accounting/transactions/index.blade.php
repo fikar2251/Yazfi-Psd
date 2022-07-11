@@ -5,7 +5,6 @@
             font-size: 12px;
             font-family: Helvetica;
         }
-
     </style>
 @endsection
 @section('content')
@@ -28,7 +27,7 @@
             <div class="card shadow">
                 <div class="card-body"> --}}
     <div class="table-responsive">
-        <form action="{{route('finance.balance')}}" method="POST" target="_blank    " >
+        <form action="{{ route('finance.balance') }}" method="POST" target="_blank    ">
             @csrf
             <div class="w-25 d-flex flex-row mb-3">
                 <select name="laporan" id="" class="form-control ">
@@ -260,44 +259,44 @@
 
                 //     },
 
-                    ajax: "/admin/ajax/ajax_transaction",
+                ajax: "/admin/ajax/ajax_transaction",
 
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            className: 'dt-body-center'
-                        },
-                        {
-                            data: 'sumber',
-                            name: 'sumber',
-                        },
-                        {
-                            data: 'tanggal',
-                            name: 'tanggal',
-                        },
-                        {
-                            data: 'deskripsi',
-                            name: 'deskripsi',
-                        },
-                        {
-                            data: 'debit',
-                            name: 'debit',
-                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
-                        },
-                        {
-                            data: 'credit',
-                            name: 'credit',
-                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
-                        },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        className: 'dt-body-center'
+                    },
+                    {
+                        data: 'sumber',
+                        name: 'sumber',
+                    },
+                    {
+                        data: 'tanggal',
+                        name: 'tanggal',
+                    },
+                    {
+                        data: 'deskripsi',
+                        name: 'deskripsi',
+                    },
+                    {
+                        data: 'debit',
+                        name: 'debit',
+                        render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                    },
+                    {
+                        data: 'credit',
+                        name: 'credit',
+                        render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                    },
 
-                        {
-                            data: 'saldo',
-                            name: 'saldo',
-                            render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
-                        },
+                    {
+                        data: 'saldo',
+                        name: 'saldo',
+                        render: $.fn.dataTable.render.number('.', '.', 0, 'Rp. ')
+                    },
 
-                      
-                    ]
+
+                ]
             });
         });
     </script>

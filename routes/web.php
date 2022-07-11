@@ -295,7 +295,7 @@ Route::middleware('auth')->group(function () {
 
             Route::resource('/jurnal', 'JurnalVoucherController');
             Route::get('/acc/name', 'JurnalVoucherController@accName');
-            
+            Route::get('/ajax/ajax_jurnal', 'JurnalVoucherController@ajax_jurnal');   
         });
 
         // Route Supervisor
