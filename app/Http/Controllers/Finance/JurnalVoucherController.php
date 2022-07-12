@@ -75,8 +75,8 @@ class JurnalVoucherController extends Controller
                 <input type="hidden" class="form-control" name="_method" value="DELETE">
                 <input type="hidden" class="form-control" name="_token" value="' . csrf_token() . '">
                
-                <button type="submit" class="btn btn-danger"><i
-                        class="fa fa-trash"></i>
+                <button onclick="return confirm(`Are you Sure`)" type="submit" class="btn btn-danger delete-form"><i
+                        class="fa fa-trash delete-form"></i>
                 </button>
             
                 </form>';
@@ -250,25 +250,31 @@ class JurnalVoucherController extends Controller
      */
     public function destroy($id)
     {
-        $test = DB::table('transactions')->where('transactions.id', $id)
+        $data = DB::table('transactions')->where('id', $id)->first();
+        $no = DB::table('transactions')->where('no_transaksi', $data->no_transaksi)->get();
+        
+        $test = DB::table('transactions')->where('no_transaksi', $data->no_transaksi)
             ->leftJoin('new_chart_of_account', 'new_chart_of_account.id', '=', 'transactions.chart_id')
-            ->first();
-            
-            if ($test->credit != '') {
-                DB::table('new_chart_of_account')->where('id', $test->chart_id)
+            ->get();
+        
+        foreach ($test as $key) {
+            # code...
+            if ($key->credit != '') {
+                DB::table('new_chart_of_account')->where('id', $key->chart_id)
                     ->update([
-                        'balance' => $test->balance - $test->credit,
+                        'balance' => $key->balance - $key->credit,
                     ]);
-            } elseif ($test->debit != '') {
-                DB::table('new_chart_of_account')->where('id', $test->chart_id)
+            } elseif ($key->debit != '') {
+                DB::table('new_chart_of_account')->where('id', $key->chart_id)
                     ->update([
-                        'balance' => $test->balance + $test->debit,
+                        'balance' => $key->balance + $key->debit,
                     ]);
             }
+        }
+
+        DB::table('transactions')->where('no_transaksi', $data->no_transaksi)->delete();
 
        
-        DB::table('transactions')->where('transaksi_id', $id)->delete();
-
         return redirect()->back();
     }
 }

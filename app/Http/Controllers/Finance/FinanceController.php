@@ -108,7 +108,7 @@ class FinanceController extends Controller
                 ->editColumn('action', function ($bayar) {
                     return
                     '<a href="' . route('finance.payment.delete', $bayar->id) . '">
-                    <button type="submit" class="btn btn-danger"><i
+                    <button onclick="return confirm(`Are you Sure`)" type="submit" class="btn btn-danger"><i
                             class="fa fa-trash"></i>
                     </button>
                     </a>';

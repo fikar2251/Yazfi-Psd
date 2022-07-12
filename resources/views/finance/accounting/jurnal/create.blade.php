@@ -180,11 +180,11 @@
                         <select required name="account_name[]" id="${index}" class="form-control select-${index}"></select>
                     </td>
                     <td>
-                         <input  type="number" name="debit[]"   class="form-control debit-${index} total-form" value="0"  data-debit="${index}" onkeyup=" TotalAbout(this)">
+                         <input  type="number" name="debit[]" id="debit"  class="form-control debit-${index} total-form" placeholder="0"  data-debit="${index}" onkeyup=" TotalAbout(this)">
                          <input hidden type="number" required name="total1[${index}]" disabled class="form-control total1-${index} total-form1"  >
                     </td>
                     <td>
-                         <input  type="number" id="rupiah" name="credit[]" class="form-control credit-${index} total-forms waktu" value="0"   data="${index}" onkeyup=" TotalAbouts(this)">
+                         <input  type="number" id="rupiah" name="credit[]" class="form-control credit-${index} total-forms waktu" placeholder="0"   data="${index}" onkeyup=" TotalAbouts(this)">
                          <input hidden type="number" required name="total[${index}]" disabled class="form-control totals-${index} total-form1"  >
                     </td>
                     <td>
@@ -239,12 +239,15 @@
         let sub_total = document.getElementById('sub_total1')
         let total = 0;
         let coll = document.querySelectorAll('.total-form')
-        for (let i = 0; i < coll.length; i++) {
-            let ele = coll[i]
-            total += parseInt(ele.value)
-        }
-        sub_total.value = total
-        document.getElementById('grandtotal').value = total;
+            for (let i = 0; i < coll.length; i++) {
+                    
+                    let ele = coll[i]
+                    let num = parseInt(ele.value)
+                    if (isNaN(num)) num = 0
+                    total += num
+            }
+            sub_total.value = total
+            document.getElementById('grandtotal').value = total;
     }
     function TotalAbouts(e) {
         let sub_total = document.getElementById('sub_total')
@@ -252,7 +255,9 @@
         let coll = document.querySelectorAll('.total-forms')
         for (let i = 0; i < coll.length; i++) {
             let ele = coll[i]
-            total += parseInt(ele.value)
+            let num = parseInt(ele.value)
+                    if (isNaN(num)) num = 0
+                    total += num
         }
         sub_total.value = total
         document.getElementById('grandtotal').value = total;

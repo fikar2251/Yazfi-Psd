@@ -15,7 +15,7 @@
         <div class="col-sm-8 text-right m-b-20">
             {{-- <a href="{{ route('finance.chart.create') }}" class="btn btn btn-primary btn-rounded float-right"><i
                     class="fa fa-plus"></i> Add chart of account</a> --}}
-            <a href="/finance/jurnal/create" class="btn btn-primary btn-rounded float-right" >
+            <a href="/finance/jurnal/create" class="btn btn-primary btn-rounded float-right">
                 <i class="fa fa-plus"></i>
                 Add jurnal voucher
             </a>
@@ -26,7 +26,7 @@
         <div class="col-md-12">
             <div class="card shadow" id="card">
                 <div class="card-body">
-                    <div class="row custom-invoice">
+                    {{-- <div class="row custom-invoice">
                         <div class="col-sm-6 col-sg-4 m-b-4">
                             <div class="dashboard-logo">
                                 <img src="{{ url('/img/logo/yazfi.png ') }}" alt="Image" />
@@ -37,7 +37,7 @@
                                 <h3 class="text-uppercase"></h3>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <table class="table table-bordered custom-table table-striped" id="jurnal" style="width: 100%">
                         <thead>
                             <tr>
@@ -79,6 +79,7 @@
         type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"
         type="text/javascript"></script>
+    
     <script>
         $(document).ready(function() {
             $.noConflict();
