@@ -49,6 +49,7 @@
                                     <th>Diajukan</th>
                                     <th>Status</th>
                                     <th>Tanggal Pembayaran</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -330,6 +331,10 @@
                         {
                             data: 'tanggal_pembayaran',
                             name: 'tanggal_pembayaran',
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
                         },
                     ]
                 });

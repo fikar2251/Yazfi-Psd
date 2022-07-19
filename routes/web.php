@@ -256,6 +256,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/komisi/daftar', 'FinanceController@listKomisi')->name('list.komisi');
             Route::get('/komisi/json', 'FinanceController@komisiJson')->name('json.komisi');
             Route::post('/komisi/daftar/store', 'FinanceController@storeKomisi')->name('store.list.komisi');
+            Route::get('/komisi/delete/{id}', 'FinanceController@deleteKomisi')->name('komisi.delete');
 
             //Route Tukar Faktur
             Route::get('/tukar', 'FinanceController@tukarFaktur')->name('tukar');
